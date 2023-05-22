@@ -45,7 +45,10 @@ export default function Home() {
                             </span>
                         </div>
                     </div>
-                    <a href="#" className="text-base text-white text-right font-roboto leading-normal hover:underline mb-6">Forget Password ?</a>
+                    <div className="flex flex-wrap justify-between">
+                        <a href="registration" className="text-base text-white text-left font-roboto leading-normal hover:underline mb-6">Register</a>
+                        <a href="#" className="text-base text-white text-right font-roboto leading-normal hover:underline mb-6 self-end">Forget Password?</a>
+                    </div>
                     <a
                         href="/"
                         className="bg-blue-400 py-4 text-center px-17 md:px-12 md:py-4 text-white rounded leading-tight text-xl md:text-base font-sans mt-4 mb-20"

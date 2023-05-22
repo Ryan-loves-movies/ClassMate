@@ -1,30 +1,39 @@
 {
-  "name": "classmate",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "start": "node express.js",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@types/node": "20.2.1",
-    "@types/react": "18.2.6",
-    "@types/react-dom": "18.2.4",
-    "autoprefixer": "10.4.14",
-    "bootstrap": "^5.2.3",
-    "bootstrap-icons": "^1.10.5",
-    "eslint": "8.41.0",
-    "eslint-config-next": "13.4.3",
-    "express": "^4.18.2",
-    "mysql": "^2.18.1",
-    "next": "13.4.3",
-    "postcss": "8.4.23",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
-  }
+    "name": "classmate",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "start": "concurrently \"npm run dev\" \"npm run express\"",
+        "express": "node express.js",
+        "dev": "next dev",
+        "build": "next build",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "@types/node": "20.2.1",
+        "@types/react": "18.2.6",
+        "@types/react-dom": "18.2.4",
+        "autoprefixer": "10.4.14",
+        "bootstrap": "^5.2.3",
+        "bootstrap-icons": "^1.10.5",
+        "eslint": "8.41.0",
+        "eslint-config-next": "13.4.3",
+        "express": "^4.18.2",
+        "mysql": "^2.18.1",
+        "next": "13.4.3",
+        "nodemon": "^2.0.22",
+        "postcss": "8.4.23",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "tailwindcss": "3.3.2",
+        "typescript": "5.0.4"
+    },
+    "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+    "main": "express.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.0.1"
+    }
 }
