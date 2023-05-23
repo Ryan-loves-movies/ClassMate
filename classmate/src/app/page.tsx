@@ -1,7 +1,7 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-icons/font/bootstrap-icons.css'
-// import "react-fontawesome";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import LoginField from '@/components/LoginField';
 
 export default function Home() {
     return (
@@ -11,40 +11,8 @@ export default function Home() {
             <div className="flex-col flex ml-auto mr-auto items-center w-full lg:w-2/3 md:w-3/5 top">
                 <h1 className="font-bold text-10xl my-10 text-white"> Login </h1>
                 <form action="" className="mt-2 flex flex-col lg:w-1/2 w-8/12">
-                    <div className="flex flex-wrap items-stretch w-full mb-4 relative h-15 bg-white items-center rounded mb-6 pr-10">
-                        <div className="flex -mr-px justify-center w-15 p-4">
-                            <span className="flex items-center leading-normal bg-white px-3 border-0 rounded rounded-r-none text-2xl text-gray-600">
-                                <i className="bi bi-person-circle" />
-                            </span>
-                        </div>
-                        <input
-                            type="text"
-                            className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border-0 h-10 border-grey-light rounded rounded-l-none px-3 self-center relative  font-roboto text-xl outline-none"
-                            placeholder="Username"
-                        />
-                    </div>
-                    <div className="flex flex-wrap items-stretch w-full relative h-15 bg-white items-center rounded mb-4">
-                        <div className="flex -mr-px justify-center w-15 p-4">
-                            <span
-                                className="flex items-center leading-normal bg-white rounded rounded-r-none text-xl px-3 whitespace-no-wrap text-gray-600"
-                            >
-                                <i className="bi bi-key" />
-                            </span
-                            >
-                        </div>
-                        <input
-                            type="password"
-                            className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border-0 h-10 px-3 relative self-center font-roboto text-xl outline-none"
-                            placeholder="Password"
-                        />
-                        <div className="flex -mr-px">
-                            <span
-                                className="flex items-center leading-normal bg-white rounded rounded-l-none border-0 px-3 whitespace-no-wrap text-gray-600"
-                            >
-                                <i className="bi bi-eye-slash-fill"></i>
-                            </span>
-                        </div>
-                    </div>
+                    <LoginField type="text" placeholder="Username" name="username" leftIcon="bi bi-person-circle" rightIcon="" />
+                    <LoginField type="password" placeholder="Password" name="password" leftIcon="bi bi-key" rightIcon="bi bi-eye-slash-fill" />
                     <div className="flex flex-wrap justify-between">
                         <a href="registration" className="text-base text-white text-left font-roboto leading-normal hover:underline mb-6">Register</a>
                         <a href="#" className="text-base text-white text-right font-roboto leading-normal hover:underline mb-6 self-end">Forget Password?</a>
