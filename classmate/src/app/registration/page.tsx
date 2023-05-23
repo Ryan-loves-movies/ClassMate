@@ -27,9 +27,9 @@ export default function Home() {
             <img src="/timetable.jpg" className="background" />
             <img src="/nusmods.png" className="flex-col flex ml-auto mr-auto items-center top" />
             <div className="flex-col flex ml-auto mr-auto items-center w-full lg:w-2/3 md:w-3/5 top">
-                <h1 className="font-bold text-10xl my-10 text-white"> Login </h1>
+                <h1 className="font-bold text-10xl my-10 text-white"> Sign up! </h1>
                 <form name="register" action="localhost:8000/users" method="POST" onSubmit={register} className="mt-2 flex flex-col lg:w-1/2 w-8/12">
-                    <LoginField type="text" placeholder="Email" name="email" leftIcon="bi bi-person-circle" rightIcon="" />
+                    <LoginField type="text" placeholder="Email" name="email" leftIcon="bi bi-envelope" rightIcon="" />
                     <LoginField type="text" placeholder="Username" name="username" leftIcon="bi bi-person-circle" rightIcon="" />
                     <LoginField type="password" placeholder="Password" name="password" leftIcon="bi bi-key" rightIcon="bi bi-eye-slash-fill" />
                     <LoginField type="password" placeholder="Confirm Password" name="confirmPassword" leftIcon="bi bi-key" rightIcon="bi bi-eye-slash-fill" />
