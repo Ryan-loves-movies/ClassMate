@@ -1,5 +1,5 @@
-const express = require('express');
-const mysql = require('mysql');
+import express from 'express';
+import { createConnection } from 'mysql';
 
 const app = express();
 const port = 8000;
@@ -8,7 +8,7 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-const connection = mysql.createConnection({
+const connection = createConnection({
     host: '127.0.0.1',
     // host: '192.168.92.115',
     port: '3306',
@@ -50,7 +50,7 @@ app.post('/login', (req, res) => {
             res.status(401).json({ error: 'Invalid username or password' });
             return;
         }
-        res.status(200).json( {message: 'Login successful'} );
+        res.status(200).json( );
     })
 })
 app.post('/register', (req, res) => {
