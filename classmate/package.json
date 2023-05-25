@@ -20,11 +20,12 @@
         "eslint": "8.41.0",
         "eslint-config-next": "13.4.3",
         "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.0",
         "mysql": "^2.18.1",
         "next": "13.4.3",
         "nodemon": "^2.0.22",
         "postcss": "8.4.23",
-        "react": "18.2.0",
+        "react": "^18.2.0",
         "react-dom": "18.2.0",
         "sequelize": "^6.31.1",
         "tailwindcss": "3.3.2",
@@ -36,6 +37,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.2",
         "concurrently": "^8.0.1"
     }
 }
