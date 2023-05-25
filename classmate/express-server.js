@@ -9,7 +9,8 @@ app.listen(port, () => {
 });
 
 const connection = mysql.createConnection({
-    host: '192.168.92.115',
+    host: '127.0.0.1',
+    // host: '192.168.92.115',
     port: '3306',
     user: 'rtyt',
     password: 'Classmate123!',
@@ -37,7 +38,22 @@ app.get('/users', (req, res) => {
 });
 
 // Route for New users
-app.post('/users', (req, res) => {
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    connection.query(`SELECT password FROM users WHERE username = '${username}'`, (err, result) => {
+        if (err) {
+            console.error('User does not exist', err);
+            res.status(500).json({ error: 'User does not exist' });
+            return;
+        } else if (!(result === password)) {
+            res.status(401).json({ error: 'Invalid username or password' });
+            return;
+        }
+        res.status(200).json( {message: 'Login successful'} );
+    })
+})
+app.post('/register', (req, res) => {
   // Extract the required data from the request body
   const { username, email, password } = req.body;
 
