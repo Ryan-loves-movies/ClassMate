@@ -38,6 +38,7 @@
     "license": "ISC",
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.2",
+        "@types/sequelize": "^4.28.15",
         "concurrently": "^8.0.1"
     }
 }
