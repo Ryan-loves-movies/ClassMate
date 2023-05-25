@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -40,8 +41,6 @@ export default function Home() {
         });
     };
 
-    const Login = () => {
-        const [isAuthenticated, setIsAuthenticated] = useState(false);
 
         return (
             <main>
@@ -67,6 +66,5 @@ export default function Home() {
                 </div>
             </main>
         );
-    } 
-    }
+}
 }
