@@ -31,7 +31,7 @@ export default function Home() {
                 // ?? is the nullish coalescing operator
                 // ?? will return value of Authorization header if not null, and return empty string if null or undefined 
                 const token = response.headers.get("Authorization") ?? "";
-                localStorage.setItem("token", token);
+                sessionStorage.setItem("token", token);
             } else {
                 alert("Invalid username or password");
             }
