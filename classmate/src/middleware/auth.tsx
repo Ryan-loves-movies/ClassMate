@@ -1,7 +1,7 @@
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
 import config from '@/config';
-import { Request, Response } from 'express';
 import { NextFunction } from 'express';
 
 declare module 'express' {
