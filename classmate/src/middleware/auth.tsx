@@ -6,7 +6,7 @@ import { NextFunction } from 'express';
 
 declare module 'express' {
   interface Request {
-    headers: any;
+    headers: { authorisation: string };
     user: any;
   }
   interface Response {
@@ -16,12 +16,12 @@ declare module 'express' {
 
 interface Config {
   JWT_SECRET: string;
-  // Other properties...
 }
 
 
 export default function authenticateToken(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.get('authorization');
+  const token = req.headers.authorisation;
+
 
   if (!token || !token.trim()) {
     return res.status(401).json({ message: 'Unauthorized' });
