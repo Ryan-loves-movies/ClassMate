@@ -5,6 +5,7 @@ type loginProps = {
     leftIcon: string;
     rightIcon: string;
 };
+
 export default function LoginField({ type, placeholder, name, leftIcon, rightIcon="" }: loginProps) {
     if (rightIcon === "") {
         return (
