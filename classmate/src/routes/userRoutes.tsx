@@ -1,15 +1,17 @@
 import express from 'express';
-const router = express.Router();
 // import createUser from '@/database/controllers/userController';
+import controller from '@/database/controllers/userController';
 // import { createUser, logIn, logOut, getProfile, updateProfile, resetPassword, verifyEmail, deleteUser } from '@/database/controllers/userController';
 
-// router.post('/register', createUser);
-// router.post('/login', logIn);
-// router.post('/logout', logOut);
-// router.get('/profile', getProfile);
-// router.put('/profile', updateProfile);
-// router.post('/reset-password', resetPassword);
-// router.get('/verify-email/:token', verifyEmail);
-// router.delete('/delete-profile', deleteUser);
+const expressRouter = express.Router();
 
-module.exports = router;
+expressRouter.post('/register', controller.createUser);
+// expressRouter.post('/login', logIn);
+// expressRouter.post('/logout', logOut);
+// expressRouter.get('/profile', getProfile);
+// expressRouter.put('/profile', updateProfile);
+// expressRouter.post('/reset-password', resetPassword);
+// expressRouter.get('/verify-email/:token', verifyEmail);
+// expressRouter.delete('/delete-profile', deleteUser);
+
+export default expressRouter;

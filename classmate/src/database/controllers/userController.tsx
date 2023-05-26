@@ -1,3 +1,4 @@
+import config from '@/config';
 // User for connection with mySQL and { Request, Response } with express api
 import User from '@/database/models/user';
 import { Request, Response } from 'express';
@@ -20,38 +21,28 @@ interface authenticatedUser {
     token: string;
 }
 
-declare module 'express' {
-    interface Request {
-        headers: { authorisation: string };
-        body: any;
-    }
-    interface Response {
-        status: any;
-        json: any;
-    }
-}
 
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
 
 function validateRequest(req: Request, res: Response) {
-    const token = req.headers.authorisation?.split(' ')[1];
+    const token = (req.headers.authorisation as string)?.split(' ')[1];
     if (!token) {
         return res.status(401).json({ message: 'No token provided' });
     }
-    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
-            if (err) {
-                    return res.
-                }
-        })
+    try {
+        return jwt.verify(token, config.JWT_SECRET);
+    } catch (err) {
+        return res.json(401).json({ message: 'invalid token' });
+    }
 }
 
-async function createUser(req: Request, res: Response) {
+const createUser = (req: Request, res: Response) => {
     const { email, username, password }: profile = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        await User.create({ username, email, hashedPassword });
+        const hashedPassword = bcrypt.hash(password, saltRounds);
+        User.create({ username, email, hashedPassword });
         res.status(201).json({ message: 'User created successfully!' });
     } catch (err) {
         console.error(err);
@@ -95,8 +86,20 @@ async function logOut(req: Request, res: Response) {
 
 async function getProfile(req: Request, res: Response) {
     try {
-        const { username, token }: authenticatedUser = req.body;
-        if 
+        const { username }: authenticatedUser = req.body;
+        validateRequest(req, res);
+        User.findOne({
+            where: {
+                username: username
+            }
+        }).then((user) => {
+            if (!user) {
+                return res.status(404).json({ message: 'No existing user found' });
+            }
+            return res.status(200).json(user);
+        });
+    } catch (err) {
+        throw err;
     }
 }
 
