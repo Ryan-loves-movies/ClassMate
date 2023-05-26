@@ -10,12 +10,13 @@
     - userController.tsx
         - createUser [done]
         - logIn [done]
+            - Still need to generate the JWT token
         - logOut [done]
         - getProfile [done]
-        - updateProfile [in progress]
+        - updateProfile [done]
         - resetPassword [for milestone 2]
         - verifyEmail [for milestone 2]
-        - deleteUser [in progress]
+        - deleteUser [done]
     - middleware/auth.tsx
         - authenticateToken [looks done?]
     - routes/authenticateUser.tsx
