@@ -6,7 +6,7 @@ import { NextFunction } from 'express';
 
 
 export default function authenticateToken(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorisation;
+    const token = req.headers.authorization;
 
     if (!token || !(token as string).trim()) {
         return res.status(401).json({ message: 'Unauthorized' });
