@@ -4,7 +4,6 @@ import { JwtPayload } from 'jsonwebtoken';
 import config from '@/config';
 import { NextFunction } from 'express';
 
-
 export default function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization;
 
