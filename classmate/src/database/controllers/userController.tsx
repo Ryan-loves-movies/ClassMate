@@ -1,6 +1,6 @@
-import config from '@/config';
 // User for connection with mySQL and { Request, Response } with express api
 import User from '@/database/models/user';
+import config from '@/config';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -104,18 +104,66 @@ async function getProfile(req: Request, res: Response) {
 }
 
 async function updateProfile(req: Request, res: Response) {
-
+    try {
+        validateRequest(req, res);
+        return await User.update(req.body, {
+            where: {
+                username: req.body.get('username')
+            }
+        }).then((rowsUpdated) => {
+            console.log(`Updated ${rowsUpdated} rows.`);
+        })
+            .catch((error) => {
+                console.error('Error updating row:', error);
+            });
+    } catch (err) {
+        throw err;
+    }
 }
 
 async function resetPassword(req: Request, res: Response) {
-
+    // Do user authentication first
+    // Update password after
+    try {
+        validateRequest(req, res);
+        return await User.update(req.body, {
+            where: {
+                password: req.body.get('password')
+            }
+        }).then((rowsUpdated) => {
+            console.log(`Updated ${rowsUpdated} rows.`);
+        }).catch((error) => {
+            console.error('Error updating row:', error);
+        });
+    } catch (err) {
+        throw err;
+    }
 }
 
 async function verifyEmail(req: Request, res: Response) {
-
+    try {
+        validateRequest(req, res);
+        return res.json({ message: 'Email verified???????' });
+    } catch (err) {
+        throw err;
+    }
 }
 
 async function deleteUser(req: Request, res: Response) {
+    try {
+        validateRequest(req, res);
+        return await User.destroy({
+            where: {
+                username: req.body.get('username')
+            }
+        }).then((rowsDeleted) => {
+            console.log(`Deleted ${rowsDeleted} rows.`);
+        }).catch((error) => {
+            console.error('Error deleting row:', error);
+        });
+    } catch (err) {
+        throw err;
+    }
 
 }
 
