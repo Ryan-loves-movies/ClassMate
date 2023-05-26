@@ -1,7 +1,7 @@
 import validateToken from '@/middleware/auth';
-import app from "next";
+// import app from "next";
 
-app.use("/classmate", validateToken);
+// app.use("/classmate", validateToken);
 const express = require('express');
 const next = require('next');
 const { createProxyMiddleware } = require('http-proxy-middleware');
@@ -17,27 +17,27 @@ const server = express();
 // server.use('/protected', verifyJwt);
 
 // Example route
-server.get('/api/test', (req, res) => {
-  res.json({ message: 'API test route' });
+server.get('/api/test', (req: Request, res: Response) => {
+    res.json();
 });
 
 // Proxy requests to Next.js app
 const apiProxy = createProxyMiddleware('/api', {
-  target: 'http://localhost:3000', // Replace with your Express server URL
-  changeOrigin: true,
+    target: 'http://localhost:3000', // Replace with your Express server URL
+    changeOrigin: true,
 });
 
 server.use(apiProxy);
 
 // Handle Next.js requests
-app.prepare().then(() => {
-  server.get('*', (req, res) => {
-    return handle(req, res);
-  });
+// app.prepare().then(() => {
+//   server.get('*', (req, res) => {
+//     return handle(req, res);
+//   });
 
-  server.listen(3000, (err) => {
-    if (err) throw err;
-    console.log('> Ready on http://localhost:3000');
-  });
-});
+//   server.listen(3000, (err) => {
+//     if (err) throw err;
+//     console.log('> Ready on http://localhost:3000');
+//   });
+// });
 

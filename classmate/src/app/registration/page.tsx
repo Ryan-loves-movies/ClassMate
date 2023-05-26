@@ -8,18 +8,18 @@ import LoginField from "@/components/LoginField";
 export default function Home() {
     const register = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const { username, password, confirmPassword, email } = document.forms["register"];
-        const regUsername = /^[a-z][^\W_]{7,14}$/i;
-        const regPassword = /^(?=[^a-z]*[a-z])(?=\D*\d)[^:&.~\s]{5,20}$/;
-        const regEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-        if (!(
-            regUsername.test(username) &&
-            regPassword.test(password) && 
-            regEmail.test(email) &&
-            password === confirmPassword)) {
-            alert("Problems!");
-            return false;
-        }
+    //     const { username, password, confirmPassword, email } = document.forms["register"];
+    //     const regUsername = /^[a-z][^\W_]{7,14}$/i;
+    //     const regPassword = /^(?=[^a-z]*[a-z])(?=\D*\d)[^:&.~\s]{5,20}$/;
+    //     const regEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    //     if (!(
+    //         regUsername.test(username) &&
+    //         regPassword.test(password) && 
+    //         regEmail.test(email) &&
+    //         password === confirmPassword)) {
+    //         alert("Problems!");
+    //         return false;
+    //     }
         return true;
     }
     return (
