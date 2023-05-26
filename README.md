@@ -5,3 +5,16 @@
 - Registration Page
 <img width="1710" alt="Screenshot 2023-05-23 at 12 59 43 PM" src="https://github.com/Ryan-loves-movies/ClassMate/assets/61112961/1c38b293-8a46-43f6-8773-e118a6ac4661">
 - Backend for user authentication
+     - userController.tsx
+        - createUser
+        - logIn
+        - logOut
+        - getProfile
+        - updateProfile
+        - resetPassword
+        - verifyEmail
+        - deleteUser
+    - middleware/auth.tsx
+        - authenticateToken
+    - routes/authenticateUser.tsx
+        - Figure out how to add to the route - prob new library needed to connect more api calls together (connect pages to express-server.js api calls)
