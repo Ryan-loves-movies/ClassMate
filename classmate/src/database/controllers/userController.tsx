@@ -31,11 +31,14 @@ function validateRequest(req: Request, res: Response) {
     if (!token) {
         return res.status(401).json({ message: 'No token provided' });
     }
-    try {
-        return jwt.verify(token, config.JWT_SECRET);
-    } catch (err) {
-        return res.json(401).json({ message: 'invalid token' });
-    }
+    return jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ message: 'invalid token' });
+        }
+        if (decoded) {
+            return res.status(200).json({ message: 'Token validated!' });
+        }
+    });
 }
 
 const createUser = (req: Request, res: Response) => {
@@ -50,6 +53,7 @@ const createUser = (req: Request, res: Response) => {
         res.status(500).json({ message: 'Server Error' });
     }
 }
+
 async function logIn(req: Request, res: Response) {
     const { username, password }: minProfile = req.body;
     try {
@@ -66,10 +70,10 @@ async function logIn(req: Request, res: Response) {
                     throw err;
                 }
                 if (authenticated) {
+                    const token = jwt.sign(req.body, config.JWT_SECRET, { expiresIn: '1d' })
                     return res.status(200).json({
                         message: 'User authenticated',
-                        // ADD JWT TOKEN HERE
-                        token: 'sadasd'
+                        token: token
                     });
                 } else {
                     return res.status(401).json({ message: 'Wrong password or something wrong with server!' });
@@ -82,7 +86,7 @@ async function logIn(req: Request, res: Response) {
 }
 
 async function logOut(req: Request, res: Response) {
-    // Clear JWT token on client-side OR invalidate token on server-side
+    // Clear JWT token on client-side AND invalidate token on server-side
     res.status(200).json({ message: 'Logout successful!' });
 }
 
