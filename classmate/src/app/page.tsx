@@ -1,11 +1,11 @@
 'use client'
 import React from 'react';
+import { FieldValues, useForm } from 'react-hook-form';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import LoginField from '@/components/LoginField';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { regPassword, regUsername } from '@/utils/validation';
-import { useForm } from 'react-hook-form';
+import LoginField from '@/components/LoginField';
 import Error from '@/components/Error';
 
 export default function Home() {
@@ -15,31 +15,24 @@ export default function Home() {
         formState: { errors },
     } = useForm();
 
-    const handleLogin = (event: React.MouseEvent<HTMLInputElement>) => {
-        if (event.target) {
-            const username = (event.target as HTMLFormElement).username;
-            const password = (event.target as HTMLFormElement).password;
-
-            return axios.post("http://localhost:8000/login", {
-                username: username,
-                password: password
+    const handleReg = async (data: FieldValues) => {
+        const { username, password } = data;
+        return axios.post("http://localhost:8000/login", {
+            username: username,
+            password: password
+        })
+            .then((res: AxiosResponse) => {
+                if (res.status === 200) {
+                    sessionStorage.setItem("token", res.data.get("token"));
+                    window.location.href = '/authorized/dashboard';
+                } else {
+                    alert("Invalid username or password");
+                }
             })
-                .then((res: AxiosResponse) => {
-                    if (res.status === 200) {
-                        sessionStorage.setItem("token", res.data.get("token"));
-                        window.location.href = '/authorized/dashboard';
-                    } else {
-                        alert("Invalid username or password");
-                    }
-                })
-                .catch((err: AxiosError) => {
-
-                    console.error(err)
-                });
-        };
-    };
-
-    const handleReg = (data: Object) => console.log(data);
+            .catch((err: AxiosError) => {
+                console.error(err)
+            });
+    }
 
     return (
         <main>
@@ -82,7 +75,6 @@ export default function Home() {
                         type="submit"
                         className="bg-blue-400 py-4 text-center px-17 md:px-12 md:py-4 text-white rounded leading-tight text-xl md:text-base font-sans mt-4 mb-20"
                         value="Login"
-                        onClick={handleLogin}
                     />
                 </form>
             </div>

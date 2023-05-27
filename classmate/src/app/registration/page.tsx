@@ -1,12 +1,12 @@
 'use client'
-import React, { FormEvent } from "react";
+import React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import axios, { AxiosResponse, AxiosError } from "axios";
 import LoginField from "@/components/LoginField";
 import Error from "@/components/Error";
 import { regEmail, regPassword, regUsername } from "@/utils/validation";
-import { document } from "postcss";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 
 export default function Home() {
     const {
@@ -15,11 +15,25 @@ export default function Home() {
         formState: { errors },
     } = useForm();
 
-    const submitRegistration = (event: React.MouseEvent<HTMLInputElement>) => {
-        return true;
+    const handleReg = async (data: FieldValues) => {
+        const { email, username, password } = data;
+        return axios.post("http://localhost:8000/register", {
+            email: email,
+            username: username,
+            password: password
+        })
+            .then((res: AxiosResponse) => {
+                if (res.status === 201) {
+                    // should show pop-up window for a few seconds that redirect to login page
+                    window.location.href = '/';
+                } else {
+                    alert("User already exists!");
+                }
+            })
+            .catch((err: AxiosError) => {
+                console.error(err)
+            });
     }
-
-    const handleReg = (data: Object) => console.log(data);
 
     return (
         <main>
@@ -84,7 +98,6 @@ export default function Home() {
                         type="submit"
                         className="bg-blue-400 py-4 text-center px-17 md:px-12 md:py-4 text-white rounded leading-tight text-xl md:text-base font-sans mt-4 mb-20"
                         value="Register"
-                        onClick={submitRegistration}
                     />
                 </form>
             </div>
