@@ -4,6 +4,7 @@ import config from '@/config';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Model } from 'sequelize';
 
 interface profile {
     email: string;
@@ -56,7 +57,7 @@ async function logIn(req: Request, res: Response) {
             where: {
                 username: username
             }
-        }).then((user) => {
+        }).then((user: Model) => {
             if (!user) {
                 return res.status(404).json({ message: 'No existing user found' });
             }
@@ -79,6 +80,7 @@ async function logIn(req: Request, res: Response) {
         console.error(err);
     }
 }
+
 async function logOut(req: Request, res: Response) {
     // Clear JWT token on client-side OR invalidate token on server-side
     res.status(200).json({ message: 'Logout successful!' });
@@ -92,7 +94,7 @@ async function getProfile(req: Request, res: Response) {
             where: {
                 username: username
             }
-        }).then((user) => {
+        }).then((user: Model) => {
             if (!user) {
                 return res.status(404).json({ message: 'No existing user found' });
             }
@@ -110,10 +112,10 @@ async function updateProfile(req: Request, res: Response) {
             where: {
                 username: req.body.get('username')
             }
-        }).then((rowsUpdated) => {
+        }).then((rowsUpdated: number) => {
             console.log(`Updated ${rowsUpdated} rows.`);
         })
-            .catch((error) => {
+            .catch((error: Error) => {
                 console.error('Error updating row:', error);
             });
     } catch (err) {
@@ -130,9 +132,9 @@ async function resetPassword(req: Request, res: Response) {
             where: {
                 password: req.body.get('password')
             }
-        }).then((rowsUpdated) => {
+        }).then((rowsUpdated: number) => {
             console.log(`Updated ${rowsUpdated} rows.`);
-        }).catch((error) => {
+        }).catch((error: Error) => {
             console.error('Error updating row:', error);
         });
     } catch (err) {
@@ -156,9 +158,9 @@ async function deleteUser(req: Request, res: Response) {
             where: {
                 username: req.body.get('username')
             }
-        }).then((rowsDeleted) => {
+        }).then((rowsDeleted: number) => {
             console.log(`Deleted ${rowsDeleted} rows.`);
-        }).catch((error) => {
+        }).catch((error: Error) => {
             console.error('Error deleting row:', error);
         });
     } catch (err) {
