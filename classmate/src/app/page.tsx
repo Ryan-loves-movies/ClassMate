@@ -55,8 +55,8 @@ export default function Home() {
                             placeholder='Username'
                             // name input is specified in register block
                             {...register('username', {
-                                required: { value: true, message: `$(name) Required` },
-                                pattern: { value: regUsername, message: 'Invalid $(name)' },
+                                required: { value: true, message: `Username required` },
+                                pattern: { value: regUsername, message: `Invalid username` },
                             })}
                         />
                         <div>{errors.username && <Error message={errors.username.message as string} />}</div>
@@ -68,8 +68,8 @@ export default function Home() {
                             placeholder='Password'
                             // name input is specified in register block
                             {...register('password', {
-                                required: { value: true, message: `$(name) Required` },
-                                pattern: { value: regPassword, message: 'Invalid $(name)' },
+                                required: { value: true, message: `Password required` },
+                                pattern: { value: regPassword, message: `Invalid password` },
                             })}
                         />
                         <div>{errors.password && <Error message={errors.password.message as string} />}</div>
