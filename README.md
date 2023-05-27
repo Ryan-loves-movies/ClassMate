@@ -17,7 +17,7 @@
         - resetPassword [for milestone 2]
         - verifyEmail [for milestone 2]
         - deleteUser [done]
-    - middleware/auth.tsx
-        - authenticateToken [looks done?]
-    - routes/authenticateUser.tsx
-        - Figure out how to add to the route - prob new library needed to connect more api calls together (connect pages to express-server.js api calls) [in progress]
+    - page.tsx 
+        -  to implement logIn function
+    - registration/page.tsx
+        - to implement registration function
