@@ -45,5 +45,5 @@ export default function AuthenticationComponent({ children }: childrenElems): Re
     }
 
     // Render the children components if the user is authenticated
-    return children;
+    return <>{children}</>;
 };
