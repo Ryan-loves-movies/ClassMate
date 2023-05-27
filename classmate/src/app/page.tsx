@@ -1,29 +1,24 @@
 'use client'
-import React, { useState } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import LoginField from '@/components/LoginField';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { regPassword, regUsername } from '@/utils/validation';
+import { useForm } from 'react-hook-form';
+import Error from '@/components/Error';
 
 export default function Home() {
-
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
 
     const handleLogin = (event: React.MouseEvent<HTMLInputElement>) => {
         if (event.target) {
             const username = (event.target as HTMLFormElement).username;
             const password = (event.target as HTMLFormElement).password;
-
-            // const requestOptions = {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //         username,
-            //         password,
-            //     }),
-            // };
 
             return axios.post("http://localhost:8000/login", {
                 username: username,
@@ -41,23 +36,10 @@ export default function Home() {
 
                     console.error(err)
                 });
-            // fetch("http://localhost:8000/login", requestOptions)
-            // .then((response) => {
-            //     if (response.status === 200) {
-            //         // ?? is the nullish coalescing operator
-            //         // ?? will return value of Authorization header if not null, and return empty string if null or undefined 
-            //         const token = response.headers.get("Authorization") ?? "";
-            //         sessionStorage.setItem("token", token);
-            //     } else {
-            //         alert("Invalid username or password");
-            //     }
-            // })
-            // .catch((error) => {
-            //     console.error(error);
-            // });
         };
     };
 
+    const handleReg = (data: Object) => console.log(data);
 
     return (
         <main>
@@ -65,12 +47,36 @@ export default function Home() {
             <img src="/nusmods.png" className="flex-col flex ml-auto mr-auto items-center top" />
             <div className="flex-col flex ml-auto mr-auto items-center w-full lg:w-2/3 md:w-3/5 top">
                 <h1 className="font-bold text-10xl my-10 text-white"> Login </h1>
-                <form action="localhost:8000/users" className="mt-2 flex flex-col lg:w-1/2 w-8/12">
-                    <LoginField type="text" placeholder="Username" name="username" leftIcon="bi bi-person-circle" rightIcon="" />
-                    <LoginField type="password" placeholder="Password" name="password" leftIcon="bi bi-key" rightIcon="bi bi-eye-slash-fill" />
+                <form action="localhost:8000/users" className="mt-2 flex flex-col lg:w-1/2 w-8/12" onSubmit={handleSubmit(handleReg)}>
+                    <LoginField leftIcon="bi bi-person-circle" rightIcon="">
+                        <input
+                            type='text'
+                            className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border-0 h-10 px-3 relative self-center font-roboto text-xl outline-none"
+                            placeholder='Username'
+                            // name input is specified in register block
+                            {...register('username', {
+                                required: { value: true, message: `$(name) Required` },
+                                pattern: { value: regUsername, message: 'Invalid $(name)' },
+                            })}
+                        />
+                        <div>{errors.username && <Error message={errors.username.message as string} />}</div>
+                    </LoginField>
+                    <LoginField leftIcon="bi bi-key" rightIcon="bi bi-eye-slash-fill">
+                        <input
+                            type='password'
+                            className="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 border-0 h-10 px-3 relative self-center font-roboto text-xl outline-none"
+                            placeholder='Password'
+                            // name input is specified in register block
+                            {...register('password', {
+                                required: { value: true, message: `$(name) Required` },
+                                pattern: { value: regPassword, message: 'Invalid $(name)' },
+                            })}
+                        />
+                        <div>{errors.password && <Error message={errors.password.message as string} />}</div>
+                    </LoginField>
                     <div className="flex flex-wrap justify-between">
                         <a href="registration" className="text-base text-white text-left font-roboto leading-normal hover:underline mb-6">Register</a>
-                        <a href="#" className="text-base text-white text-right font-roboto leading-normal hover:underline mb-6 self-end">Forget Password?</a>
+                        <a href="#" className="text-base text-white text-right font-roboto leading-normal hover:underline mb-6 self-end">Forgot Password?</a>
                     </div>
                     <input
                         type="submit"

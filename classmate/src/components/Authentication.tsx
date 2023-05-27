@@ -1,7 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 import { useState, useEffect, ReactElement } from 'react';
 
-export default function AuthenticationComponent({ children }: { children: ReactElement }): ReactElement {
+interface childrenElems {
+    children?: ReactElement | ReactElement[];
+}
+export default function AuthenticationComponent({ children }: childrenElems): ReactElement {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
