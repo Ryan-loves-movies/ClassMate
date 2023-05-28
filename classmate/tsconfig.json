@@ -10,6 +10,7 @@
         "esModuleInterop": true,
         "module": "esnext",
         "moduleResolution": "node",
+        "outDir": "./dist",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
@@ -21,6 +22,8 @@
         ],
         "paths": {
             "@/*": ["./src/*"],
+            "@app/*": ["./src/app/*"],
+            "@server/*": ["./src/server/*"]
         },
     },
     "include": [
@@ -28,7 +31,6 @@
         "**/*.ts", 
         "**/*.tsx", 
         ".next/types/**/*.ts", 
-        "src/utils/*.tsx"
     ],
     "exclude": ["node_modules"]
 }

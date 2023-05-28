@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "start": "concurrently \"npm run dev\" \"npm run express\"",
-        "express": "ts-node -r tsconfig-paths/register --project tsconfig-express.json src/express-server.ts",
         "dev": "next dev",
+        "express": "ts-node -r tsconfig-paths/register --project tsconfig-express.json src/server/express-server.ts",
+        "start": "concurrently \"npm run dev\" \"npm run express\"",
         "build": "next build",
         "lint": "next lint"
     },

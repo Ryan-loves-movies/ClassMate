@@ -5,7 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import axios, { AxiosResponse, AxiosError } from "axios";
 import LoginField from "@/components/LoginField";
 import Error from "@/components/Error";
-import { regEmail, regPassword, regUsername } from "@/utils/validation";
+import { regEmail, regPassword, regUsername } from "@app/validation";
 import { FieldValues, useForm } from "react-hook-form";
 
 export default function Home() {

@@ -1,6 +1,6 @@
 // User for connection with mySQL and { Request, Response } with express api
-import User from '@/database/models/user';
-import config from '@/config';
+import User from '@server/database/models/user';
+import config from '@server/config';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';

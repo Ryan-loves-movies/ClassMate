@@ -1,7 +1,7 @@
 import express from 'express';
-import userRouter from './routes/userRoutes';
-import authRouter from './routes/authenticateUser';
-import sequelize from './database/connection';
+import userRouter from '@server/routes/userRoutes';
+import authRouter from '@server/routes/authenticateUser';
+import sequelize from '@server/database/connection';
 
 const expressApp = express();
 const port = 8000;

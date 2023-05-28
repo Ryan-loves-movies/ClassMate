@@ -4,7 +4,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { regPassword, regUsername } from '@/utils/validation';
+import { regPassword, regUsername } from '@app/validation';
 import LoginField from '@/components/LoginField';
 import Error from '@/components/Error';
 

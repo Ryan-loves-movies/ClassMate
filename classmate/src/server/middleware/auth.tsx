@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import config from '@/config';
+import config from '@server/config';
 
 export default function authenticateToken(req: Request, res: Response) {
     const token = req.headers.authorization;

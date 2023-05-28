@@ -2,17 +2,11 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "module": "commonjs",
-        "outDir": "dist",
+        "moduleResolution": "node",
+        "outDir": "./dist",
         "noEmit": false,
-        "paths": {
-            "@/*": ["./src/*"],
-        },
     },
     "include": [
-        "./src/routes/*.tsx", 
-        "./src/middleware/*.tsx",
-        "./src/database/*.tsx",
-        "./src/database/**/*.tsx",
-        "./src/utils/*.tsx"
+        "./src/server/*"
     ]
 }
