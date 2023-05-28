@@ -1,3 +1,4 @@
+'use client'
 import axios, { AxiosResponse } from 'axios';
 import { useState, useEffect, ReactElement } from 'react';
 
@@ -23,12 +24,12 @@ export default function AuthenticationComponent({ children }: childrenElems): Re
                             setIsAuthenticated(true);
                         } else {
                             setIsAuthenticated(false);
-                            window.location.href = 'http://localhost:3000/login';
-                            console.error('Authorization error', res.statusText);
+                            window.location.href = 'http://localhost:3000';
+                            console.log('Authorization error', res.statusText);
                         }
                     });
             } catch (error) {
-                console.error('Authentication error:', error);
+                console.error('Axios authentication error:', error);
             }
         };
 
