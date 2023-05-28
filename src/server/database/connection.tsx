@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('orbital', 'root', 'Classmate123!', {
-    host: 'localhost',
+const sequelize = new Sequelize('classmate', 'rtyt', 'Database.2023', {
+    host: 'rtyt.cif3jijsurfi.ap-southeast-2.rds.amazonaws.com',
     port: 3306,
     dialect: 'mysql',
 });
