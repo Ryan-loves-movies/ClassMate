@@ -43,7 +43,7 @@
 
 import express from 'express';
 const expressRouter = express.Router();
-import authenticateToken from '@server/middleware/auth';
+import authenticateToken from '@server/middleware/auth.jsx';
 
 expressRouter.get('/authenticate', authenticateToken);
 

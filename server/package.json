@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
-        "start": "npm run dev",
-        "build": "next build",
+        "dev": "ts-node -r tsconfig-paths/register express-server.ts",
+        "start": "node dist/express-server.js",
+        "build": "tsc",
         "lint": "next lint"
     },
     "dependencies": {
@@ -35,10 +35,12 @@
         "react-hook-form": "^7.44.0",
         "sequelize": "^6.31.1",
         "tailwindcss": "3.3.2",
-        "tsconfig-paths": "^4.2.0"
+        "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.0.4"
     },
+    "main": "express-server.ts",
     "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
-    "main": "express.js",
     "keywords": [],
     "author": "",
     "license": "ISC",
@@ -48,7 +50,9 @@
         "@types/jsonwebtoken": "^9.0.2",
         "@types/sequelize": "^4.28.15",
         "concurrently": "^8.0.1",
-        "ts-node": "^10.9.1",
-        "typescript": "^5.0.4"
+        "module-alias": "^2.2.2"
+    },
+    "_moduleAliases": {
+        "@server": "dist"
     }
 }

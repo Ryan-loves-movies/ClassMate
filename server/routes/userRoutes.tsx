@@ -1,6 +1,6 @@
 import express from 'express';
 const expressRouter = express.Router();
-import controller from '@server/database/controllers/userController';
+import controller from '@server/database/controllers/userController.jsx';
 const { createUser, logIn, logOut, getProfile, updateProfile, resetPassword, verifyEmail, deleteUser } = controller;
 
 expressRouter.post('/register', createUser);

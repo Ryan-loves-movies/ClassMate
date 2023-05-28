@@ -1,8 +1,9 @@
+import 'module-alias/register';
 import express from 'express';
 import cors from 'cors';
-import userRouter from '@server/routes/userRoutes';
-import authRouter from '@server/routes/authenticateUser';
-import sequelize from '@server/database/connection';
+import userRouter from '@server/routes/userRoutes.jsx';
+import authRouter from '@server/routes/authenticateUser.jsx';
+import sequelize from '@server/database/connection.jsx';
 
 const expressApp = express();
 const port = 8000;
