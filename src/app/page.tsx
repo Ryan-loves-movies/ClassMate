@@ -17,13 +17,14 @@ export default function Home() {
 
     const handleReg = async (data: FieldValues) => {
         const { username, password } = data;
-        return axios.post("http://localhost:8000/login", {
+        return await axios.post("http://localhost:8000/login", {
             username: username,
             password: password
         })
             .then((res: AxiosResponse) => {
+                console.log(res.status);
                 if (res.status === 200) {
-                    sessionStorage.setItem("token", res.data.get("token"));
+                    sessionStorage.setItem("token", res.data.token);
                     window.location.href = '/authorized/dashboard';
                 } else {
                     alert("Invalid username or password");

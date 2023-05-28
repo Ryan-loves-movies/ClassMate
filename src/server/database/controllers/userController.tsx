@@ -43,10 +43,18 @@ function validateRequest(req: Request, res: Response) {
 
 const createUser = (req: Request, res: Response) => {
     const { email, username, password }: profile = req.body;
+    console.log(email);
 
     try {
-        const hashedPassword = bcrypt.hash(password, saltRounds);
-        User.create({ username, email, hashedPassword });
+        bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+            console.log(hashedPassword);
+            if (err) {
+                throw err;
+            }
+            if (hashedPassword) {
+                return User.create({ username: username, email: email, password: hashedPassword });
+            }
+        });
         res.status(201).json({ message: 'User created successfully!' });
     } catch (err) {
         console.error(err);
@@ -65,7 +73,7 @@ async function logIn(req: Request, res: Response) {
             if (!user) {
                 return res.status(404).json({ message: 'No existing user found' });
             }
-            bcrypt.compare(password, user.get('password') as string, (err, authenticated) => {
+            bcrypt.compare(password, user.dataValues.password as string, (err, authenticated) => {
                 if (err) {
                     throw err;
                 }
@@ -114,7 +122,7 @@ async function updateProfile(req: Request, res: Response) {
         validateRequest(req, res);
         return await User.update(req.body, {
             where: {
-                username: req.body.get('username')
+                username: req.body.username
             }
         }).then((rowsUpdated: number) => {
             console.log(`Updated ${rowsUpdated} rows.`);
@@ -134,7 +142,7 @@ async function resetPassword(req: Request, res: Response) {
         validateRequest(req, res);
         return await User.update(req.body, {
             where: {
-                password: req.body.get('password')
+                password: req.body.password
             }
         }).then((rowsUpdated: number) => {
             console.log(`Updated ${rowsUpdated} rows.`);
@@ -160,7 +168,7 @@ async function deleteUser(req: Request, res: Response) {
         validateRequest(req, res);
         return await User.destroy({
             where: {
-                username: req.body.get('username')
+                username: req.body.username
             }
         }).then((rowsDeleted: number) => {
             console.log(`Deleted ${rowsDeleted} rows.`);
