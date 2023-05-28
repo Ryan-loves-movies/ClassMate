@@ -6,6 +6,7 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        primaryKey: true
     },
     password: {
         type: DataTypes.STRING,
@@ -19,6 +20,8 @@ const User = sequelize.define('users', {
             isEmail: true,
         },
     },
-});
+}, {
+        timestamps: false
+    });
 
 export default User;
