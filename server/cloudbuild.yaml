@@ -1,0 +1,11 @@
+steps:
+  - id: 'APP INSTAL NPM'
+    name: node:$_NODE_VERSION
+    dir: 'ui'
+    entrypoint: npm
+    args: ['ci']
+  - id: 'APP BUILD PROCESS WITH NODE NPM'
+    name: node:$_NODE_VERSION
+    dir: 'ui'
+    entrypoint: npm
+    args: ['run', 'build']
