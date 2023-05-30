@@ -1,0 +1,6 @@
+{
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/",
+  "/registration/page": "/registration",
+  "/authorized/dashboard/page": "/authorized/dashboard"
+}
