@@ -4,6 +4,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import config from '@/config';
 import { regPassword, regUsername } from '@app/validation';
 import LoginField from '@/components/LoginField';
 import Error from '@/components/Error';
@@ -17,7 +18,7 @@ export default function Home() {
 
     const handleReg = async (data: FieldValues) => {
         const { username, password } = data;
-        return await axios.post("http://localhost:8000/login", {
+        return await axios.post(`${config.expressHost}/login`, {
             username: username,
             password: password
         })

@@ -1,5 +1,6 @@
 'use client'
 import axios, { AxiosResponse } from 'axios';
+import config from '@/config';
 import { useState, useEffect, ReactElement } from 'react';
 
 interface childrenElems {
@@ -13,7 +14,7 @@ export default function AuthenticationComponent({ children }: childrenElems): Re
             try {
                 // Perform the authentication logic, e.g., send JWT token to the server
                 // and validate it
-                axios.get("http://localhost:8000/authenticate", {
+                axios.get(`${config.expressHost}/authenticate`, {
                     headers: {
                         Authorization: sessionStorage.getItem("token")
                     }
@@ -24,7 +25,7 @@ export default function AuthenticationComponent({ children }: childrenElems): Re
                             setIsAuthenticated(true);
                         } else {
                             setIsAuthenticated(false);
-                            window.location.href = 'http://localhost:3000';
+                            window.location.href = '/';
                             console.log('Authorization error', res.statusText);
                         }
                     });

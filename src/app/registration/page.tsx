@@ -3,6 +3,7 @@ import React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import axios, { AxiosResponse, AxiosError } from "axios";
+import config from '@/config';
 import LoginField from "@/components/LoginField";
 import Error from "@/components/Error";
 import { regEmail, regPassword, regUsername } from "@app/validation";
@@ -17,7 +18,7 @@ export default function Home() {
 
     const handleReg = async (data: FieldValues) => {
         const { email, username, password } = data;
-        return axios.post("http://localhost:8000/register", {
+        return axios.post(`${config.expressHost}/register`, {
             email: email,
             username: username,
             password: password
