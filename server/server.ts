@@ -1,3 +1,4 @@
+require('module-alias/register');
 import 'module-alias/register';
 import express from 'express';
 import cors from 'cors';
@@ -6,7 +7,7 @@ import authRouter from '@server/routes/authenticateUser.jsx';
 import sequelize from '@server/database/connection.jsx';
 
 const expressApp = express();
-const port = 8000;
+const port = 8080;
 
 expressApp.use(express.json());
 expressApp.use(cors());
