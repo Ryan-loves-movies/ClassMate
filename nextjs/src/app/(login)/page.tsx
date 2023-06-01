@@ -81,7 +81,7 @@ export default function Home() {
                 <div className="user_options-container">
                     <div className="user_options-text">
                         <div className="user_options-unregistered">
-                            <h2 className="user_unregistered-title">Don't have an account?</h2>
+                            <h2 className="user_unregistered-title">{`Don't have an account?`}</h2>
                             <p className="user_unregistered-text">Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art fap.</p>
                             <button className="user_unregistered-signup" id="signup-button" onClick={signUpHandler}>Sign up</button>
                         </div>

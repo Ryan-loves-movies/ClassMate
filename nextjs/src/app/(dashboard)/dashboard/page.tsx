@@ -406,7 +406,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <p className="message-line">
-                                        Hey, can tell me about progress of project? I'm waiting for your response.
+                                        {`Hey, can tell me about progress of project? I'm waiting for your response.`}
                                     </p>
                                     <p className="message-line time">
                                         Dec, 12
@@ -448,7 +448,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <p className="message-line">
-                                        I am really impressed! Can't wait to see the final result.
+                                        {`I am really impressed! Can't wait to see the final result.`}
                                     </p>
                                     <p className="message-line time">
                                         Dec, 11

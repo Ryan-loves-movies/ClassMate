@@ -1,5 +1,5 @@
 import './globals.css'
-import { Inter, Montserrat } from 'next/font/google'
+import { Montserrat } from 'next/font/google'
 
 const mont = Montserrat({
     weight: '700',
