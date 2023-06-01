@@ -1,6 +1,6 @@
-const regUsername: RegExp = /^[a-z][^\W_]{7,14}$/i;
-const regPassword: RegExp = /^(?=[^a-z]*[a-z])(?=\D*\d)[^:&.~\s]{5,20}$/;
 const regEmail: RegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const regUsername: RegExp = /^[a-z][^\W_]{5,14}$/i;
+const regPassword: RegExp = /^(?=[^a-z]*[a-z])(?=\D*\d)[^:~\s]{5,20}$/;
 
 function isValidUsername(username: string) {
     return regUsername.test(username);

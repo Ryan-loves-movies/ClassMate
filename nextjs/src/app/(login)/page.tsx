@@ -40,11 +40,19 @@ export default function Home() {
                 if (res.status === 200) {
                     sessionStorage.setItem("token", res.data.token);
                     window.location.href = '/dashboard';
+                    // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {
                     alert("Invalid username or password");
                 }
             })
             .catch((err: AxiosError) => {
+                if (err.response?.status === 404) {
+                    alert("Username could not be found. Have you signed up yet?")
+                } else if (err.response?.status === 401) {
+                    alert("Wrong password!")
+                } else {
+                    alert("Wrong username or password!")
+                }
                 console.error(err)
             });
     }
@@ -143,7 +151,7 @@ export default function Home() {
                                             placeholder="Email"
                                             {...registerRegistration('emailRegistration', {
                                                 required: { value: true, message: `Email required` },
-                                                pattern: { value: regEmail, message: `Invalid email` },
+                                                pattern: { value: regEmail, message: `Please provide a valid email. Examples: 'test@gmail.com'` },
                                             })
                                             }
                                         />
@@ -156,7 +164,7 @@ export default function Home() {
                                             placeholder="Username"
                                             {...registerRegistration('usernameRegistration', {
                                                 required: { value: true, message: `Username required` },
-                                                pattern: { value: regUsername, message: `Invalid username` },
+                                                pattern: { value: regUsername, message: `Username has to start with a letter and be 6~15 characters long` },
                                             })
                                             }
                                         />
@@ -169,7 +177,7 @@ export default function Home() {
                                             placeholder="Password"
                                             {...registerRegistration('passwordRegistration', {
                                                 required: { value: true, message: `Password required` },
-                                                pattern: { value: regPassword, message: `Invalid password` },
+                                                pattern: { value: regPassword, message: `Password has to consist of alphabet and numbers. Spaces are not allowed. Special characters not allowed are : ~` },
                                             })
                                             }
                                         />
