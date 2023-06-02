@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Model } from 'sequelize';
+import { Error } from 'sequelize';
+import { AxiosError } from 'axios';
 
 interface profile {
     email: string;
@@ -19,25 +21,27 @@ interface minProfile {
 
 interface authenticatedUser {
     username: string;
-    token: string;
 }
 
 
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
 
-function validateRequest(req: Request, res: Response) {
-    const token = (req.headers.authorisation as string)?.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-    return jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ message: 'invalid token' });
+function validateRequest(req: Request, res: Response): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const token = req.headers.authorization?.split(' ')[0] as string;
+
+        if (!token) {
+            res.status(404).json({ message: 'No token provided' });
+            throw new AxiosError('No token provided');
         }
-        if (decoded) {
-            return res.status(200).json({ message: 'Token validated!' });
-        }
+
+        jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+            if (err) {
+                res.status(401).json({ message: 'Invalid token' });
+                throw new AxiosError('Invalid token');
+            }
+        });
     });
 }
 
@@ -100,17 +104,19 @@ async function logOut(req: Request, res: Response) {
 
 async function getProfile(req: Request, res: Response) {
     try {
-        const { username }: authenticatedUser = req.body;
         validateRequest(req, res);
-        User.findOne({
+        return await User.findOne({
             where: {
-                username: username
+                username: req.query.username
             }
         }).then((user: Model) => {
             if (!user) {
                 return res.status(404).json({ message: 'No existing user found' });
             }
-            return res.status(200).json(user);
+            return res.status(200).json({
+                    username: user.get("username"),
+                    email: user.get("email")
+                });
         });
     } catch (err) {
         throw err;

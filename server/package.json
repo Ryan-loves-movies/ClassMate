@@ -5,6 +5,7 @@
         "node": "18.x.x"
     },
     "scripts": {
+        "dev": "ts-node -r tsconfig-paths/register server.ts",
         "start": "node dist/server.js",
         "build": "tsc",
         "lint": "next lint"
