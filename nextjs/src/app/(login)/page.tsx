@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { regPassword, regUsername, regEmail } from '@app/(login)/validation';
-import Error from '@/components/Error';
+import Error from '@components/login/Error';
 import config from '@/config';
 
 export default function Home() {
@@ -30,15 +29,14 @@ export default function Home() {
             'usernameLogIn': username,
             'passwordLogIn': password
         } = data;
-        console.log(username);
         return await axios.post(`${config.expressHost}/login`, {
             username: username,
             password: password
         })
             .then((res: AxiosResponse) => {
-                console.log(res.status);
                 if (res.status === 200) {
-                    sessionStorage.setItem("token", res.data.token);
+                    window['sessionStorage'].setItem("token", res.data.token);
+                    window['sessionStorage'].setItem("username", username);
                     window.location.href = '/dashboard';
                     // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {
@@ -63,7 +61,6 @@ export default function Home() {
             'usernameRegistration': username,
             'passwordRegistration': password
         } = data;
-        console.log(password);
         return axios.post(`${config.expressHost}/register`, {
             email: email,
             username: username,

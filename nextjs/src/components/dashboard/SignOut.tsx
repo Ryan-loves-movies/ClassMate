@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LogOut() {
+export default function SignOut() {
     const handleLogout = () => {
         // Remove the "token" key from Session Storage
         sessionStorage.removeItem('token');
@@ -10,6 +10,6 @@ export default function LogOut() {
     };
 
     return (
-        <button onClick={handleLogout}>Logout</button>
+        <a onClick={handleLogout}>Sign out</a>
     );
 };

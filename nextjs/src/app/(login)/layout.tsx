@@ -1,4 +1,4 @@
-import './globals.css'
+import '@app/(login)/globals.css'
 import { Montserrat } from 'next/font/google'
 
 const mont = Montserrat({

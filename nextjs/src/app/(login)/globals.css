@@ -11,6 +11,8 @@
 
 .logo {
     height: 250px;
+    padding-top: 4em;
+    float: right;
 }
 
 .button {

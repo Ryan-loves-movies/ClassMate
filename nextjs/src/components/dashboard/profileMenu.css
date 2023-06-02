@@ -1,0 +1,63 @@
+.dropdown-wrapper {
+    position: absolute;
+    top: 75%;
+    transform: scale(0.8);
+    width: 200px;
+    transform-origin: top;
+    transform-origin: right;
+    right: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08), 0 2px 4px 0 rgba(50, 50, 93, 0.05), 0 4px 8px 0 rgba(136, 152, 170, 0.08);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    text-align: right;
+    opacity: 0;
+    visibility: hidden;
+}
+.dropdown-wrapper.active {
+    top: 90%;
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown-profile-details {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.dropdown-profile-details--name {
+    font-size: 1.75rem;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.dropdown-profile-details--email {
+    font-size: 1.2rem;
+    color: #6f6f6f;
+}
+
+.dropdown-links {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1.5rem;
+}
+.dropdown-links a {
+    color: #525F7F;
+    text-decoration: none;
+    padding-bottom: 1rem;
+    transition: all 0.1s linear;
+}
+.dropdown-links a:hover {
+    color: #ebeff5;
+}
+.dropdown-links a:last-of-type {
+    padding-bottom: 0;
+}
