@@ -124,6 +124,7 @@ button, a {
 }
 .app-name {
     color: var(--main-color);
+    text-decoration: none;
     margin: 0;
     font-size: 20px;
     line-height: 24px;
@@ -586,6 +587,7 @@ button, a {
 }
 
 .box-content-header {
+    color:#1f1c2e;
     font-size: 16px;
     line-height: 24px;
     font-weight: 700;
@@ -593,6 +595,7 @@ button, a {
 }
 
 .box-content-subheader {
+    color:#1f1c2e;
     font-size: 14px;
     line-height: 24px;
     opacity: 0.7;
@@ -612,12 +615,14 @@ button, a {
     margin: 8px 0;
 }
 .box-progress-header {
+    color:#1f1c2e;
     font-size: 14px;
     font-weight: 700;
     line-height: 16px;
     margin: 0;
 }
 .box-progress-percentage {
+    color:#1f1c2e;
     text-align: right;
     margin: 0;
     font-size: 14px;
