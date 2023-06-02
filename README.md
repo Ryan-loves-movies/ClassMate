@@ -14,9 +14,11 @@
 
 ### To-do list for future
 - Separate the components of the dashboard into layout.tsx (To be shared across pages - sidebar, profile, searchbar) and page.tsx
+  - In progress (Almost Done?)
 - Implement interactive sidebar for dashboard that expands when mouse hovers over it
   - Make sure this renders properly on mobile as well
 - Implement pop-up when profile picture is clicked on to show settings page, log out component, ...
+  - Somewhat done??
 - Implement interface for timetable
   - Implement actual timetable optimiser
 - Implement search function?
