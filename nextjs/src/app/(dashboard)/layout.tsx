@@ -26,7 +26,9 @@ export default function RootLayout({
                         <div className="app-container">
                             <div className="app-header">
                                 <div className="app-header-left">
-                                    <span className="app-icon"></span>
+                                    <a href="/dashboard">
+                                        <img src="/logoDark.png" className="app-icon" />
+                                    </a>
                                     <a className="app-name" href="/dashboard">ClassMate</a>
                                     <div className="search-wrapper">
                                         <input className="search-input" type="text" placeholder="Search" />

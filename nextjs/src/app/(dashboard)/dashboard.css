@@ -72,6 +72,7 @@ button, a {
     transition: 0.2s;
     max-width: 1800px;
 }
+
 .app-container button, .app-container input, .app-container optgroup, .app-container select, .app-container textarea {
     font-family: "DM Sans", sans-serif;
 }
@@ -100,36 +101,19 @@ button, a {
     margin-left: 10px;
 }
 .app-icon {
-    width: 26px;
-    height: 2px;
+    width: 90px;
+    height: 70px;
     border-radius: 4px;
-    background-color: var(--main-color);
     position: relative;
 }
-.app-icon:before, .app-icon:after {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 2px;
-    border-radius: 4px;
-    background-color: var(--main-color);
-    left: 50%;
-    transform: translatex(-50%);
-}
-.app-icon:before {
-    top: -6px;
-}
-.app-icon:after {
-    bottom: -6px;
-}
+
 .app-name {
     color: var(--main-color);
     text-decoration: none;
-    margin: 0;
     font-size: 20px;
     line-height: 24px;
     font-weight: 700;
-    margin: 0 32px;
+    margin: 0 16px;
 }
 
 .mode-switch {
@@ -229,16 +213,20 @@ button, a {
 }
 
 .app-sidebar {
+    width: 73px;
+    height: 230px;
     padding: 40px 16px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    transition: width 1.5s ease-in-out;
 }
-.app-sidebar-link {
+
+.app-sidebar-container {
     color: var(--main-color);
     color: var(--link-color);
-    margin: 16px 0;
-    transition: 0.2s;
+    text-decoration: none;
+    padding: 8px 0;
+    margin: 30px 0;
+    transition: background 1.5s ease-in-out;
     border-radius: 50%;
     flex-shrink: 0;
     width: 40px;
@@ -246,12 +234,45 @@ button, a {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
-.app-sidebar-link:hover {
+
+.app-sidebar-container svg {
+    position: absolute;
+}
+
+.app-sidebar-container span {
+    visibility: hidden;
+    margin-left: 20px;
+    transition: margin 1.5s ease;
+}
+
+.app-sidebar:hover {
+    width: 190px;
+}
+
+.app-sidebar:hover .app-sidebar-container {
+    transition: all 1.5s ease;
+    width:160px;
+    border-radius: 19px;
+    justify-content: flex-start;
+    padding: 8px;
+}
+
+.app-sidebar:hover .app-sidebar-container span {
+    display: flex;
+    margin-left: 35px;
+    font-weight: 600;
+    font-size: 18px;
+    visibility: visible;
+}
+
+.app-sidebar-container:hover {
     background-color: var(--link-color-hover);
     color: var(--link-color-active);
 }
-.app-sidebar-link.active {
+
+.app-sidebar-container.active {
     background-color: var(--link-color-active-bg);
     color: var(--link-color-active);
 }

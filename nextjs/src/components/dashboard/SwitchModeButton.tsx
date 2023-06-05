@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 
 export default function SwitchModeButton() {
     let { theme, setTheme } = useTheme();
-    let [isActive, setIsActive] = useState(false);
+    let [isActive, setIsActive] = useState((theme === "dark") ? true : false);
 
     const toggleTheme = () => {
         setIsActive(!isActive);
