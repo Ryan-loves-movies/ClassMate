@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "update": "ts-node ./src/sqlite/modulesController.tsx",
+        "update": "ts-node -P ./tsconfig.update.json -r tsconfig-paths/register ./src/sqlite/modulesController.tsx",
         "dev": "next dev",
         "start": "next start",
         "build": "next build",

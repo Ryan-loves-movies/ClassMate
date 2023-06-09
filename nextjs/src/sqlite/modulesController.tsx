@@ -31,22 +31,6 @@ export default async function populateDatabase() {
                         .then(() => { });
                 })
                 .all();
-            // const lol = {
-            //         code: res.data[0].moduleCode,
-            //         title: res.data[0].title
-            //     };
-            // modules.create(lol, { ignoreDuplicates: true })
-            // .then(() => console.log("ok"));
-            //     fields: ['code', 'title'],
-            //     ignoreDuplicates: true,
-            //     logging: console.log
-            // });
-            // console.log(acceptedModules[0].moduleCode);
-            // acceptedModules = {
-            //     code: acceptedModules[0].moduleCode,
-            //     title: acceptedModules[0].title
-            // };
-            // Insert module data into the database
         })
         .catch((err: AxiosError) => {
             console.error('Error populating database:', err.message);
