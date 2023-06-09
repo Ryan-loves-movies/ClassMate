@@ -1,4 +1,4 @@
-import sequelize from "@/sqlite/modulesConnection";
+import sequelize from "@sqlite/modulesConnection";
 import { DataTypes } from 'sequelize';
 
 const modules = sequelize.define('Modules', {

@@ -1,6 +1,6 @@
 'use client'
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { ReactElement, ReactNode, useLayoutEffect, useState } from 'react';
+import { ReactNode, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Loading from '@components/Loading';
 import config from '@/config';
@@ -8,7 +8,7 @@ import config from '@/config';
 interface childrenElems {
     children?: ReactNode | ReactNode[];
 }
-export default function AuthorizationComponent({ children }: childrenElems): ReactElement {
+export default function AuthorizationComponent({ children }: childrenElems): ReactNode {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);

@@ -65,3 +65,9 @@
     background-color: var(--link-color-active-bg);
     color: var(--link-color-active);
 }
+
+@media screen and (max-width: 520px) {
+    .app-sidebar {
+        display: none;
+    }
+}
