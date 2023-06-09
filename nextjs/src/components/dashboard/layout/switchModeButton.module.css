@@ -1,0 +1,33 @@
+.mode-switch {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    color: var(--main-color);
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+.mode-switch:hover {
+    background-color: var(--link-color-hover);
+    color: var(--link-color-active)
+}
+
+.mode-switch.active svg {
+    fill: var(--main-color);
+}
+
+@media screen and (max-width: 720px) {
+    .mode-switch {
+        width: 20px;
+        height: 20px;
+        margin-left: 4px;
+    }
+    .mode-switch svg {
+        width: 16px;
+        height: 16px;
+    }
+}

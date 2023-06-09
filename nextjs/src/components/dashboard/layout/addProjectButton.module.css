@@ -1,0 +1,24 @@
+.add-btn {
+    color: #fff;
+    background-color: var(--button-bg);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media screen and (max-width: 720px) {
+    .add-btn {
+        width: 20px;
+        height: 20px;
+        margin-left: 4px;
+    }
+    .add-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}

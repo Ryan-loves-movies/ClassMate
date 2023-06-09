@@ -10,6 +10,10 @@
     display: block;
     padding-bottom: 100%;
 }
+.cat:hover > * {
+    -webkit-animation-play-state: paused;
+    animation-play-state: paused;
+}
 .cat:active > * {
     -webkit-animation-play-state: running;
     animation-play-state: running;
@@ -96,22 +100,35 @@
     background-color: #e6dcdc;
 }
 
-*,
-    *::before,
-    *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
 
-    html {
-        height: 100%;
-    }
 
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100%;
-        margin: 0;
-        line-height: 1.4;
-    }
+.intro {
+    width: 90%;
+    max-width: 36rem;
+    padding-bottom: 1rem;
+    margin: 0 auto 1em;
+    padding-top: 0.5em;
+    font-size: calc(1rem + 2vmin);
+    text-transform: capitalize;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+.intro small {
+    display: block;
+    opacity: 0.5;
+    font-style: italic;
+    text-transform: none;
+}
+
+.info {
+    margin: 0;
+    padding: 1em;
+    font-size: 0.9em;
+    font-style: italic;
+    font-family: serif;
+    text-align: right;
+    opacity: 0.5;
+}
+.info a {
+    color: inherit;
+}

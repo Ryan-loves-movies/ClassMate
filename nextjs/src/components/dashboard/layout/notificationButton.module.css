@@ -1,0 +1,23 @@
+.notification-btn {
+    color: var(--main-color);
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (max-width: 720px) {
+    .notification-btn {
+        width: 20px;
+        height: 20px;
+        margin-left: 4px;
+    }
+    .notification-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+

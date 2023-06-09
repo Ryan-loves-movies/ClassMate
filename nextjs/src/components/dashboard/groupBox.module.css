@@ -1,0 +1,138 @@
+.project-box-wrapper {
+    padding: 8px;
+    transition: 0.2s;
+}
+
+.project-box {
+    --main-color-card: #dbf6fd;
+    border-radius: 30px;
+    padding: 16px;
+    background-color: var(--main-color-card);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.project-box-header {
+    order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    color: #fff;
+}
+
+.project-btn-more {
+    padding: 0;
+    height: 14px;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    background-color: transparent;
+    border: none;
+    flex-shrink: 0;
+    color: #1f1c2e;
+}
+
+/* .project-btn-more::after, .project-btn-more::before { */
+/*     content: ''; */
+/*     position: absolute; */
+/*     width: 6px; */
+/*     height: 6px; */
+/*     border-radius: 50%; */
+/*     background-color: var(--main-color); */
+/*     opacity: .8; */
+/*     left: 50%; */
+/*     transform: translatex(-50%); */
+/* } */
+
+/* .project-btn-more::before { */
+/*     top: 0; */
+/* } */
+
+/* .project-btn-more::before { */
+/*     bottom: 0; */
+/* } */
+
+.more-wrapper {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+}
+
+.project-box-content-header {
+    order: 1;
+    text-align: center;
+    margin-top: 6px;
+}
+
+.box-content-header {
+    color:#1f1c2e;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 700;
+    opacity: 0.7;
+    margin: 0;
+}
+
+.box-content-subheader {
+    color:#1f1c2e;
+    font-size: 18px;
+    line-height: 24px;
+    opacity: 0.7;
+    margin: 0;
+}
+
+.project-box-footer {
+    order: 3;
+    display: flex;
+    justify-content: center;
+    padding-top: 16px;
+    position: relative;
+}
+
+.project-box-footer:after {
+    display: none;
+}
+
+/* .project-box-footer:after { */
+/*     content: ""; */
+/*     position: absolute; */
+/*     background-color: rgba(255, 255, 255, 0.6); */
+/*     width: calc(100% + 32px); */
+/*     top: 0; */
+/*     left: -16px; */
+/*     height: 1px; */
+/* } */
+
+.participants {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.participants img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.participants img:not(:first-child) {
+    margin-left: -26px;
+}
+
+.add-participant {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.6);
+    margin-left: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}

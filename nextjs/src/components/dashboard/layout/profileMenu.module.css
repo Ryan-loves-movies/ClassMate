@@ -1,3 +1,29 @@
+.profile-btn {
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    border-left: 2px solid #ddd;
+}
+
+.profile-btn img {
+    width: 32px;
+    height: 32px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.profile-btn > span {
+    color: var(--main-color);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
 .dropdown-wrapper {
     position: absolute;
     top: 75%;
@@ -34,9 +60,10 @@
 }
 
 .dropdown-profile-details--name {
-    font-size: 1.75rem;
+    color: #1f1c2e;
+    font-size: 1.05rem;
     margin-bottom: 0;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .dropdown-profile-details--email {
@@ -49,15 +76,31 @@
     flex-direction: column;
     padding-top: 1.5rem;
 }
+
 .dropdown-links a {
     color: #525F7F;
     text-decoration: none;
     padding-bottom: 1rem;
     transition: all 0.1s linear;
 }
+
 .dropdown-links a:hover {
     color: #ebeff5;
 }
+
 .dropdown-links a:last-of-type {
     padding-bottom: 0;
+}
+
+@media screen and (max-width: 720px) {
+    .profile-btn > span {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 520px) {
+    .profile-btn img {
+        width: 24px;
+        height: 24px;
+    }
 }
