@@ -1,11 +1,20 @@
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import styles from '@components/dashboard/layout/switchModeButton.module.css';
 
 export default function SwitchModeButton() {
+    const [mounted, setMounted] = useState(false);
     const { theme, setTheme } = useTheme();
     const [isActive, setIsActive] = useState((theme === "dark") ? true : false);
+
+    useEffect(() => {
+        setMounted(true);
+    })
+
+    if (!mounted) {
+        return null;
+    }
 
     const toggleTheme = () => {
         setIsActive(!isActive);
