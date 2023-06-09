@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "update": "ts-node ./src/sqlite/modulesController.tsx",
         "dev": "next dev",
         "start": "next start",
         "build": "next build",
@@ -35,6 +36,7 @@
         "react-dom": "18.2.0",
         "react-hook-form": "^7.44.0",
         "sequelize": "^6.31.1",
+        "sqlite3": "^5.1.6",
         "tailwindcss": "3.3.2",
         "tsconfig-paths": "^4.2.0"
     },

@@ -24,14 +24,15 @@
             "@/*": ["./src/*"],
             "@app/*": ["./src/app/*"],
             "@components/*": ["./src/components/*"],
-            "@server/*": ["./server/*"]
-        },
+            "@server/*": ["./server/*"],
+            "@sqlite/*": ["./src/sqlite/*"]
+        }
     },
     "include": [
         "next-env.d.ts", 
         "**/*.ts", 
         "**/*.tsx", 
-        ".next/types/**/*.ts", 
+        ".next/types/**/*.ts"
     ],
     "exclude": ["node_modules"]
 }
