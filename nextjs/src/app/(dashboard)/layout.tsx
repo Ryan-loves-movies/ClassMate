@@ -1,12 +1,14 @@
 import React from "react";
-import AddProjectButton from "@components/dashboard/AddProjectButton";
+import Logo from "@components/dashboard/layout/Logo";
+import AddProjectButton from "@components/dashboard/layout/AddProjectButton";
 import AuthorizationComponent from "@components/dashboard/Authorization";
 import ThemeProviderLocal from "@components/dashboard/ThemeProviderLocal";
-import SwitchModeButton from "@components/dashboard/SwitchModeButton";
-import NotificationButton from "@components/dashboard/NotificationButton";
-import ProfileMenuButton from "@components/dashboard/ProfileMenuButton";
-import Sidebar from "@components/dashboard/Sidebar";
-import "@app/(dashboard)/dashboard.css"
+import SwitchModeButton from "@components/dashboard/layout/SwitchModeButton";
+import NotificationButton from "@components/dashboard/layout/NotificationButton";
+import ProfileMenuButton from "@components/dashboard/layout/ProfileMenuButton";
+import Sidebar from "@components/dashboard/layout/Sidebar";
+import "@app/(dashboard)/globals.css"
+import Link from "next/link";
 
 export const metadata = {
     title: 'Next.js',
@@ -19,47 +21,30 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body>
-                <AuthorizationComponent>
-                    <ThemeProviderLocal>
-                        <div className="app-container">
-                            <div className="app-header">
-                                <div className="app-header-left">
-                                    <a href="/dashboard">
-                                        <img src="/logoDark.png" className="app-icon" />
-                                    </a>
-                                    <a className="app-name" href="/dashboard">ClassMate</a>
-                                    <div className="search-wrapper">
-                                        <input className="search-input" type="text" placeholder="Search" />
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="feather feather-search" viewBox="0 0 24 24">
-                                            <defs></defs>
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <path d="M21 21l-4.35-4.35"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div className="app-header-right">
-                                    <button className="messages-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-message-circle">
-                                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                                        </svg>
-                                    </button>
-                                    <SwitchModeButton />
-                                    <AddProjectButton />
-                                    <NotificationButton />
-                                    <ProfileMenuButton />
-                                </div>
-
-
+                <ThemeProviderLocal>
+                    <div className="app-container">
+                        <div className="app-header">
+                            <div className="app-header-left">
+                                <Logo />
+                                <Link className="app-name" href="/dashboard">ClassMate</Link>
                             </div>
-                            <div className="app-content">
-                                <Sidebar />
-                                {children}
+                            <div className="app-header-right">
+                                <SwitchModeButton />
+                                <AddProjectButton />
+                                <NotificationButton />
+                                <ProfileMenuButton />
                             </div>
                         </div>
-                    </ThemeProviderLocal>
-                </AuthorizationComponent>
+                        <div className="app-content">
+                            <Sidebar />
+                            <AuthorizationComponent>
+                                {children}
+                            </AuthorizationComponent>
+                        </div>
+                    </div>
+                </ThemeProviderLocal>
             </body>
         </html>
     )

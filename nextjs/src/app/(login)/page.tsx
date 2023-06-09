@@ -1,14 +1,16 @@
 'use client'
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FieldValues, useForm } from 'react-hook-form';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { regPassword, regUsername, regEmail } from '@app/(login)/validation';
-import Error from '@components/login/Error';
+import LocalError from "@components/login/LocalError";
 import config from '@/config';
 
 export default function Home() {
-    let [bounceDir, setBounceDir] = useState(0);
+    const router = useRouter();
+    const [bounceDir, setBounceDir] = useState(0);
     const signUpHandler = () => setBounceDir(1);
     const logInHandler = () => setBounceDir(0);
 
@@ -37,7 +39,7 @@ export default function Home() {
                 if (res.status === 200) {
                     window['sessionStorage'].setItem("token", res.data.token);
                     window['sessionStorage'].setItem("username", username);
-                    window.location.href = '/dashboard';
+                    router.push("/dashboard");
                     // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {
                     alert("Invalid username or password");
@@ -81,24 +83,26 @@ export default function Home() {
 
     return (
         <main>
-            <div className='float-end'><img src="/logoWhite.png" className="logo flex-col flex ml-auto mr-auto top" /></div>
+            <div className='float-end'>
+                <img src="/logoWhiteWithCaptions.png" className="logo flex-col flex ml-auto mr-auto top" alt="Logo" />
+            </div>
             <section className="user">
                 <div className="user_options-container">
                     <div className="user_options-text">
                         <div className="user_options-unregistered">
                             <h2 className="user_unregistered-title">{`Don't have an account?`}</h2>
                             <p className="user_unregistered-text">Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art fap.</p>
-                            <button className="user_unregistered-signup" id="signup-button" onClick={signUpHandler}>Sign up</button>
+                            <button className="user_unregistered-signup" id="signup-button" onClick={signUpHandler} type="button">Sign up</button>
                         </div>
 
                         <div className="user_options-registered">
                             <h2 className="user_registered-title">Have an account?</h2>
                             <p className="user_registered-text">Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art fap.</p>
-                            <button className="user_registered-login" id="login-button" onClick={logInHandler}>Login</button>
+                            <button className="user_registered-login" id="login-button" onClick={logInHandler} type="button">Login</button>
                         </div>
                     </div>
 
-                    <div className={"user_options-forms " + (bounceDir ? 'bounceLeft' : 'bounceRight')} id="user_options-forms">
+                    <div className={`user_options-forms ${(bounceDir ? 'bounceLeft' : 'bounceRight')}`} id="user_options-forms">
                         <div className="user_forms-login">
                             <h2 className="forms_title">Login</h2>
                             <form className="forms_form" onSubmit={handleLogInSubmit(handleLogIn)}>
@@ -107,15 +111,14 @@ export default function Home() {
                                         <input
                                             type="text"
                                             className="forms_field-input"
-                                            autoFocus
                                             placeholder="Username"
                                             {...registerLogIn('usernameLogIn', {
-                                                required: { value: true, message: `Username required` },
-                                                pattern: { value: regUsername, message: `Invalid username` },
+                                                required: { value: true, message: "Username required" },
+                                                pattern: { value: regUsername, message: "Invalid username" },
                                             })
                                             }
                                         />
-                                        <div>{errorsLogIn.usernameLogIn && <Error message={errorsLogIn.usernameLogIn.message as string} />}</div>
+                                        <div>{errorsLogIn.usernameLogIn && <LocalError message={errorsLogIn.usernameLogIn.message as string} />}</div>
                                     </div>
                                     <div className="forms_field">
                                         <input
@@ -123,12 +126,12 @@ export default function Home() {
                                             className="forms_field-input"
                                             placeholder="Password"
                                             {...registerLogIn('passwordLogIn', {
-                                                required: { value: true, message: `Password required` },
-                                                pattern: { value: regPassword, message: `Invalid password` },
+                                                required: { value: true, message: "Password required" },
+                                                pattern: { value: regPassword, message: "Invalid password" },
                                             })
                                             }
                                         />
-                                        <div>{errorsLogIn.passwordLogIn && <Error message={errorsLogIn.passwordLogIn.message as string} />}</div>
+                                        <div>{errorsLogIn.passwordLogIn && <LocalError message={errorsLogIn.passwordLogIn.message as string} />}</div>
                                     </div>
                                 </fieldset>
                                 <div className="forms_buttons">
@@ -147,12 +150,12 @@ export default function Home() {
                                             className="forms_field-input"
                                             placeholder="Email"
                                             {...registerRegistration('emailRegistration', {
-                                                required: { value: true, message: `Email required` },
+                                                required: { value: true, message: "Email required" },
                                                 pattern: { value: regEmail, message: `Please provide a valid email. Examples: 'test@gmail.com'` },
                                             })
                                             }
                                         />
-                                        <div>{errorsRegistration.emailRegistration && <Error message={errorsRegistration.emailRegistration.message as string} />}</div>
+                                        <div>{errorsRegistration.emailRegistration && <LocalError message={errorsRegistration.emailRegistration.message as string} />}</div>
                                     </div>
                                     <div className="forms_field">
                                         <input
@@ -160,12 +163,12 @@ export default function Home() {
                                             className="forms_field-input"
                                             placeholder="Username"
                                             {...registerRegistration('usernameRegistration', {
-                                                required: { value: true, message: `Username required` },
-                                                pattern: { value: regUsername, message: `Username has to start with a letter and be 6~15 characters long` },
+                                                required: { value: true, message: "Username required" },
+                                                pattern: { value: regUsername, message: "Username has to start with a letter and be 6~15 characters long" },
                                             })
                                             }
                                         />
-                                        <div>{errorsRegistration.usernameRegistration && <Error message={errorsRegistration.usernameRegistration.message as string} />}</div>
+                                        <div>{errorsRegistration.usernameRegistration && <LocalError message={errorsRegistration.usernameRegistration.message as string} />}</div>
                                     </div>
                                     <div className="forms_field">
                                         <input
@@ -173,12 +176,12 @@ export default function Home() {
                                             className="forms_field-input"
                                             placeholder="Password"
                                             {...registerRegistration('passwordRegistration', {
-                                                required: { value: true, message: `Password required` },
-                                                pattern: { value: regPassword, message: `Password has to consist of alphabet and numbers. Spaces are not allowed. Special characters not allowed are : ~` },
+                                                required: { value: true, message: "Password required" },
+                                                pattern: { value: regPassword, message: "Password has to consist of alphabet and numbers. Spaces are not allowed. Special characters not allowed are : ~" },
                                             })
                                             }
                                         />
-                                        <div>{errorsRegistration.passwordRegistration && <Error message={errorsRegistration.passwordRegistration.message as string} />}</div>
+                                        <div>{errorsRegistration.passwordRegistration && <LocalError message={errorsRegistration.passwordRegistration.message as string} />}</div>
                                     </div>
                                 </fieldset>
                                 <div className="forms_buttons">

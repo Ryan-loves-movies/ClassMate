@@ -1,14 +1,14 @@
 import React from "react";
-import '@components/loading.css';
+import styles from '@components/loading.module.css';
 
 export default function Loading() {
     return (
-        <div className="box">
-            <div className="cat">
-                <div className="cat__body" />
-                <div className="cat__body" />
-                <div className="cat__tail" />
-                <div className="cat__head" />
+        <div className={styles['box']}>
+            <div className={styles['cat']}>
+                <div className={styles['cat__body']} />
+                <div className={styles['cat__body']} />
+                <div className={styles['cat__tail']} />
+                <div className={styles['cat__head']} />
             </div>
         </div>
     );
