@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "@app/(dashboard)/timetable/timetable.module.css";
-import SearchBar from "@/components/dashboard/SearchBar";
+import AsyncSearchBar from "@components/dashboard/AsyncSearchBar";
 
 export default function timetable() {
     // var schedule = {
@@ -449,7 +449,7 @@ export default function timetable() {
                 </div>
             </div>
             <div className={styles['module-field']}>
-                <SearchBar width="1500px" />
+                <AsyncSearchBar width="1500px" />
             </div>
         </div>
 

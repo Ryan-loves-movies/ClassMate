@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import modules from "@/sqlite/modulesModel";
+import modules from "@sqlite/modulesModel";
+import { Model, Op } from "sequelize";
 
 interface ModuleResponse {
     moduleCode: string;
@@ -12,7 +13,7 @@ interface Module {
     title: string;
 }
 
-export default async function populateDatabase() {
+export async function populateDatabase(): Promise<void> {
     await modules.sync();
     // Fetch module list data from NUSMods API
     await axios.get<ModuleResponse[]>('https://api.nusmods.com/v2/2022-2023/moduleList.json')
@@ -37,11 +38,22 @@ export default async function populateDatabase() {
         });
 }
 
-async function queryDatabase() {
-    const lol = await modules.findOne({ where: { code: "BT1101" } });
-    // const lol = await modules.findAll();
-    console.log(lol);
+export default async function findSimilar(query: string, limit: Number): Promise<Array<Model>> {
+    return await modules.findAll({
+        limit: limit,
+        where: {
+            [Op.or]: [
+                {
+                    code: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+                {
+                    title: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+            ],
+        }
+    });
 }
-
-// populateDatabase();
-queryDatabase();
