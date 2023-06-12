@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
         .then((models) => {
             return models.map((model) => model.toJSON());
         });
-    console.log(searchRes);
 
     return NextResponse.json(searchRes);
 }

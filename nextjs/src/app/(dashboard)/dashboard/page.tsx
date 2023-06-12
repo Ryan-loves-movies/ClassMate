@@ -29,7 +29,7 @@ export default function Dashboard() {
             <div className={styles['messages-section']}>
                 <div className={styles['projects-section-header']}>
                     <p>Add people</p>
-                    <SearchBar width="800px"/>
+                    <SearchBar width="80%" />
                 </div>
                 <div className={styles['messages']}>
                     <PeopleBar name="Stephanie" bio="I got your first assignment. It was quite good. 🥳 We can continue with the next assignment." />
