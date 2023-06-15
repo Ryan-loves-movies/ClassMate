@@ -1,10 +1,10 @@
-// User for connection with mySQL and { Request, Response } with express api
-import User from '@server/database/models/user.jsx';
-import config from '@server/config.jsx';
+// Users for connection with mySQL and { Request, Response } with express api
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { AxiosError } from 'axios';
+import config from '@server/config.jsx';
+import Users, { lessonTypes } from '@models/Users.jsx';
 
 interface profile {
     email: string;
@@ -17,16 +17,13 @@ interface minProfile {
     password: string;
 }
 
-interface authenticatedUser {
-    username: string;
-}
-
 interface modDet {
     code: string;
     day: string;
     startTime: string;
     endTime: string;
 }
+
 interface modType {
     code: string;
     lecture: modDet;
@@ -82,10 +79,10 @@ const createUser = (req: Request, res: Response) => {
                 throw err;
             }
             if (hashedPassword) {
-                return User.create({ username: username, email: email, password: hashedPassword });
+                return Users.create({ username: username, email: email, password: hashedPassword });
             }
         });
-        res.status(201).json({ message: 'User created successfully!' });
+        res.status(201).json({ message: 'Users created successfully!' });
     } catch (err) {
         console.log("Error while making new user in createUser() - userController.tsx, line 65\n", err);
         res.status(500).json({ message: 'Server Error' });
@@ -104,7 +101,7 @@ const createUser = (req: Request, res: Response) => {
 async function logIn(req: Request, res: Response) {
     const { username, password }: minProfile = req.body;
     try {
-        await User.findOne({
+        await Users.findOne({
             where: {
                 username: username
             }
@@ -119,7 +116,7 @@ async function logIn(req: Request, res: Response) {
                 if (authenticated) {
                     const token = jwt.sign(req.body, config.JWT_SECRET, { expiresIn: '1d' })
                     return res.status(200).json({
-                        message: 'User authenticated',
+                        message: 'Users authenticated',
                         token: token
                     });
                 } else {
@@ -169,294 +166,68 @@ async function getProfile(req: Request, res: Response) {
             res.status(500).json({ message: "No username passed in params" })
             return;
         }
-        return await User.findOne({
-            where: {
-                username: username
-            }
-        }).then((user) => {
-            if (!user) {
-                return res.status(404).json({ message: 'No existing user found' });
-            }
-
-            if (req.query.mods === 'true') {
-                return res.status(200).json({
-                    username: user.get("username"),
-                    email: user.get("email"),
-
-                    mods: [
-                        {
-                            code: user.get('mod1'),
-                            lecture: {
-                                code: user.get('mod1LecCode'),
-                                day: user.get('mod1LecDay'),
-                                startTime: user.get('mod1LecStartTime'),
-                                endTime: user.get('mod1LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod1TutCode'),
-                                day: user.get('mod1TutDay'),
-                                startTime: user.get('mod1TutStartTime'),
-                                endTime: user.get('mod1TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod1LabCode'),
-                                day: user.get('mod1LabDay'),
-                                startTime: user.get('mod1LabStartTime'),
-                                endTime: user.get('mod1LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod2'),
-                            lecture: {
-                                code: user.get('mod2LecCode'),
-                                day: user.get('mod2LecDay'),
-                                startTime: user.get('mod2LecStartTime'),
-                                endTime: user.get('mod2LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod2TutCode'),
-                                day: user.get('mod2TutDay'),
-                                startTime: user.get('mod2TutStartTime'),
-                                endTime: user.get('mod2TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod2LabCode'),
-                                day: user.get('mod2LabDay'),
-                                startTime: user.get('mod2LabStartTime'),
-                                endTime: user.get('mod2LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod3'),
-                            lecture: {
-                                code: user.get('mod3LecCode'),
-                                day: user.get('mod3LecDay'),
-                                startTime: user.get('mod3LecStartTime'),
-                                endTime: user.get('mod3LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod3TutCode'),
-                                day: user.get('mod3TutDay'),
-                                startTime: user.get('mod3TutStartTime'),
-                                endTime: user.get('mod3TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod3LabCode'),
-                                day: user.get('mod3LabDay'),
-                                startTime: user.get('mod3LabStartTime'),
-                                endTime: user.get('mod3LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod4'),
-                            lecture: {
-                                code: user.get('mod4LecCode'),
-                                day: user.get('mod4LecDay'),
-                                startTime: user.get('mod4LecStartTime'),
-                                endTime: user.get('mod4LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod4TutCode'),
-                                day: user.get('mod4TutDay'),
-                                startTime: user.get('mod4TutStartTime'),
-                                endTime: user.get('mod4TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod4LabCode'),
-                                day: user.get('mod4LabDay'),
-                                startTime: user.get('mod4LabStartTime'),
-                                endTime: user.get('mod4LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod5'),
-                            lecture: {
-                                code: user.get('mod5LecCode'),
-                                day: user.get('mod5LecDay'),
-                                startTime: user.get('mod5LecStartTime'),
-                                endTime: user.get('mod5LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod5TutCode'),
-                                day: user.get('mod5TutDay'),
-                                startTime: user.get('mod5TutStartTime'),
-                                endTime: user.get('mod5TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod5LabCode'),
-                                day: user.get('mod5LabDay'),
-                                startTime: user.get('mod5LabStartTime'),
-                                endTime: user.get('mod5LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod6'),
-                            lecture: {
-                                code: user.get('mod6LecCode'),
-                                day: user.get('mod6LecDay'),
-                                startTime: user.get('mod6LecStartTime'),
-                                endTime: user.get('mod6LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod6TutCode'),
-                                day: user.get('mod6TutDay'),
-                                startTime: user.get('mod6TutStartTime'),
-                                endTime: user.get('mod6TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod6LabCode'),
-                                day: user.get('mod6LabDay'),
-                                startTime: user.get('mod6LabStartTime'),
-                                endTime: user.get('mod6LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod7'),
-                            lecture: {
-                                code: user.get('mod7LecCode'),
-                                day: user.get('mod7LecDay'),
-                                startTime: user.get('mod7LecStartTime'),
-                                endTime: user.get('mod7LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod7TutCode'),
-                                day: user.get('mod7TutDay'),
-                                startTime: user.get('mod7TutStartTime'),
-                                endTime: user.get('mod7TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod7LabCode'),
-                                day: user.get('mod7LabDay'),
-                                startTime: user.get('mod7LabStartTime'),
-                                endTime: user.get('mod7LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod8'),
-                            lecture: {
-                                code: user.get('mod8LecCode'),
-                                day: user.get('mod8LecDay'),
-                                startTime: user.get('mod8LecStartTime'),
-                                endTime: user.get('mod8LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod8TutCode'),
-                                day: user.get('mod8TutDay'),
-                                startTime: user.get('mod8TutStartTime'),
-                                endTime: user.get('mod8TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod8LabCode'),
-                                day: user.get('mod8LabDay'),
-                                startTime: user.get('mod8LabStartTime'),
-                                endTime: user.get('mod8LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod9'),
-                            lecture: {
-                                code: user.get('mod9LecCode'),
-                                day: user.get('mod9LecDay'),
-                                startTime: user.get('mod9LecStartTime'),
-                                endTime: user.get('mod9LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod9TutCode'),
-                                day: user.get('mod9TutDay'),
-                                startTime: user.get('mod9TutStartTime'),
-                                endTime: user.get('mod9TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod9LabCode'),
-                                day: user.get('mod9LabDay'),
-                                startTime: user.get('mod9LabStartTime'),
-                                endTime: user.get('mod9LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod10'),
-                            lecture: {
-                                code: user.get('mod10LecCode'),
-                                day: user.get('mod10LecDay'),
-                                startTime: user.get('mod10LecStartTime'),
-                                endTime: user.get('mod10LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod10TutCode'),
-                                day: user.get('mod10TutDay'),
-                                startTime: user.get('mod10TutStartTime'),
-                                endTime: user.get('mod10TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod10LabCode'),
-                                day: user.get('mod10LabDay'),
-                                startTime: user.get('mod10LabStartTime'),
-                                endTime: user.get('mod10LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod11'),
-                            lecture: {
-                                code: user.get('mod11LecCode'),
-                                day: user.get('mod11LecDay'),
-                                startTime: user.get('mod11LecStartTime'),
-                                endTime: user.get('mod11LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod11TutCode'),
-                                day: user.get('mod11TutDay'),
-                                startTime: user.get('mod11TutStartTime'),
-                                endTime: user.get('mod11TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod11LabCode'),
-                                day: user.get('mod11LabDay'),
-                                startTime: user.get('mod11LabStartTime'),
-                                endTime: user.get('mod11LabEndTime')
-                            }
-                        },
-
-                        {
-                            code: user.get('mod12'),
-                            lecture: {
-                                code: user.get('mod12LecCode'),
-                                day: user.get('mod12LecDay'),
-                                startTime: user.get('mod12LecStartTime'),
-                                endTime: user.get('mod12LecEndTime')
-                            },
-                            tutorial: {
-                                code: user.get('mod12TutCode'),
-                                day: user.get('mod12TutDay'),
-                                startTime: user.get('mod12TutStartTime'),
-                                endTime: user.get('mod12TutEndTime'),
-                            },
-                            lab: {
-                                code: user.get('mod12LabCode'),
-                                day: user.get('mod12LabDay'),
-                                startTime: user.get('mod12LabStartTime'),
-                                endTime: user.get('mod12LabEndTime')
-                            }
-                        }
-                    ]
+        if (req.query.mods === 'true') {
+            return await Users.findOne({
+                where: {
+                    username: username
+                },
+                include: lessonTypes
+            })
+                .then((user) => {
+                    if (!user) {
+                        return res.status(404).json({ message: 'No existing user found' });
+                    }
+                    return res.status(200).json({
+                        username: user.get("username"),
+                        email: user.get("email"),
+                    });
 
                 });
-            }
-            return res.status(200).json({
-                username: user.get("username"),
-                email: user.get("email"),
-            });
-        });
-    } catch (err) {
+        }
+
+        return await Users.findOne({
+            where: {
+                username: username
+            },
+            include: lessonTypes
+        })
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).json({ message: 'No existing user found' });
+                }
+                return user.get(lessonTypes[0].name);
+                // return res.status(200).json({
+                //     username: user.get("username"),
+                //     email: user.get("email"),
+
+                //     mods: lessonTypes.map((lessonType) => user.get(lessonType.name))
+                //         [
+                //         {
+                //             code: user.get('mod1'),
+                //             lecture: {
+                //                 code: user.get('mod1LecCode'),
+                //                 day: user.get('mod1LecDay'),
+                //                 startTime: user.get('mod1LecStartTime'),
+                //                 endTime: user.get('mod1LecEndTime')
+                //             },
+                //             tutorial: {
+                //                 code: user.get('mod1TutCode'),
+                //                 day: user.get('mod1TutDay'),
+                //                 startTime: user.get('mod1TutStartTime'),
+                //                 endTime: user.get('mod1TutEndTime'),
+                //             },
+                //             lab: {
+                //                 code: user.get('mod1LabCode'),
+                //                 day: user.get('mod1LabDay'),
+                //                 startTime: user.get('mod1LabStartTime'),
+                //                 endTime: user.get('mod1LabEndTime')
+                //             }
+                //         }
+                //     ]
+                // });
+            })
+    }
+    catch (err) {
         console.log("Error while getting profile details in getProfile() - userController.tsx - line 400?\n", err);
     }
 }
@@ -478,7 +249,7 @@ async function updateProfile(req: Request, res: Response) {
         validateRequest(req, res);
         const { username, ...updatedValsRaw } = req.body;
         const updatedVals = updatedValsRaw as modType;
-        await User.findOne({
+        await Users.findOne({
             where: {
                 username: username
             }
@@ -508,7 +279,7 @@ async function updateProfile(req: Request, res: Response) {
                 [`mod${modNoToChange}TutStartTime`]: updatedVals.tutorial.startTime,
                 [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime
             }
-            User.update(updatedDet, {
+            Users.update(updatedDet, {
                 where: {
                     username: username
                 }
@@ -544,7 +315,7 @@ async function resetPassword(req: Request, res: Response) {
     // Update password after
     try {
         validateRequest(req, res);
-        return await User.update(req.body, {
+        return await Users.update(req.body, {
             where: {
                 password: req.body.password
             }
@@ -583,7 +354,7 @@ async function verifyEmail(req: Request, res: Response) {
 async function deleteUser(req: Request, res: Response) {
     try {
         validateRequest(req, res);
-        return await User.destroy({
+        return await Users.destroy({
             where: {
                 username: req.body.username
             }
