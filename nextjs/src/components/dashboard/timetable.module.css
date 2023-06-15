@@ -62,12 +62,17 @@
 
 .s-container .s-activities {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     height: 100%;
     z-index: 2;
 }
 
 .s-act-row {
     position: relative;
+    display: flex;
+    width: 100%;
     height: 20%;
 }
 
@@ -76,7 +81,6 @@
     padding: 35px;
     border-radius: 16px;
     position: absolute;
-    top: 4px;
 }
 
 .s-act-tab .s-act-name {
@@ -125,7 +129,7 @@
 }
 
 .s-act-tab.orange {
-    background: linear-gradient(to right, #F2994A, #F2C94C);
+    background: linear-gradient(to right, #f59042, #f59942);
 }
 
 .s-act-tab.red {
@@ -133,7 +137,7 @@
 }
 
 .s-act-tab.yellow {
-    background: linear-gradient(to right, #fffc00, #fffc00);
+    background: linear-gradient(to right, #f5d142, #f5d142);
 }
 
 .s-act-tab.blue {

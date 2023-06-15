@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { Dispatch, useState } from "react";
 import styles from "@components/dashboard/modSearchBar.module.css";
 import axios, { AxiosResponse } from "axios";
 
@@ -8,9 +8,9 @@ interface respBody {
     title: string;
 }
 
-export default function ModSearchBar({ width }: { width: string }) {
+export default function ModSearchBar({ setAddedActivity, width }: { setAddedActivity: Dispatch<string>, width: string }) {
     // The sequelize model passed should have indexes based on the LIKE query for both `code` and `title` for efficiency
-    const [searchRes, setSearchRes] = useState<Array<respBody>>([]);
+    const [searchRes, setSearchRes] = useState<respBody[]>([]);
     const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -23,7 +23,7 @@ export default function ModSearchBar({ width }: { width: string }) {
         } else if (event.key === 'Enter' && focusedIndex >= 0 && focusedIndex < searchRes.length) {
             event.preventDefault();
             const selectedOption = searchRes[focusedIndex];
-            console.log(selectedOption);
+            setAddedActivity(selectedOption.code);
         }
     }
 
@@ -46,28 +46,8 @@ export default function ModSearchBar({ width }: { width: string }) {
                 });
         }
     };
-    // interface Option {
-    //     value: string;
-    //     label: string;
-    // }
-    // const handleSearch = (query: string, callback: (opt: OptionsOrGroups<Option, GroupBase<Option>>) => void): void => {
-    //     if (query === "") {
-    //         setSearchRes([]);
-    //     } else {
-    //         axios.get('/search/modules', {
-    //             params: {
-    //                 limit: 10,
-    //                 query: query
-    //             }
-    //         })
-    //             .then((res: AxiosResponse) => {
-    //                 const options: Option[] = res.data.map((item: respBody) => ({ value: item.code, label: item.title }));
-    //                 callback(options);
-    //             });
-    //     }
-    // };
     const searchLi = (
-        <ul role="listbox">
+        <ul>
             {searchRes.map((item, index: number) => (
                 <li key={item.code} 
                     className={(index === focusedIndex) ? styles['selected'] : ''}
@@ -77,10 +57,6 @@ export default function ModSearchBar({ width }: { width: string }) {
                 </li>
             ))}
         </ul>
-        // <AsyncSelect<Option>
-        //     loadOptions={handleSearch}
-        //     cacheOptions
-        // />
     );
 
     return (

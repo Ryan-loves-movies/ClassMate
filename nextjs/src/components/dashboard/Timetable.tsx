@@ -1,67 +1,96 @@
 'use client'
-import axios, { AxiosError, AxiosResponse } from "axios";
-import config from '@/config';
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "@components/dashboard/timetable.module.css";
 
-export default function timetable() {
-    interface modType {
-        code: string,
-        lectureCode: string,
-        lectureStartTime: string,
-        lectureEndTime: string,
-        tutorialCode: string,
-        tutorialStartTime: string,
-        tutorialEndTime: string,
-        labCode: string,
-        labStartTime: string,
-        labEndTime: string
-    }
+interface modDet {
+    code: string;
+    day: string;
+    startTime: string;
+    endTime: string;
+}
+interface modType {
+    code: string;
+    lecture: modDet;
+    tutorial: modDet;
+    lab: modDet;
+}
 
-    // Components for the module tabs
-    const toMin = (hours: number, minutes: number, string = ''): number => {
-        // change time format (10,45) to minutes (645)
-        if (string.length > 0) {
-            // "0710"
-            const h = parseInt(string.slice(0, 2));
-            const m = parseInt(string.slice(2, 4));
-
-            return toMin(h, m);
-        }
-
-        return hours * 60 + minutes;
-    }
-
-    const minToWidth = (min: number): number => {
-        return (min / 120 * twoHourWidth);
-    }
-
-    const start = toMin(8, 0);
-    const end = toMin(22, 0);
+export default function timetable({ activities }: { activities: modType[] }) {
     const twoHourBox = useRef<HTMLDivElement>(null);
-    const [twoHourWidth, setTwoHourWidth] = useState(125);
     const colors = [
         'green',
-        'orange',
-        'red',
-        'yellow',
         'blue',
         'pink',
         'black',
-        'purple',
         'teal',
+        'cyan',
         'brown',
+        'purple',
         'gray',
-        'cyan'
+        'orange',
+        'red',
+        'yellow'
     ];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    // One Module tab
-    const ModActivity = ({ code = 'BT1101', startTime = '0800', endTime = '2200', color = 'blue', lessonType = 'Tutorial[C1]' }) => {
-        const width = minToWidth(toMin(0, 0, endTime) - toMin(0, 0, startTime));
+    // For each day of the week,
+    //     Extract all start and end times to determine max no. of overlaps
+    // const maxOverlapsEachDay = days.map((day: string) => {
+    //     const dayActivities = activities
+    //         .map((mod: modType) => {
+    //             const lecture = (mod.lecture.day === day)
+    //                 ? {
+    //                     startTime: mod.lecture.startTime,
+    //                     endTime: mod.lecture.endTime
+    //                 }
+    //                 : {};
+    //             const tutorial = (mod.tutorial.day === day)
+    //                 ? {
+    //                     startTime: mod.tutorial.startTime,
+    //                     endTime: mod.tutorial.endTime
+    //                 }
+    //                 : {};
+    //             const lab = (mod.lab.day === day)
+    //                 ? {
+    //                     startTime: mod.lab.startTime,
+    //                     endTime: mod.lab.endTime
+    //                 }
+    //                 : {};
+    //             return [lecture, tutorial, lab];
+    //         })
+    //         .reduce((mod1, mod2) => mod1.concat(mod2))
+    //         .filter((singleActivity) => singleActivity)
+    //         .filter((singleActivity) => singleActivity.startTime);
+    //         // dayActivities.sort(())
+    // });
+    // Components for the module tabs
+    const toMin = (hours: number, minutes: number, time = ''): number => {
+        if (time === null || time.length === 0) {
+            return hours * 60 + minutes;
+        }
+        // change time format (10,45) to minutes (645)
+        else {
+            // "0710"
+            const h = parseInt(time.slice(0, 2));
+            const m = parseInt(time.slice(2, 4));
+
+            return toMin(h, m);
+        }
+    };
+
+    const minToPerc = (min: number): number => {
+        return (min / (120 * 7) * 100);
+    };
+
+    // One Activitiy Tab
+    const Activity = ({ code = 'BT1101', startTime = '0800', endTime = '2200', color = 'blue', lessonType = 'Tutorial[C1]' }) => {
+        const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
+        const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
                 style={{
-                    width: `${width}px`
+                    left: `${start}%`,
+                    width: `${width}%`
                 }}
             >
                 <div className={styles['s-act-name']}>{code}</div>
@@ -70,30 +99,66 @@ export default function timetable() {
         );
     };
 
-    const [mods, setMods] = useState<modType[]>();
-
-    // Get list of modules this user is studying
-    const getModules = () => {
-        axios.get(`${config.expressHost}/profile`, {
-            headers: {
-                Authorization: window['sessionStorage'].getItem("token")
-            },
-            params: {
-                username: window['sessionStorage'].getItem("username"),
-                mods: true
+    // Activities for the whole week
+    const Activities = () => {
+        const activitiesWithColors = activities.map((mod: modType, index: number) => {
+            return {
+                ...mod,
+                color: colors[index]
             }
-        })
-            .then((res: AxiosResponse) => {
-                if (res.status === 200) {
-                    console.log(res.data);
-                    const { username, email, ...tempMods } = res.data;
-                    (tempMods as modType[]).filter((mod) => mod.code !== null);
-                    setMods(mods);
-                }
-            })
-            .catch((err: AxiosError) => {
-                alert("Sorry! A problem occured! Your email could not be found.");
-            })
+        });
+        return (
+            <>
+                {days.map((day) => {
+                    return (
+                        <div className={styles['s-act-row']}>
+                            {activitiesWithColors
+                                .filter((mod) => mod.lecture.day === day)
+                                .map((mod) => {
+                                    return (
+                                        <Activity
+                                            code={mod.code}
+                                            color={mod.color}
+                                            startTime={mod.lecture.startTime}
+                                            endTime={mod.lecture.endTime}
+                                            lessonType={mod.lecture.code}
+                                        />
+                                    )
+                                })
+                            }
+                            {activitiesWithColors
+                                .filter((mod) => mod.lab.day === day)
+                                .map((mod) => {
+                                    return (
+                                        <Activity
+                                            code={mod.code}
+                                            color={mod.color}
+                                            startTime={mod.lab.startTime}
+                                            endTime={mod.lab.endTime}
+                                            lessonType={mod.lab.code}
+                                        />
+                                    )
+                                })
+                            }
+                            {activitiesWithColors
+                                .filter((mod) => mod.tutorial.day === day)
+                                .map((mod) => {
+                                    return (
+                                        <Activity
+                                            code={mod.code}
+                                            color={mod.color}
+                                            startTime={mod.tutorial.startTime}
+                                            endTime={mod.tutorial.endTime}
+                                            lessonType={mod.tutorial.code}
+                                        />
+                                    )
+                                })
+                            }
+                        </div>
+                    );
+                })}
+            </>
+        );
     };
 
     // Component for the background
@@ -108,11 +173,6 @@ export default function timetable() {
             </div>
         );
     };
-
-    useEffect(() => {
-        setTwoHourWidth(twoHourBox?.current?.clientWidth || 125);
-        getModules();
-    });
 
     return (
         <div className={styles['DM_Sans']}>
@@ -136,36 +196,7 @@ export default function timetable() {
                 </div>
                 <div className={styles['s-container']}>
                     <div className={styles['s-activities']}>
-                        <div className={styles['s-act-row']}>
-                            {mods?.map((mod: modType, index: number) => {
-                                return (
-                                    <>
-                                        <ModActivity
-                                            code={mod.code}
-                                            color={colors[index]}
-                                            startTime={mod.lectureStartTime}
-                                            endTime={mod.lectureEndTime}
-                                            lessonType={mod.lectureCode}
-                                        />
-                                        <ModActivity
-                                            code={mod.code}
-                                            color={colors[index]}
-                                            startTime={mod.tutorialStartTime}
-                                            endTime={mod.tutorialEndTime}
-                                            lessonType={mod.tutorialCode}
-                                        />
-                                        <ModActivity
-                                            code={mod.code}
-                                            color={colors[index]}
-                                            startTime={mod.labStartTime}
-                                            endTime={mod.labEndTime}
-                                            lessonType={mod.labCode}
-                                        />
-                                    </>
-                                )
-                            })}
-                            <ModActivity />
-                        </div>
+                        <Activities />
                     </div>
                     <div className={styles['background-col']}>
                         <Col gray={true} />
