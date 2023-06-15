@@ -15,7 +15,7 @@ interface modType {
     lab: modDet;
 }
 
-export default function timetable({ activities }: { activities: modType[] }) {
+export default function Timetable({ activities }: { activities: modType[] }) {
     const twoHourBox = useRef<HTMLDivElement>(null);
     const colors = [
         'green',
@@ -111,12 +111,13 @@ export default function timetable({ activities }: { activities: modType[] }) {
             <>
                 {days.map((day) => {
                     return (
-                        <div className={styles['s-act-row']}>
+                        <div className={styles['s-act-row']} key="">
                             {activitiesWithColors
                                 .filter((mod) => mod.lecture.day === day)
                                 .map((mod) => {
                                     return (
                                         <Activity
+                                            key=""
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lecture.startTime}
@@ -131,6 +132,7 @@ export default function timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
+                                            key=""
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lab.startTime}
@@ -145,6 +147,7 @@ export default function timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
+                                            key=""
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.tutorial.startTime}
