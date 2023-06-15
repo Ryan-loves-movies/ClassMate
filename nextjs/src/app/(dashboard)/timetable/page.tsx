@@ -57,7 +57,7 @@ interface modType {
     lab: modDet;
 }
 
-export default function timetable() {
+export default function TimetableMain() {
     const [isSem1, setIsSem1] = useState<boolean>(true);
     const [mods, setMods] = useState<modType[]>([]);
     const [addedMod, setAddedMod] = useState<string>('');

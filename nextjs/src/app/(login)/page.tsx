@@ -91,13 +91,13 @@ export default function Home() {
                     <div className="user_options-text">
                         <div className="user_options-unregistered">
                             <h2 className="user_unregistered-title">{`Don't have an account?`}</h2>
-                            <p className="user_unregistered-text">Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art fap.</p>
+                            <p className="user_unregistered-text">One click away from matching modules with your friends!</p>
                             <button className="user_unregistered-signup" id="signup-button" onClick={signUpHandler} type="button">Sign up</button>
                         </div>
 
                         <div className="user_options-registered">
                             <h2 className="user_registered-title">Have an account?</h2>
-                            <p className="user_registered-text">Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art fap.</p>
+                            <p className="user_registered-text">One click away from matching modules with your friends!</p>
                             <button className="user_registered-login" id="login-button" onClick={logInHandler} type="button">Login</button>
                         </div>
                     </div>

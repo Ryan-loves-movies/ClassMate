@@ -8,7 +8,7 @@ import config from '@/config';
 interface childrenElems {
     children?: ReactNode | ReactNode[];
 }
-export default function AuthorizationComponent({ children }: childrenElems): ReactNode {
+export default function AuthorizationComponent({ children }: childrenElems): JSX.Element {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
