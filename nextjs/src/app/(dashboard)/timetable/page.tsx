@@ -128,6 +128,7 @@ export default function timetable() {
             })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
+                        console.log(res.data);
                         const tempMods: modType[] = res.data.mods;
                         tempMods.filter((mod) => mod.code !== null);
                         setMods(tempMods);
