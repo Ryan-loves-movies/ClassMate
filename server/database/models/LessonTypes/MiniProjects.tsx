@@ -2,7 +2,7 @@ import sequelize from '@server/database/connection.jsx';
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
 class MiniProjects extends Model<InferAttributes<MiniProjects>, InferCreationAttributes<MiniProjects>> {
-    declare code: string;
+    declare id: string;
     declare moduleCode: string;
     declare sem: number;
     declare day: string;
@@ -11,7 +11,7 @@ class MiniProjects extends Model<InferAttributes<MiniProjects>, InferCreationAtt
 }
 
 MiniProjects.init({
-    code: {
+    id: {
         type: DataTypes.STRING(10),
         allowNull: false,
         unique: true,

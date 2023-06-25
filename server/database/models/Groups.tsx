@@ -1,9 +1,26 @@
-import sequelize from '@server/database/connection.jsx';
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import sequelize from '@server/database/connection';
+import { Association, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin, BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import Modules from '@models/Modules';
+import Users from '@models/Users';
 
 class Groups extends Model<InferAttributes<Groups>, InferCreationAttributes<Groups>> {
-    declare id: string;
+    declare id: number | null;
     declare name: string;
+
+    declare getUsers: BelongsToManyGetAssociationsMixin<Users>;
+    declare addUser: BelongsToManyAddAssociationMixin<Users, number>;
+    declare addUsers: BelongsToManyAddAssociationsMixin<Users, number>;
+    declare setUsers: BelongsToManySetAssociationsMixin<Users, number>;
+    declare removeUser: BelongsToManyRemoveAssociationMixin<Users, number>;
+    declare removeUsers: BelongsToManyRemoveAssociationsMixin<Users, number>;
+    declare hasUser: BelongsToManyHasAssociationMixin<Users, number>;
+    declare hasUsers: BelongsToManyHasAssociationsMixin<Users, number>;
+    declare countUsers: BelongsToManyCountAssociationsMixin;
+    declare createUser: BelongsToManyCreateAssociationMixin<Users>;
+
+    declare static associations: {
+        users: Association<Modules, Users>;
+    };
 }
 
 Groups.init({
@@ -19,8 +36,8 @@ Groups.init({
         allowNull: false
     }
 }, {
-    tableName: 'Modules',
     sequelize,
+    tableName: 'Groups',
     timestamps: false
 });
 

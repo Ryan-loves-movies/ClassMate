@@ -2,7 +2,7 @@ import sequelize from '@server/database/connection.jsx';
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
 class SeminarStyleModuleClasses extends Model<InferAttributes<SeminarStyleModuleClasses>, InferCreationAttributes<SeminarStyleModuleClasses>> {
-    declare code: string;
+    declare id: string;
     declare moduleCode: string;
     declare sem: number;
     declare day: string;
@@ -11,7 +11,7 @@ class SeminarStyleModuleClasses extends Model<InferAttributes<SeminarStyleModule
 }
 
 SeminarStyleModuleClasses.init({
-    code: {
+    id: {
         type: DataTypes.STRING(10),
         allowNull: false,
         unique: true,

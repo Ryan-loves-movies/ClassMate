@@ -1,9 +1,8 @@
 import sequelize from '@server/database/connection.jsx';
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import internal from 'stream';
 
 class Laboratories extends Model<InferAttributes<Laboratories>, InferCreationAttributes<Laboratories>> {
-    declare code: string;
+    declare id: string;
     declare moduleCode: string;
     declare sem: number;
     declare day: string;
@@ -12,7 +11,7 @@ class Laboratories extends Model<InferAttributes<Laboratories>, InferCreationAtt
 }
 
 Laboratories.init({
-    code: {
+    id: {
         type: DataTypes.STRING(10),
         allowNull: false,
         unique: true,

@@ -2,9 +2,12 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { AxiosError } from 'axios';
-import config from '@server/config.jsx';
-import Users, { lessonTypes } from '@models/Users.jsx';
+import config from '@server/config';
+import validateRequest from '@controllers/authController';
+import Users from '@models/Users';
+import Modules from '@models/Modules';
+import Lessons from '@models/Lessons';
+import Users_Modules from '@models/Users_Modules';
 
 interface profile {
     email: string;
@@ -35,41 +38,18 @@ interface modType {
 const saltRounds = 10;
 
 /** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        * }
-        * Verifies the JSON web token passed in request headers
-        * */
-function validateRequest(req: Request, res: Response): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const token = req.headers.authorization as string;
-
-        if (!token) {
-            res.status(404).json({ message: 'No token provided' });
-            throw new AxiosError('No token provided');
-        }
-
-        jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
-            if (err) {
-                res.status(401).json({ message: 'Invalid token' });
-                throw new AxiosError('Invalid token');
-            }
-        });
-    });
-}
-
-/** 
-    * req: {
-    *   body: {
-        *   username: string,
-        *   password: string (encoded),
-        *   email: string
-        *   }
-        * }
-        * Creates new user with empty details in the database
-        * */
+    * Creates new user with empty details in the database
+* @param req -
+    * {body: 
+        * {
+    *   username: string,
+    *   password: string (encoded),
+    *   email: string
+    *   }
+    * }
+    * @param res {express.Response}
+    * @returns void
+    */
 const createUser = (req: Request, res: Response) => {
     const { email, username, password }: profile = req.body;
 
@@ -166,12 +146,11 @@ async function getProfile(req: Request, res: Response) {
             res.status(500).json({ message: "No username passed in params" })
             return;
         }
-        if (req.query.mods === 'true') {
+        if (req.query.mods === 'false') {
             return await Users.findOne({
                 where: {
                     username: username
                 },
-                include: lessonTypes
             })
                 .then((user) => {
                     if (!user) {
@@ -184,47 +163,64 @@ async function getProfile(req: Request, res: Response) {
 
                 });
         }
-
-        return await Users.findOne({
-            where: {
-                username: username
-            },
-            include: lessonTypes
+        return await Users.findByPk(username, {
+            include: [
+                {
+                    model: Users_Modules,
+                    include: [
+                        {
+                            model: Lessons
+                        },
+                        {
+                            model: Modules
+                        }]
+                }]
         })
             .then((user) => {
                 if (!user) {
                     return res.status(404).json({ message: 'No existing user found' });
                 }
-                return user.get(lessonTypes[0].name);
-                // return res.status(200).json({
-                //     username: user.get("username"),
-                //     email: user.get("email"),
+                console.log(user);
+                console.log(user.get('Users_Modules'));
+                console.log(user.get('Lessons'));
+                return res.status(200).json({
+                    username: user.get("username"),
+                    email: user.get("email"),
 
-                //     mods: lessonTypes.map((lessonType) => user.get(lessonType.name))
-                //         [
-                //         {
-                //             code: user.get('mod1'),
-                //             lecture: {
-                //                 code: user.get('mod1LecCode'),
-                //                 day: user.get('mod1LecDay'),
-                //                 startTime: user.get('mod1LecStartTime'),
-                //                 endTime: user.get('mod1LecEndTime')
-                //             },
-                //             tutorial: {
-                //                 code: user.get('mod1TutCode'),
-                //                 day: user.get('mod1TutDay'),
-                //                 startTime: user.get('mod1TutStartTime'),
-                //                 endTime: user.get('mod1TutEndTime'),
-                //             },
-                //             lab: {
-                //                 code: user.get('mod1LabCode'),
-                //                 day: user.get('mod1LabDay'),
-                //                 startTime: user.get('mod1LabStartTime'),
-                //                 endTime: user.get('mod1LabEndTime')
-                //             }
-                //         }
-                //     ]
-                // });
+                    mods: user.get('Modules')
+                    // .map((module) => {
+                    //     return {
+                    //         code: module.get('code'),
+                    //         lessons: lessonTypes
+                    //             .map((lessonType) => user.get(`${lessonType.name}Id`))
+                    //             .filter((lesson) => lesson !== null)
+                    //     }
+
+                    // })
+                    // [
+                    //     {
+                    //         code: user.get('mod1'),
+                    //         lecture: {
+                    //             code: user.get('mod1LecCode'),
+                    //             day: user.get('mod1LecDay'),
+                    //             startTime: user.get('mod1LecStartTime'),
+                    //             endTime: user.get('mod1LecEndTime')
+                    //         },
+                    //         tutorial: {
+                    //             code: user.get('mod1TutCode'),
+                    //             day: user.get('mod1TutDay'),
+                    //             startTime: user.get('mod1TutStartTime'),
+                    //             endTime: user.get('mod1TutEndTime'),
+                    //         },
+                    //         lab: {
+                    //             code: user.get('mod1LabCode'),
+                    //             day: user.get('mod1LabDay'),
+                    //             startTime: user.get('mod1LabStartTime'),
+                    //             endTime: user.get('mod1LabEndTime')
+                    //         }
+                    //     }
+                    // ]
+                });
             })
     }
     catch (err) {
@@ -293,7 +289,7 @@ async function updateProfile(req: Request, res: Response) {
                 });
         });
     } catch (err) {
-        console.log("Error when updating profile in updateProfile() - line 462 in userController.tsx\n", err);
+        console.log("Error when updating profile in updateProfile() - line 430 in userController.tsx\n", err);
     }
 }
 
@@ -325,7 +321,7 @@ async function resetPassword(req: Request, res: Response) {
             res.status(200).json({ message: `Error updating row for password: ${error}` });
         });
     } catch (err) {
-        throw err;
+        console.log("Error when updating profile in resetPassword() - line 462 in userController.tsx\n", err);
     }
 }
 
@@ -334,7 +330,7 @@ async function verifyEmail(req: Request, res: Response) {
         validateRequest(req, res);
         return res.json({ message: 'Email verified???????' });
     } catch (err) {
-        throw err;
+        console.log("Error when updating profile in verifyEmail() - line 471 in userController.tsx\n", err);
     }
 }
 
@@ -364,7 +360,7 @@ async function deleteUser(req: Request, res: Response) {
             console.error('Error deleting row:', error);
         });
     } catch (err) {
-        throw err;
+        console.log("Error when updating profile in deleteUser() - line 501 in userController.tsx\n", err);
     }
 }
 
