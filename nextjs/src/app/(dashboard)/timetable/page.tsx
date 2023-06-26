@@ -159,9 +159,10 @@ export default function TimetableMain() {
                 .catch((err: AxiosError) => console.log("Error when pushing mod to DB", err));
             return;
         };
-        getModules()
+        updateAddedMod();
+        /* getModules()
             .then(() => updateAddedMod())
-            .then((updatedMod) => pushToDB(updatedMod));
+            .then((updatedMod) => pushToDB(updatedMod)); */
     }, [isSem1, addedMod]);
 
     return (
