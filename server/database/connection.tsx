@@ -2,10 +2,10 @@ import { Error as SequelizeError } from "sequelize";
 
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('classmate', 'root', 'Classmate123!', {
-    host: 'localhost',
-    port: 3306,
-    dialect: 'mysql'
+const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
+    host: 'db.tubxvcrohjakulghoizg.supabase.co',
+    port: 6543,
+    dialect: 'postgres'
 });
 
 
