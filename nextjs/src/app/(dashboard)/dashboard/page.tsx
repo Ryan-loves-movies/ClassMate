@@ -18,12 +18,12 @@ export default function Dashboard() {
                     <p className={styles['time']}>{formattedDate.toString()}</p>
                 </div>
                 <div className={styles['project-boxes']}>
-                    <GroupBox backgroundColor={"#fee4cb"} header="Web Design" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#e9e7fd"} header="Web Design" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={""} header="Web Design" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#ffd3e2"} header="Web Design" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#c8f7dc"} header="Web Design" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#d5deff"} header="Web Design" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={"#fee4cb"} header="CS2030" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={"#e9e7fd"} header="CS2040" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={""} header="BT2102" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={"#ffd3e2"} header="LAF1201" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={"#c8f7dc"} header="GEX1015" subheader="Prototyping" width="50%" />
+                    <GroupBox backgroundColor={"#d5deff"} header="IS1108" subheader="Prototyping" width="50%" />
                 </div>
             </div>
             <div className={styles['messages-section']}>
@@ -32,10 +32,10 @@ export default function Dashboard() {
                     <SearchBar width="80%" />
                 </div>
                 <div className={styles['messages']}>
-                    <PeopleBar name="Stephanie" bio="I got your first assignment. It was quite good. 🥳 We can continue with the next assignment." />
-                    <PeopleBar name="Mark" bio={`Hey, can tell me about progress of project? I'm waiting for your response.`} />
-                    <PeopleBar name="David" bio={`I am really impressed! Can't wait to see the final result.`} />
-                    <PeopleBar name="Jessica" bio="Awesome! 🤩 I like it. We can schedule a meeting for the next one" />
+                    <PeopleBar name="Stephanie" bio="hihi wanna do CS2030 together?" />
+                    <PeopleBar name="Ethan" bio={`I want to study French 1 next sem, you think you want to take it tgt? We can help each other!`} />
+                    <PeopleBar name="David" bio={`ok i'm down! lets take it together with james too then.`} />
+                    <PeopleBar name="Jessica" bio="I have to take BT2102 next sem, wbu?" />
                 </div>
             </div>
         </>
