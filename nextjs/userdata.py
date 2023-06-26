@@ -2,14 +2,18 @@ import pymysql
 import bcrypt
 
 # Function to store user data in the database
+
+
 def store_user_data(username, email, password):
     # Connect to MySQL
-    con = pymysql.connect(host='localhost', user='root', passwd='Classmate123!', db='orbital')
+    con = pymysql.connect(host='localhost', user='root',
+                          passwd='Classmate123!', db='orbital')
     cursor = con.cursor()
 
     try:
         # Hash the password
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(
+            password.encode('utf-8'), bcrypt.gensalt())
 
         # Prepare SQL query
         query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
@@ -31,6 +35,7 @@ def store_user_data(username, email, password):
     finally:
         # Close the database connection
         con.close()
+
 
 # Example usage: assuming you have extracted the user data from the login form
 username = "example_user"
