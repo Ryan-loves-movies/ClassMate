@@ -2,9 +2,10 @@ import { SequelizeScopeError } from "sequelize";
 
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize({
-    dialect: "sqlite",
-    storage: "src/sqlite/modules.db"
+const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
+    host: 'db.tubxvcrohjakulghoizg.supabase.co',
+    port: 6543,
+    dialect: 'postgres'
 });
 
 sequelize.authenticate()

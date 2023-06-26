@@ -57,3 +57,5 @@ export default async function findSimilar(query: string, limit: Number): Promise
         }
     });
 }
+
+populateDatabase();
