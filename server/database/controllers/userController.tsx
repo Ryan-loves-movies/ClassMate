@@ -37,19 +37,18 @@ interface modType {
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
 
-/** 
-    * Creates new user with empty details in the database
-* @param req -
-    * {body: 
-        * {
-    *   username: string,
-    *   password: string (encoded),
-    *   email: string
-    *   }
-    * }
-    * @param res {express.Response}
-    * @returns void
-    */
+/**
+    Creates new user with empty details in the database
+@param req: {
+    body: {
+        username: string,
+        password: string (encoded),
+        email: string
+    }
+}
+@param res {express.Response}
+@returns void
+**/
 const createUser = (req: Request, res: Response) => {
     const { email, username, password }: profile = req.body;
 
@@ -69,15 +68,15 @@ const createUser = (req: Request, res: Response) => {
     }
 }
 
-/** 
-    * req: {
-    *   body: {
-        *   username: string,
-        *   password: string (encoded),
-        *   }
-        * }
-        * Verifies password of user, then returns a JSON web token with expiry in 24 hours.
-            * */
+/**
+    req: {
+    body: {
+        username: string,
+        password: string (encoded),
+    }
+}
+Verifies password of user, then returns a JSON web token with expiry in 24 hours.
+    **/
 async function logIn(req: Request, res: Response) {
     const { username, password }: minProfile = req.body;
     try {
@@ -109,35 +108,35 @@ async function logIn(req: Request, res: Response) {
     }
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        * }
-        * Verifies token of user, then return log out successful message. 
-            * Note: Deletion of JSON web token to be done on client side
-        * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+}
+Verifies token of user, then return log out successful message. 
+    Note: Deletion of JSON web token to be done on client side
+**/
 async function logOut(req: Request, res: Response) {
     validateRequest(req, res);
     // Clear JWT token on client-side AND invalidate token on server-side
     res.status(200).json({ message: 'Logout successful!' });
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   params: {
-            *   username: string,
-            *   mods: ~boolean~
-            *   }
-            * }
-            * Search for the user profile on the database and returns first matching username.
-                    * If mods is true, return all module details of user profile
-                * Else, only return username and email
-            * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    params: {
+        username: string,
+        mods: ~boolean~
+    }
+}
+Search for the user profile on the database and returns first matching username.
+        If mods is true, return all module details of user profile
+    Else, only return username and email
+**/
 async function getProfile(req: Request, res: Response) {
     try {
         validateRequest(req, res);
@@ -228,18 +227,18 @@ async function getProfile(req: Request, res: Response) {
     }
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   ~updatedRowKey~: ~updatedRowValue~
-            *   }
-            * }
-            * Updates the values of the user profile in the database and returns the number of values updated
-            * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        ~updatedRowKey~: ~updatedRowValue~
+    }
+}
+Updates the values of the user profile in the database and returns the number of values updated
+**/
 async function updateProfile(req: Request, res: Response) {
     try {
         validateRequest(req, res);
@@ -293,19 +292,19 @@ async function updateProfile(req: Request, res: Response) {
     }
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   oldPassword: ~oldPassword~ (encoded),
-            *   newPassword: ~newPassword~ (encoded)
-            *   }
-            * }
-            * Resets the passowrd of the user profile in the database
-            * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        oldPassword: ~oldPassword~ (encoded),
+        newPassword: ~newPassword~ (encoded)
+    }
+}
+Resets the passowrd of the user profile in the database
+**/
 async function resetPassword(req: Request, res: Response) {
     // Do user authentication first
     // Update password after
@@ -334,19 +333,19 @@ async function verifyEmail(req: Request, res: Response) {
     }
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   password: string (encoded),
-            *   email: string
-            *   }
-            * }
-            * Deletes the user and user profile details from the database
-            * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        password: string (encoded),
+        email: string
+    }
+}
+Deletes the user and user profile details from the database
+**/
 async function deleteUser(req: Request, res: Response) {
     try {
         validateRequest(req, res);
