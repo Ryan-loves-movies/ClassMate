@@ -2,9 +2,11 @@ require('module-alias/register');
 import 'module-alias/register';
 import express from 'express';
 import cors from 'cors';
-import userRouter from '@server/routes/userRoutes.jsx';
-import authRouter from '@server/routes/authenticateUser.jsx';
-import sequelize from '@server/database/connection.jsx';
+import userRouter from '@server/routes/userRoutes';
+import groupRouter from '@server/routes/groupRoutes';
+import moduleRouter from '@server/routes/moduleRoutes';
+import authRouter from '@server/routes/authenticateUser';
+import sequelize from '@server/database/connection';
 
 const expressApp = express();
 const port = 8080;
@@ -12,6 +14,8 @@ const port = 8080;
 expressApp.use(express.json());
 expressApp.use(cors());
 expressApp.use('/', userRouter);
+expressApp.use('/', groupRouter);
+expressApp.use('/', moduleRouter);
 expressApp.use('/', authRouter);
 
 expressApp.listen(port, () => {
@@ -23,3 +27,5 @@ process.on('SIGINT', () => {
     sequelize.close();
     process.exit();
 });
+
+export default expressApp;

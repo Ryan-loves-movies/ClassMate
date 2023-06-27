@@ -3,7 +3,7 @@ import { Association, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociat
 import Users_Modules from '@models/Users_Modules';
 
 class Lessons extends Model<InferAttributes<Lessons>, InferCreationAttributes<Lessons>> {
-    declare id: number;
+    declare id: number | null;
     declare lessonId: string;
     declare moduleCode: string;
     declare lessonType: string;

@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 import config from '@server/config';
 
 /** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        * }
-        * Verifies the JSON web token passed in request headers
-        * */
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+}
+Verifies the JSON web token passed in request headers
+**/
 function validateRequest(req: Request, res: Response) {
     const token = req.headers.authorization as string;
 

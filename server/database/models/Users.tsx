@@ -118,10 +118,10 @@ async function sync() {
     Users.belongsToMany(Modules, { through: Users_Modules, foreignKey: 'username' });
     Modules.belongsToMany(Users, { through: Users_Modules, foreignKey: 'moduleCode' });
     // Below are so that u can query the user_modules rows associated with a specific user or module
-    Users_Modules.belongsTo(Users, { foreignKey: 'userModuleId' });
+    /* Users_Modules.belongsTo(Users, { foreignKey: 'userModuleId' });
     Users_Modules.belongsTo(Modules, { foreignKey: 'userModuleId' });
     Users.hasMany(Users_Modules, { foreignKey: 'username' });
-    Modules.hasMany(Users_Modules, { foreignKey: 'moduleCode' });
+    Modules.hasMany(Users_Modules, { foreignKey: 'moduleCode' }); */
 
     Users.belongsToMany(Groups, { through: Users_Groups, foreignKey: 'username' });
     Groups.belongsToMany(Users, { through: Users_Groups, foreignKey: 'groupId' });

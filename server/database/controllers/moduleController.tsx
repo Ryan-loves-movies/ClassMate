@@ -3,30 +3,218 @@ import Users from '@models/Users';
 import Modules from '@models/Modules';
 import Users_Modules from '@models/Users_Modules';
 import Lessons from '@models/Lessons';
+import { Op } from 'sequelize';
+import validateRequest from '@controllers/authController';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import axiosRateLimit from 'axios-rate-limit';
+
 
 interface lesson {
     lessonId: string;
     lessonType: string;
 }
 
+interface lessonResponse {
+    classNo: string,
+    startTime: string,
+    endTime: string,
+    weeks: number[],
+    venue: string,
+    day: string,
+    lessonType: string,
+    size: number,
+    covidZone: string
+}
+
+interface semesterDataResponse {
+    semester: number,
+    timetable: lessonResponse[],
+    covidZones: string[]
+}
+
+interface ModuleResponse {
+    moduleCode: string;
+    title: string;
+    semesters: number[];
+}
+
+interface Module {
+    code: string;
+    name: string;
+}
+
 /** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   moduleCode: string,
-            *   lessons: [{
-                *   lessonId: string,
-                *   lessonType: string
-                *   },
-                *   ...]
-                *   }
-                * }
-                * Adds the module to the user and the lessons associated with it
-                    * */
+    req: {
+    headers: {
+        Authorization: ~token~
+    }
+}
+Adds the module to the user and the lessons associated with it
+**/
+async function populateModules(req: Request, res: Response) {
+    await Modules.sync();
+    // Fetch module list data from NUSMods API
+    await axios.get<ModuleResponse[]>(`https://api.nusmods.com/v2/${req.body.ay}/moduleList.json`)
+        .then((axiosRes: AxiosResponse) => {
+            const modules = axiosRes.data
+                .filter((module: ModuleResponse) => module.moduleCode !== null)
+                .map((module: ModuleResponse) => ({
+                    code: module.moduleCode,
+                    name: module.title
+                }))
+                .map((module: Module, index: number) => {
+                    if ((index + 1) % 1000 === 0) {
+                        console.log("Another 1000 records updated");
+                    }
+                    Modules.create(module, { ignoreDuplicates: true })
+                        .then(() => { });
+                });
+            Promise.all(modules)
+                .then(() => {
+                    return res.status(200).json({ message: "database updated!" });
+                })
+                .catch((err) => {
+                    return res.status(500).json({ message: err });
+                })
+        })
+        .catch((err: AxiosError) => {
+            console.error('Error populating database:', err.message);
+            return res.status(500).json({ message: err });
+        });
+}
+
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    params: {
+        ay: '2023-2024'
+    }
+}
+Adds the module to the user and the lessons associated with it
+**/
+async function populateLessons(req: Request, res: Response) {
+    await Modules.sync();
+    let counter = 0;
+    const axiosPromises: Promise<Response | void>[] = [];
+    const axiosRateLimited = axiosRateLimit(axios.create(), { maxRPS: 200 })
+    const fakeModules: string[] = [];
+    await Modules.findAll()
+        .then((modules) => {
+            modules.forEach((module) => {
+                const axiosPromise = axiosRateLimited.get<ModuleResponse[]>(`https://api.nusmods.com/v2/${req.body.ay}/modules/${module.code}.json`)
+                    .then((axiosRes: AxiosResponse) => {
+                        const modData = axiosRes.data;
+                        modData
+                            .semesterData
+                            .forEach((semData: semesterDataResponse) => {
+                                semData.timetable
+                                    .forEach(async (timetable) => {
+                                        await Lessons.create({
+                                            moduleCode: modData.moduleCode,
+                                            lessonId: timetable.classNo,
+                                            lessonType: timetable.lessonType,
+                                            sem: semData.semester,
+                                            day: timetable.day,
+                                            startTime: timetable.startTime,
+                                            endTime: timetable.endTime
+                                        }, { ignoreDuplicates: true });
+                                        counter++;
+                                        console.log(counter);
+                                    })
+                            })
+                    })
+                    .catch((err: AxiosError) => {
+                        console.log("Axios Error: Module doesn't exist", err);
+                        fakeModules.push(module.code);
+                    })
+                axiosPromises.push(axiosPromise)
+            });
+        });
+    await Promise.all(axiosPromises)
+        .then(() => {
+            console.log('lessons updated!')
+            return res.status(200).json({ message: "database updated!", fakeModules});
+        })
+        .catch((err) => {
+            console.log('Error populating database:', err);
+            return res.status(500).json({ message: err });
+        })
+}
+
+
+async function searchModules(req: Request, res: Response) {
+    const query = req.query.query as string;
+    const limit = parseInt(req.query.limit as string);
+
+    const ans = await Modules.findAll({
+        limit: limit,
+        where: {
+            [Op.or]: [
+                {
+                    code: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+                {
+                    name: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+            ],
+        }
+    });
+
+    res.status(200).json({ modules: ans.map((model) => model.toJSON()) });
+    return ans;
+}
+
+async function getModules(req: Request, res: Response) {
+    const query = req.query.query as string;
+    const limit = parseInt(req.query.limit as string);
+
+    const ans = await Modules.findAll({
+        limit: limit,
+        where: {
+            [Op.or]: [
+                {
+                    code: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+                {
+                    name: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+            ],
+        }
+    });
+
+    res.status(200).json({ modules: ans.map((model) => model.toJSON()) });
+    return ans;
+}
+
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        moduleCode: string,
+        lessons: [{
+            lessonId: string,
+            lessonType: string
+        },
+        ...]
+    }
+}
+Adds the module to the user and the lessons associated with it
+**/
 async function addModule(req: Request, res: Response) {
+    validateRequest(req, res);
     const { username, moduleCode, lessons } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -63,19 +251,20 @@ async function addModule(req: Request, res: Response) {
         })
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   moduleCode: string (new lectureCode)
-            *   }
-            * }
-            * Remove specific module taken by user (and all related lessons)
-                * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        moduleCode: string (new lectureCode)
+    }
+}
+Remove specific module taken by user (and all related lessons)
+**/
 async function removeModule(req: Request, res: Response) {
+    validateRequest(req, res);
     const { username, moduleCode } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -91,21 +280,22 @@ async function removeModule(req: Request, res: Response) {
         });
 }
 
-/** 
-    * req: {
-    *   headers: {
-        *   Authorization: ~token~
-        *   },
-        *   body: {
-            *   username: string,
-            *   moduleCode: string,
-            *   lessonId: string (e.g. G03),
-            *   lessonType: string,
-            *   }
-            * }
-            * Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
-                * */
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        moduleCode: string,
+        lessonId: string (e.g. G03),
+        lessonType: string,
+    }
+}
+Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
+    **/
 async function updateLesson(req: Request, res: Response) {
+    validateRequest(req, res);
     const { username, moduleCode, lessonId, lessonType } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -142,4 +332,4 @@ async function updateLesson(req: Request, res: Response) {
         });
 }
 
-export default { addModule, removeModule, updateLesson };
+export default { populateLessons, populateModules, getModules, addModule, removeModule, updateLesson };

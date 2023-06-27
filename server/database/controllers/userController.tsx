@@ -58,7 +58,7 @@ const createUser = (req: Request, res: Response) => {
                 throw err;
             }
             if (hashedPassword) {
-                return Users.create({ username: username, email: email, password: hashedPassword });
+                return Users.create({ username: username, email: email, password: hashedPassword }, { ignoreDuplicates: true });
             }
         });
         res.status(201).json({ message: 'Users created successfully!' });
