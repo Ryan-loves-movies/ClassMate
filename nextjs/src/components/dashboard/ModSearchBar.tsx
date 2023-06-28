@@ -2,6 +2,8 @@
 import React, { Dispatch, useState } from "react";
 import styles from "@components/dashboard/modSearchBar.module.css";
 import axios, { AxiosResponse } from "axios";
+import config from '@/config';
+const { expressHost } = config;
 
 interface respBody {
     code: string;
@@ -35,7 +37,7 @@ export default function ModSearchBar({ setAddedActivity, width }: { setAddedActi
         if (query === "") {
             setSearchRes([]);
         } else {
-            await axios.get('/search/modules', {
+            await axios.get(`${expressHost}/search/modules`, {
                 params: {
                     limit: 10,
                     query: query
