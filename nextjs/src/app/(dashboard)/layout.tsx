@@ -1,6 +1,5 @@
 import React from "react";
 import Logo from "@components/dashboard/layout/Logo";
-import AddProjectButton from "@components/dashboard/layout/AddProjectButton";
 import AuthorizationComponent from "@components/dashboard/Authorization";
 import ThemeProviderLocal from "@components/dashboard/ThemeProviderLocal";
 import SwitchModeButton from "@components/dashboard/layout/SwitchModeButton";
@@ -32,7 +31,6 @@ export default function RootLayout({
                             </div>
                             <div className="app-header-right">
                                 <SwitchModeButton />
-                                <AddProjectButton />
                                 <NotificationButton />
                                 <ProfileMenuButton />
                             </div>
