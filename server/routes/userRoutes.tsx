@@ -2,13 +2,15 @@ import express from 'express';
 const expressRouter = express.Router();
 import userController from '@controllers/userController';
 
-const { createUser, logIn, logOut, getProfile, updateProfile, resetPassword, verifyEmail, deleteUser } = userController;
+const { getUsers, createUser, logIn, logOut, getProfile, updateProfilePhoto, updateProfile, resetPassword, verifyEmail, deleteUser } = userController;
 
 // User routes
+expressRouter.post('/users', getUsers);
 expressRouter.post('/register', createUser);
 expressRouter.post('/login', logIn);
 expressRouter.post('/logout', logOut);
 expressRouter.get('/profile', getProfile);
+expressRouter.put('/profile/photo', updateProfilePhoto);
 expressRouter.put('/profile', updateProfile);
 expressRouter.post('/reset-password', resetPassword);
 expressRouter.get('/verify-email/:token', verifyEmail);
