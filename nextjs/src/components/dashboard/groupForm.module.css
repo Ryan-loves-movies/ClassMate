@@ -25,7 +25,7 @@
     width: 30%;
     height: 40%;
     text-align: center;
-    background-color: #fff;
+    background-color: var(--projects-section);
     opacity: 100%;
     border-radius: 4em 4em 4em 4em;
     text-align: center;
@@ -53,6 +53,7 @@
 
 .forms_field-input {
     width: 100%;
+    background-color: var(--projects-section);
     border-top: 0px;
     border-left: 0px;
     border-right: 0px;
@@ -78,8 +79,7 @@
     width: 100%;
     background-color: #e8716d;
     border-radius: 4em 4em 4em 4em;
-    border-bottom: 0px;
-    border-right: 0px;
+    border: 0px;
     margin-top: 25px;
     padding: 20px;
     font-size: 1rem;
