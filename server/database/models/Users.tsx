@@ -8,40 +8,11 @@ import Users_Groups from '@models/Users_Groups';
 import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
 import { BelongsToManyRemoveAssociationsMixin } from 'sequelize';
 
-// import DesignLectures from '@models/LessonTypes/DesignLectures.jsx';
-// import Laboratories from '@models/LessonTypes/Laboratories.jsx';
-// import Lectures from '@models/LessonTypes/Lectures.jsx';
-// import MiniProjects from '@models/LessonTypes/MiniProjects.jsx';
-// import PackagedLectures from '@models/LessonTypes/PackagedLectures.jsx';
-// import PackagedTutorials from '@models/LessonTypes/PackagedTutorials.jsx';
-// import Recitations from '@models/LessonTypes/Recitations.jsx';
-// import SectionalTeachings from '@models/LessonTypes/SectionalTeachings.jsx';
-// import SeminarStyleModuleClasses from '@models/LessonTypes/SeminarStyleModuleClasses.jsx';
-// import Tutorials from '@models/LessonTypes/Tutorials.jsx';
-// import TutorialType2s from '@models/LessonTypes/TutorialType2s.jsx';
-// import Workshops from '@models/LessonTypes/Workshops.jsx';
-// import Users_Modules from '@models/Users_Modules.jsx';
-// import Users_Groups from '@models/Users_Groups.jsx';
-
-// export const lessonTypes = [
-//     DesignLectures,
-//     Laboratories,
-//     Lectures,
-//     MiniProjects,
-//     PackagedLectures,
-//     PackagedTutorials,
-//     Recitations,
-//     SectionalTeachings,
-//     SeminarStyleModuleClasses,
-//     Tutorials,
-//     TutorialType2s,
-//     Workshops
-// ];
-
 class Users extends Model<InferAttributes<Users>, InferCreationAttributes<Users>> {
     declare username: string;
     declare password: string;
     declare email: string;
+    declare photo: Blob | null;
 
     declare getModules: BelongsToManyGetAssociationsMixin<Modules>;
     declare addModule: BelongsToManyAddAssociationMixin<Modules, number>;
@@ -105,6 +76,10 @@ Users.init({
         validate: {
             isEmail: true,
         }
+    },
+    photo: {
+        type: DataTypes.BLOB('long'),
+        allowNull: true
     }
 }, {
     tableName: 'Users',
@@ -134,9 +109,7 @@ async function sync() {
     Users_Modules.belongsToMany(Lessons, { through: Users_Modules_Lessons, foreignKey: 'id' });
     Lessons.belongsToMany(Users_Modules, { through: Users_Modules_Lessons, foreignKey: 'id' });
 
-    await sequelize.sync({ force: true });
-
-    Users.hasHooks
+    await sequelize.sync({ alter: true });
 }
 
 sync();
