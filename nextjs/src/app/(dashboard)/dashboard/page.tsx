@@ -2,7 +2,7 @@
 import "@app/(dashboard)/globals.css";
 import styles from "@app/(dashboard)/dashboard/dashboard.module.css";
 import GroupBox from "@components/dashboard/GroupBox";
-import PeopleSearchBar from "@components/dashboard/PeopleSearchBar";
+/* import PeopleSearchBar from "@components/dashboard/PeopleSearchBar"; */
 import PeopleBar from "@components/PeopleBar";
 import AddProjectButton from "@components/dashboard/AddProjectButton";
 import { useState } from "react";
@@ -42,7 +42,6 @@ export default function Dashboard() {
             <div className={styles['messages-section']}>
                 <div className={styles['projects-section-header']}>
                     <p>Add people</p>
-                    <PeopleSearchBar width="80%" />
                 </div>
                 <div className={styles['messages']}>
                     <PeopleBar name="Stephanie" bio="hihi wanna do CS2030 together?" />
