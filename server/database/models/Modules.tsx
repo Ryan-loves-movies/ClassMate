@@ -24,7 +24,7 @@ class Modules extends Model<InferAttributes<Modules>, InferCreationAttributes<Mo
 
 Modules.init({
     code: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.STRING(30),
         allowNull: false,
         unique: true,
         primaryKey: true

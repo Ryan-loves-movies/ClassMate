@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import Groups from '@models/Groups';
 import Users from '@models/Users';
 import Users_Groups from '@models/Users_Groups';
-import validateRequest from '@controllers/authController';
 
 /** 
     req: {
@@ -19,7 +18,6 @@ Returns the groupId of the group given the users and group name.
     NOTE: MAY NOT BE ACCURATE
 **/
 async function getGroupId(req: Request, res: Response) {
-    validateRequest(req, res);
     const { usernames, groupName } = req.body;
     await Groups.findOne({
         where: {
@@ -56,7 +54,6 @@ async function getGroupId(req: Request, res: Response) {
 Create a new group with the list of users, return groupId
 **/
 async function createGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { groupName, username } = req.body;
     await Groups.create({ name: groupName })
         .then((group) => {
@@ -84,7 +81,6 @@ async function createGroup(req: Request, res: Response) {
 Create a new group with the list of users, return groupId
 **/
 async function deleteGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { groupId } = req.body;
     await Groups.destroy({
         where: {
@@ -111,7 +107,6 @@ async function deleteGroup(req: Request, res: Response) {
 Modifies the lessons being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function addUserToGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, groupId } = req.body;
     await Groups.findByPk(groupId, {
         include: [
@@ -140,7 +135,6 @@ async function addUserToGroup(req: Request, res: Response) {
 Modifies the lessons being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function removeUserFromGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, groupId } = req.body;
     await Groups.findByPk(groupId, {
         include: [
