@@ -1,11 +1,12 @@
-'use client'
 import React, { Dispatch, useState } from "react";
 import styles from "@components/dashboard/modSearchBar.module.css";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import config from '@/config';
+const { expressHost } = config;
 
 interface respBody {
     code: string;
-    title: string;
+    name: string;
 }
 
 export default function ModSearchBar({ setAddedActivity, width }: { setAddedActivity: Dispatch<string>, width: string }) {
@@ -35,25 +36,31 @@ export default function ModSearchBar({ setAddedActivity, width }: { setAddedActi
         if (query === "") {
             setSearchRes([]);
         } else {
-            await axios.get('/search/modules', {
+            await axios.get(`${expressHost}/authorized/search/modules`, {
+                headers: {
+                    Authorization: sessionStorage.getItem('token')
+                },
                 params: {
-                    limit: 10,
-                    query: query
+                    query: query,
+                    limit: 0
                 }
             })
                 .then((res: AxiosResponse) => {
-                    setSearchRes(res.data);
+                    setSearchRes(res.data.modules);
+                })
+                .catch((err: AxiosError) => {
+                    console.log('Error:', err);
                 });
         }
     };
     const searchLi = (
         <ul>
             {searchRes.map((item, index: number) => (
-                <li key={item.code} 
+                <li key={item.code}
                     className={(index === focusedIndex) ? styles['selected'] : ''}
                     onMouseEnter={() => handleMouseEnter(index)}>
                     <span className={styles['module-code']}>{item.code}</span>
-                    <span className={styles['module-title']}>{item.title}</span>
+                    <span className={styles['module-title']}>{item.name}</span>
                 </li>
             ))}
         </ul>

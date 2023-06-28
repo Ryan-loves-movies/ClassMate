@@ -17,7 +17,7 @@ export default function AuthorizationComponent({ children }: childrenElems): JSX
     // and validate it
     useLayoutEffect(() => {
         const updateAuthorization = async () => {
-            await axios.get(`${config.expressHost}/authenticate`, {
+            await axios.get(`${config.expressHost}/authorized/user`, {
                 headers: {
                     Authorization: window['sessionStorage'].getItem("token")
                 }

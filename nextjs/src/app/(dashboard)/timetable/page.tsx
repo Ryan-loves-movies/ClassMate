@@ -117,7 +117,7 @@ export default function TimetableMain() {
 
         // Get list of modules this user is studying from personal database
         const getModules = async () => {
-            return await axios.get(`${config.expressHost}/profile`, {
+            return await axios.get(`${config.expressHost}/authorized/profile`, {
                 headers: {
                     Authorization: window['sessionStorage'].getItem("token")
                 },
@@ -145,7 +145,7 @@ export default function TimetableMain() {
             if (updatedMod === undefined) {
                 return;
             }
-            axios.put(`${config.expressHost}/profile`, {
+            axios.put(`${config.expressHost}/authorized/profile`, {
                 username: window['sessionStorage'].getItem("username"),
                 ...updatedMod
             }, {

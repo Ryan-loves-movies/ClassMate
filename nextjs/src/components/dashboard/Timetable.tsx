@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import styles from "@components/dashboard/timetable.module.css";
 
 interface modDet {
@@ -117,7 +117,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
-                                            key=""
+                                            key=''
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lecture.startTime}
