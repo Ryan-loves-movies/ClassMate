@@ -8,6 +8,7 @@ import Users from '@models/Users';
 import Modules from '@models/Modules';
 import Lessons from '@models/Lessons';
 import Users_Modules from '@models/Users_Modules';
+import { Op } from 'sequelize';
 
 interface profile {
     email: string;
@@ -36,6 +37,48 @@ interface modType {
 
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
+
+/**
+    Creates new user with empty details in the database
+@param req: {
+    params: {
+        query: string,
+        limit: number
+    }
+}
+@param res {express.Response}
+@returns void
+**/
+const getUsers = async (req: Request, res: Response) => {
+    const query = req.query.query as string;
+    const limit = parseInt(req.query.limit as string);
+    let ans;
+
+    if (limit === 0) {
+        ans = await Users.findAll({
+            where: {
+                username: {
+                    [Op.like]: `%${query}%`,
+                }
+            },
+            attributes: ['username', 'photo']
+        });
+
+    } else {
+        ans = await Users.findAll({
+            limit: limit,
+            where: {
+                username: {
+                    [Op.like]: `%${query}%`,
+                }
+            },
+            attributes: ['username', 'photo']
+        });
+    }
+
+    res.status(200).json({ users: ans.map((model) => model.toJSON()) });
+    return ans;
+}
 
 /**
     Creates new user with empty details in the database
@@ -118,7 +161,6 @@ Verifies token of user, then return log out successful message.
     Note: Deletion of JSON web token to be done on client side
 **/
 async function logOut(req: Request, res: Response) {
-    validateRequest(req, res);
     // Clear JWT token on client-side AND invalidate token on server-side
     res.status(200).json({ message: 'Logout successful!' });
 }
@@ -139,92 +181,114 @@ Search for the user profile on the database and returns first matching username.
 **/
 async function getProfile(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         const username = req.query.username as string;
         if (!username) {
             res.status(500).json({ message: "No username passed in params" })
             return;
         }
-        if (req.query.mods === 'false') {
-            return await Users.findOne({
-                where: {
-                    username: username
-                },
-            })
-                .then((user) => {
-                    if (!user) {
-                        return res.status(404).json({ message: 'No existing user found' });
-                    }
-                    return res.status(200).json({
-                        username: user.get("username"),
-                        email: user.get("email"),
-                    });
-
-                });
-        }
-        return await Users.findByPk(username, {
-            include: [
-                {
-                    model: Users_Modules,
-                    include: [
-                        {
-                            model: Lessons
-                        },
-                        {
-                            model: Modules
-                        }]
-                }]
-        })
+        /* if (req.query.mods === 'false') { */
+        return await Users.findByPk(username)
             .then((user) => {
                 if (!user) {
                     return res.status(404).json({ message: 'No existing user found' });
                 }
-                console.log(user);
-                console.log(user.get('Users_Modules'));
-                console.log(user.get('Lessons'));
                 return res.status(200).json({
                     username: user.get("username"),
                     email: user.get("email"),
-
-                    mods: user.get('Modules')
-                    // .map((module) => {
-                    //     return {
-                    //         code: module.get('code'),
-                    //         lessons: lessonTypes
-                    //             .map((lessonType) => user.get(`${lessonType.name}Id`))
-                    //             .filter((lesson) => lesson !== null)
-                    //     }
-
-                    // })
-                    // [
-                    //     {
-                    //         code: user.get('mod1'),
-                    //         lecture: {
-                    //             code: user.get('mod1LecCode'),
-                    //             day: user.get('mod1LecDay'),
-                    //             startTime: user.get('mod1LecStartTime'),
-                    //             endTime: user.get('mod1LecEndTime')
-                    //         },
-                    //         tutorial: {
-                    //             code: user.get('mod1TutCode'),
-                    //             day: user.get('mod1TutDay'),
-                    //             startTime: user.get('mod1TutStartTime'),
-                    //             endTime: user.get('mod1TutEndTime'),
-                    //         },
-                    //         lab: {
-                    //             code: user.get('mod1LabCode'),
-                    //             day: user.get('mod1LabDay'),
-                    //             startTime: user.get('mod1LabStartTime'),
-                    //             endTime: user.get('mod1LabEndTime')
-                    //         }
-                    //     }
-                    // ]
+                    photo: user.get("photo")
                 });
-            })
-    }
-    catch (err) {
+
+            });
+        /* } */
+        /* return await Users.findByPk(username, {
+        include: [
+            {
+                model: Users_Modules,
+                include: [
+                    {
+                        model: Lessons
+                    },
+                    {
+                        model: Modules
+                    }]
+            }]
+    })
+    .then((user) => {
+        if (!user) {
+            return res.status(404).json({ message: 'No existing user found' });
+        }
+        console.log(user);
+        console.log(user.get('Users_Modules'));
+        console.log(user.get('Lessons'));
+        return res.status(200).json({
+            username: user.get("username"),
+            email: user.get("email"),
+
+            mods: user.get('Modules')
+            // .map((module) => {
+            //     return {
+            //         code: module.get('code'),
+            //         lessons: lessonTypes
+            //             .map((lessonType) => user.get(`${lessonType.name}Id`))
+            //             .filter((lesson) => lesson !== null)
+            //     }
+
+            // })
+            // [
+            //     {
+            //         code: user.get('mod1'),
+            //         lecture: {
+            //             code: user.get('mod1LecCode'),
+            //             day: user.get('mod1LecDay'),
+            //             startTime: user.get('mod1LecStartTime'),
+            //             endTime: user.get('mod1LecEndTime')
+            //         },
+            //         tutorial: {
+            //             code: user.get('mod1TutCode'),
+            //             day: user.get('mod1TutDay'),
+            //             startTime: user.get('mod1TutStartTime'),
+            //             endTime: user.get('mod1TutEndTime'),
+            //         },
+            //         lab: {
+            //             code: user.get('mod1LabCode'),
+            //             day: user.get('mod1LabDay'),
+            //             startTime: user.get('mod1LabStartTime'),
+            //             endTime: user.get('mod1LabEndTime')
+            //         }
+            //     }
+            // ]
+        });
+    }) */
+    } catch (err) {
         console.log("Error while getting profile details in getProfile() - userController.tsx - line 400?\n", err);
     }
+}
+
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        photo: blob
+    }
+}
+Updates the values of the user profile in the database and returns the number of values updated
+**/
+async function updateProfilePhoto(req: Request, res: Response) {
+    const { username, photo } = req.body;
+    console.log(photo);
+    return await Users.findByPk(username)
+        .then((user) => {
+            user?.update({
+                photo: photo.data
+            });
+            res.status(200).json({ message: 'photo updated!' });
+        })
+        .catch(() => {
+            res.status(404).json({ message: 'user not found!' })
+        })
 }
 
 /**
@@ -241,7 +305,6 @@ Updates the values of the user profile in the database and returns the number of
 **/
 async function updateProfile(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         const { username, ...updatedValsRaw } = req.body;
         const updatedVals = updatedValsRaw as modType;
         await Users.findOne({
@@ -309,7 +372,6 @@ async function resetPassword(req: Request, res: Response) {
     // Do user authentication first
     // Update password after
     try {
-        validateRequest(req, res);
         return await Users.update(req.body, {
             where: {
                 password: req.body.password
@@ -326,7 +388,6 @@ async function resetPassword(req: Request, res: Response) {
 
 async function verifyEmail(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         return res.json({ message: 'Email verified???????' });
     } catch (err) {
         console.log("Error when updating profile in verifyEmail() - line 471 in userController.tsx\n", err);
@@ -348,7 +409,6 @@ Deletes the user and user profile details from the database
 **/
 async function deleteUser(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         return await Users.destroy({
             where: {
                 username: req.body.username
@@ -363,4 +423,4 @@ async function deleteUser(req: Request, res: Response) {
     }
 }
 
-export default { createUser, logIn, logOut, getProfile, updateProfile, resetPassword, verifyEmail, deleteUser };
+export default { getUsers, createUser, logIn, logOut, getProfile, updateProfilePhoto, updateProfile, resetPassword, verifyEmail, deleteUser };
