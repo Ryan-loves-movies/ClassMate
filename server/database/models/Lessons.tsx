@@ -39,7 +39,7 @@ Lessons.init({
         allowNull: false,
     },
     moduleCode: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.STRING(30),
         allowNull: false,
         references: {
             model: "Modules",

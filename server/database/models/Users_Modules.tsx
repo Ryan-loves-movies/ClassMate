@@ -44,7 +44,7 @@ Users_Modules.init({
         }
     },
     moduleCode: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.STRING(30),
         allowNull: false,
         references: {
             model: 'Modules',
@@ -54,14 +54,14 @@ Users_Modules.init({
 }, {
     sequelize,
     tableName: 'Users_Modules',
-    timestamps: false
-    /* indexes: [
+    timestamps: false,
+    indexes: [
         {
             unique: true,
             fields: ['username', 'moduleCode'],
             name: 'fakeCompositePrimaryKey'
         }
-    ] */
+    ] 
 });
 
 export default Users_Modules;

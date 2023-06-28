@@ -105,6 +105,8 @@ async function sync() {
     // Users_Groups.belongsTo(Groups, { foreignKey: 'userGroupId' });
     // Users.hasMany(Users_Groups, { foreignKey: 'username' });
     // Modules.hasMany(Users_Groups, { foreignKey: 'groupId' });
+    Groups.belongsTo(Modules, { foreignKey: 'moduleCode' });
+    Modules.hasMany(Groups, { foreignKey: 'moduleCode' });
 
     Users_Modules.belongsToMany(Lessons, { through: Users_Modules_Lessons, foreignKey: 'id' });
     Lessons.belongsToMany(Users_Modules, { through: Users_Modules_Lessons, foreignKey: 'id' });
