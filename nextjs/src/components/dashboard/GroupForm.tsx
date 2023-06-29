@@ -6,10 +6,16 @@ import config from '@/config';
 import axios, { AxiosResponse } from 'axios';
 const { expressHost } = config;
 
-export default function GroupForm({ visibility, setVisibility, setHasNew }: {
+interface group {
+    id: number,
+    moduleCode: string;
+    name: string;
+}
+
+export default function GroupForm({ visibility, setVisibility, setNewGroup }: {
     visibility: boolean,
     setVisibility: Dispatch<boolean>,
-    setHasNew: Dispatch<boolean>
+    setNewGroup: Dispatch<group>
 }) {
     // React-hook forms: Registreation things
     const {
@@ -23,13 +29,32 @@ export default function GroupForm({ visibility, setVisibility, setHasNew }: {
     } = useForm();
 
     // Adding group functionality
-    const handleGroupAdd = (data: FieldValues) => {
+    const handleGroupAdd = async (data: FieldValues) => {
         const {
             moduleCode,
             groupName
         } = data;
-        setVisibility(false);
-        setHasNew(true);
+        return await axios.post(`${expressHost}/authorized/group`,
+            {
+                groupName,
+                moduleCode,
+                username: sessionStorage.getItem('username')
+            }, {
+            headers: {
+                Authorization: sessionStorage.getItem('token')
+            }
+        })
+            .then((group) => {
+                setVisibility(false);
+                setNewGroup({
+                    id: group.data.id,
+                    moduleCode: group.data.moduleCode,
+                    name: group.data.name
+                });
+            })
+            .catch((err) => {
+                alert(`An error occurred when trying to create group: ${err}`);
+            });
     }
 
     // validation of module code
@@ -41,7 +66,7 @@ export default function GroupForm({ visibility, setVisibility, setHasNew }: {
             params: {
                 moduleCode: input
             }
-        }).catch(() => { 
+        }).catch(() => {
             return { status: 404 }
         });
         return moduleExists.status === 200;
