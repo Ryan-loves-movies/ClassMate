@@ -5,7 +5,7 @@ import userController from '@controllers/userController';
 const { getUsers, createUser, logIn, logOut, getProfile, updateProfilePhoto, updateProfile, resetPassword, verifyEmail, deleteUser } = userController;
 
 // User routes
-expressRouter.post('/users', getUsers);
+expressRouter.get('/users', getUsers);
 expressRouter.post('/register', createUser);
 expressRouter.post('/login', logIn);
 expressRouter.post('/logout', logOut);

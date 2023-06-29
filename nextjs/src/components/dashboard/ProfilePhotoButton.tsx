@@ -5,7 +5,6 @@ const { expressHost } = config;
 
 export default function ProfilePhotoButton() {
     const updateProfilePhoto = async (photo: Buffer) => {
-        console.log(photo);
         await axios.put(`${expressHost}/authorized/profile/photo`,
             {
                 username: sessionStorage.getItem('username'),
