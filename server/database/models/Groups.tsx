@@ -6,6 +6,7 @@ import Users from '@models/Users';
 class Groups extends Model<InferAttributes<Groups>, InferCreationAttributes<Groups>> {
     declare id: number | null;
     declare name: string;
+    declare moduleCode: string;
 
     declare getUsers: BelongsToManyGetAssociationsMixin<Users>;
     declare addUser: BelongsToManyAddAssociationMixin<Users, number>;
@@ -33,7 +34,15 @@ Groups.init({
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+    },
+    moduleCode: {
+        type: DataTypes.STRING(30),
+        allowNull: false,
+        references: {
+            model: "Modules",
+            key: "code"
+        }
     }
 }, {
     sequelize,
