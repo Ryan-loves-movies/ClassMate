@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import Groups from '@models/Groups';
 import Users from '@models/Users';
 import Users_Groups from '@models/Users_Groups';
-import validateRequest from '@controllers/authController';
 
 /** 
     req: {
@@ -19,7 +18,6 @@ Returns the groupId of the group given the users and group name.
     NOTE: MAY NOT BE ACCURATE
 **/
 async function getGroupId(req: Request, res: Response) {
-    validateRequest(req, res);
     const { usernames, groupName } = req.body;
     await Groups.findOne({
         where: {
@@ -55,10 +53,43 @@ async function getGroupId(req: Request, res: Response) {
 }
 Create a new group with the list of users, return groupId
 **/
+async function getGroups(req: Request, res: Response) {
+    const username = req.query.username as string;
+    await Users.findByPk(username, {
+        include: [{
+            model: Groups
+        }]
+    })
+        .then((user) => {
+            const groups = user?.getGroups()
+                .then((groups) => {
+                    return groups.map((group) => group.toJSON());
+                });
+            res.status(200).json({ groups: groups });
+        })
+        .catch(() => {
+            res.status(404).json({ message: 'user could not be found!' });
+        });
+}
+
+/** 
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        groupName: number (new lectureCode),
+        username: string[]
+    }
+}
+Create a new group with the list of users, return groupId
+**/
 async function createGroup(req: Request, res: Response) {
-    validateRequest(req, res);
-    const { groupName, username } = req.body;
-    await Groups.create({ name: groupName })
+    const { groupName, moduleCode, username } = req.body;
+    await Groups.create({
+        name: groupName,
+        moduleCode: moduleCode
+    })
         .then((group) => {
             Users.findByPk(username, {
                 include: [{
@@ -69,6 +100,12 @@ async function createGroup(req: Request, res: Response) {
                     group.addUser(user as Users);
                     res.status(200).json({ groupId: group.id });
                 })
+                .catch(() => {
+                    res.status(404).json({ message: 'user could not be found!' })
+                });
+        })
+        .catch((err) => {
+            res.status(401).json({ message: err.message });
         });
 }
 
@@ -84,7 +121,6 @@ async function createGroup(req: Request, res: Response) {
 Create a new group with the list of users, return groupId
 **/
 async function deleteGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { groupId } = req.body;
     await Groups.destroy({
         where: {
@@ -111,7 +147,6 @@ async function deleteGroup(req: Request, res: Response) {
 Modifies the lessons being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function addUserToGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, groupId } = req.body;
     await Groups.findByPk(groupId, {
         include: [
@@ -140,7 +175,6 @@ async function addUserToGroup(req: Request, res: Response) {
 Modifies the lessons being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function removeUserFromGroup(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, groupId } = req.body;
     await Groups.findByPk(groupId, {
         include: [
@@ -156,4 +190,4 @@ async function removeUserFromGroup(req: Request, res: Response) {
         });
 }
 
-export default { getGroupId, createGroup, deleteGroup, addUserToGroup, removeUserFromGroup };
+export default { getGroupId, getGroups, createGroup, deleteGroup, addUserToGroup, removeUserFromGroup };

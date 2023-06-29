@@ -4,7 +4,6 @@ import Modules from '@models/Modules';
 import Users_Modules from '@models/Users_Modules';
 import Lessons from '@models/Lessons';
 import { Op } from 'sequelize';
-import validateRequest from '@controllers/authController';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
 
@@ -135,7 +134,7 @@ async function populateLessons(req: Request, res: Response) {
     await Promise.all(axiosPromises)
         .then(() => {
             console.log('lessons updated!')
-            return res.status(200).json({ message: "database updated!", fakeModules});
+            return res.status(200).json({ message: "database updated!", fakeModules });
         })
         .catch((err) => {
             console.log('Error populating database:', err);
@@ -143,12 +142,52 @@ async function populateLessons(req: Request, res: Response) {
         })
 }
 
+async function hasModule(req: Request, res: Response) {
+    const moduleCode = (req.query.moduleCode as string);
+    return await Modules.findByPk(moduleCode)
+        .then((module) => {
+            if (module) {
+                return res.status(200).json({ message: 'Module exists!' });
+            } else {
+                throw Error;
+            }
+        })
+        .catch(() => {
+            return res.status(404).json({ message: 'Module does not exist!' });
+        });
+}
+
 
 async function searchModules(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
 
-    const ans = await Modules.findAll({
+    if (limit === 0) {
+        return await Modules.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        code: {
+                            [Op.iLike]: `%${query}%`,
+                        },
+                    },
+                    {
+                        name: {
+                            [Op.iLike]: `%${query}%`,
+                        },
+                    },
+                ],
+            }
+        })
+            .then((modules) => {
+                console.log(modules.slice(0, 5));
+                res.status(200).json({ modules: modules.map((model) => model.toJSON()) });
+            })
+            .catch((err) => {
+                res.status(401).json({ message: err });
+            })
+    }
+    return await Modules.findAll({
         limit: limit,
         where: {
             [Op.or]: [
@@ -164,10 +203,14 @@ async function searchModules(req: Request, res: Response) {
                 },
             ],
         }
-    });
+    })
+        .then((modules) => {
+            res.status(200).json({ modules: modules.map((model) => model.toJSON()) });
+        })
+        .catch((err) => {
+            res.status(401).json({ message: err });
+        });
 
-    res.status(200).json({ modules: ans.map((model) => model.toJSON()) });
-    return ans;
 }
 
 async function getModules(req: Request, res: Response) {
@@ -214,7 +257,6 @@ async function getModules(req: Request, res: Response) {
 Adds the module to the user and the lessons associated with it
 **/
 async function addModule(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, moduleCode, lessons } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -264,7 +306,6 @@ async function addModule(req: Request, res: Response) {
 Remove specific module taken by user (and all related lessons)
 **/
 async function removeModule(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, moduleCode } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -295,7 +336,6 @@ async function removeModule(req: Request, res: Response) {
 Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function updateLesson(req: Request, res: Response) {
-    validateRequest(req, res);
     const { username, moduleCode, lessonId, lessonType } = req.body;
     await Users.findByPk(username, {
         include: [
@@ -332,4 +372,4 @@ async function updateLesson(req: Request, res: Response) {
         });
 }
 
-export default { populateLessons, populateModules, getModules, addModule, removeModule, updateLesson };
+export default { populateLessons, populateModules, hasModule, searchModules, getModules, addModule, removeModule, updateLesson };
