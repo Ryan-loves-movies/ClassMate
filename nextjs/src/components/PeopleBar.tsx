@@ -3,11 +3,16 @@ import styles from '@components/peopleBar.module.css';
 
 let starIdCounter = 0;
 
-export default function PeopleBar({ name, bio }: { name: string, bio: string }) {
+export default function PeopleBar({ name, bio, photo}:
+    {
+        name: string,
+        bio: string,
+        photo: string
+    }) {
     const starId = `star-${starIdCounter++}`;
     return (
         <div className={styles['message-box']}>
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2550&q=80" alt="Profile" />
+            <img src={photo} alt="Profile" />
             <div className={styles['message-content']}>
                 <div className={styles['message-header']}>
                     <div className={styles['name']}>{name}</div>
