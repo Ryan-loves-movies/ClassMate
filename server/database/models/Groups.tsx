@@ -1,5 +1,5 @@
 import sequelize from '@server/database/connection';
-import { Association, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin, BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import { Association, BelongsToCreateAssociationMixin, BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin, BelongsToManySetAssociationsMixin, BelongsToSetAssociationMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import Modules from '@models/Modules';
 import Users from '@models/Users';
 
@@ -19,6 +19,10 @@ class Groups extends Model<InferAttributes<Groups>, InferCreationAttributes<Grou
     declare countUsers: BelongsToManyCountAssociationsMixin;
     declare createUser: BelongsToManyCreateAssociationMixin<Users>;
 
+    declare getModule: BelongsToGetAssociationMixin<Modules>;
+    declare setModule: BelongsToSetAssociationMixin<Modules, number>;
+    declare createModule: BelongsToCreateAssociationMixin<Users>;
+
     declare static associations: {
         users: Association<Modules, Users>;
     };
@@ -34,7 +38,7 @@ Groups.init({
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
     },
     moduleCode: {
         type: DataTypes.STRING(30),
