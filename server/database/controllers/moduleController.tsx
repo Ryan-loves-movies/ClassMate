@@ -142,6 +142,21 @@ async function populateLessons(req: Request, res: Response) {
         })
 }
 
+async function hasModule(req: Request, res: Response) {
+    const moduleCode = (req.query.moduleCode as string);
+    return await Modules.findByPk(moduleCode)
+        .then((module) => {
+            if (module) {
+                return res.status(200).json({ message: 'Module exists!' });
+            } else {
+                throw Error;
+            }
+        })
+        .catch(() => {
+            return res.status(404).json({ message: 'Module does not exist!' });
+        });
+}
+
 
 async function searchModules(req: Request, res: Response) {
     const query = (req.query.query as string);
@@ -165,7 +180,7 @@ async function searchModules(req: Request, res: Response) {
             }
         })
             .then((modules) => {
-                console.log(modules.slice(0,5));
+                console.log(modules.slice(0, 5));
                 res.status(200).json({ modules: modules.map((model) => model.toJSON()) });
             })
             .catch((err) => {
@@ -190,12 +205,11 @@ async function searchModules(req: Request, res: Response) {
         }
     })
         .then((modules) => {
-            console.log(modules);
             res.status(200).json({ modules: modules.map((model) => model.toJSON()) });
         })
         .catch((err) => {
             res.status(401).json({ message: err });
-        })
+        });
 }
 
 async function getModules(req: Request, res: Response) {
@@ -357,4 +371,4 @@ async function updateLesson(req: Request, res: Response) {
         });
 }
 
-export default { populateLessons, populateModules, searchModules, getModules, addModule, removeModule, updateLesson };
+export default { populateLessons, populateModules, hasModule, searchModules, getModules, addModule, removeModule, updateLesson };
