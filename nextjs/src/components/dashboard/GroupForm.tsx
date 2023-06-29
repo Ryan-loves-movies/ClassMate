@@ -2,8 +2,15 @@ import styles from '@components/dashboard/groupForm.module.css';
 import { Dispatch, KeyboardEvent, MouseEvent, useEffect, useRef } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import LocalError from '@components/login/LocalError';
+import config from '@/config';
+import axios, { AxiosResponse } from 'axios';
+const { expressHost } = config;
 
-export default function GroupForm({ visibility, setVisibility }: { visibility: boolean, setVisibility: Dispatch<boolean> }) {
+export default function GroupForm({ visibility, setVisibility, setHasNew }: {
+    visibility: boolean,
+    setVisibility: Dispatch<boolean>,
+    setHasNew: Dispatch<boolean>
+}) {
     // React-hook forms: Registreation things
     const {
         register: registerGroup,
@@ -15,20 +22,29 @@ export default function GroupForm({ visibility, setVisibility }: { visibility: b
         }
     } = useForm();
 
-    // Reset the input fields upon submission
-    useEffect(() => {
-        if (isSubmitSuccessful) {
-            resetInputs();
-        }
-    }, [isSubmitSuccessful, resetInputs]);
-
     // Adding group functionality
     const handleGroupAdd = (data: FieldValues) => {
         const {
-            'Module Code': moduleCode,
-            'Group Name': groupName
+            moduleCode,
+            groupName
         } = data;
         setVisibility(false);
+        setHasNew(true);
+    }
+
+    // validation of module code
+    const validateModule = async (input: string) => {
+        const moduleExists = await axios.get(`${expressHost}/authorized/module`, {
+            headers: {
+                Authorization: sessionStorage.getItem('token')
+            },
+            params: {
+                moduleCode: input
+            }
+        }).catch(() => { 
+            return { status: 404 }
+        });
+        return moduleExists.status === 200;
     }
 
     // Escape window functions
@@ -44,6 +60,13 @@ export default function GroupForm({ visibility, setVisibility }: { visibility: b
         }
     }
 
+    // Reset the input fields upon submission
+    useEffect(() => {
+        if (isSubmitSuccessful) {
+            resetInputs();
+        }
+    }, [isSubmitSuccessful, resetInputs]);
+
     return (
         <div className={`${styles['popup']} ${visibility ? styles['visible'] : ''}`} onClick={handleOutsideClick} onKeyDown={handleEscape}>
             <div className={styles['popup-container']} ref={ref}>
@@ -56,7 +79,10 @@ export default function GroupForm({ visibility, setVisibility }: { visibility: b
                                 className={styles['forms_field-input']}
                                 placeholder="Module Code"
                                 {...registerGroup('moduleCode', {
-                                    required: { value: true, message: "Module code required" }
+                                    required: { value: true, message: "Module code required" },
+                                    validate: {
+                                        checkModule: async (input: string) => await validateModule(input) || "Module doesn't exist!"
+                                    }
                                 })
                                 }
                             />

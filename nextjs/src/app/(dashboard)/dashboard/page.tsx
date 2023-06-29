@@ -5,8 +5,14 @@ import GroupBox from "@components/dashboard/GroupBox";
 import PeopleSearchBar from "@components/dashboard/PeopleSearchBar";
 import PeopleBar from "@components/PeopleBar";
 import AddProjectButton from "@components/dashboard/AddProjectButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupForm from "@components/dashboard/GroupForm";
+
+interface group {
+    id: number;
+    moduleCode: string;
+    name: string;
+}
 
 export default function Dashboard() {
     // Determining date for section
@@ -15,12 +21,29 @@ export default function Dashboard() {
     const day = currentDate.getDate();
     const formattedDate = `${month}, ${day}`;
 
-    const [searchRes, setSearchRes] = useState([]);
+    const [hasNewGroup, setHasNewGroup] = useState(false);
+    const [groups, setGroups] = useState<group[]>([]);
+    const [searchRes, setSearchRes] = useState<string[]>([]);
     const [formVisible, setFormVisible] = useState(false);
+
+    // Rendering of all the GroupBoxes
+    const groupBoxes = () => {
+        return groups.map((oneGroup: group) => {
+            <GroupBox backgroundColor={"#fee4cb"} header="CS2030" subheader={oneGroup.name} width="50%" />
+        })
+    }
 
     const addGroup = () => {
         setFormVisible(true);
     }
+
+    // Search Bar Functionalities
+    const handleKeyDown = () => {};
+
+    useEffect(() => {
+        console.log('1');
+        setHasNewGroup(false);
+    }, [hasNewGroup])
 
     return (
         <>
@@ -42,7 +65,7 @@ export default function Dashboard() {
             <div className={styles['messages-section']}>
                 <div className={styles['projects-section-header']}>
                     <p>Add people</p>
-                    <PeopleSearchBar width="80%" />
+                    <PeopleSearchBar handleKeyDown={handleKeyDown} setSearchRes={setSearchRes} width="80%" />
                 </div>
                 <div className={styles['messages']}>
                     <PeopleBar name="Stephanie" bio="hihi wanna do CS2030 together?" />
@@ -51,7 +74,7 @@ export default function Dashboard() {
                     <PeopleBar name="Jessica" bio="I have to take BT2102 next sem, wbu?" />
                 </div>
             </div>
-                <GroupForm visibility={formVisible} setVisibility={setFormVisible} />
+            <GroupForm visibility={formVisible} setVisibility={setFormVisible} setHasNew={setHasNewGroup} />
         </>
     )
 }
