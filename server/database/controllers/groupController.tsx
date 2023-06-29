@@ -61,11 +61,46 @@ async function getGroups(req: Request, res: Response) {
         }]
     })
         .then((user) => {
-            const groups = user?.getGroups()
+            user?.getGroups()
                 .then((groups) => {
-                    return groups.map((group) => group.toJSON());
+                    res.status(200).json({ groups: groups.map((group) => group.toJSON()) });
+                })
+                .catch((err) => {
+                    res.status(404).json({ message: `error occurred when trying to find groups associated with user: ${err}` });
                 });
-            res.status(200).json({ groups: groups });
+        })
+        .catch(() => {
+            res.status(404).json({ message: 'user could not be found!' });
+        });
+}
+
+/** 
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        groupName: number (new lectureCode),
+        username: string[]
+    }
+}
+Create a new group with the list of users, return groupId
+**/
+async function getUsersInGroup(req: Request, res: Response) {
+    const groupId = req.query.groupId as string;
+    await Groups.findByPk(groupId, {
+        include: [{
+            model: Users
+        }]
+    })
+        .then(async (group) => {
+            await group?.getUsers()
+                .then((users) => {
+                    res.status(200).json({ users: users.map((user) => user.toJSON()) });
+                })
+                .catch((err) => {
+                    res.status(404).json({ message: `error occurred when trying to find groups associated with user: ${err}` });
+                });
         })
         .catch(() => {
             res.status(404).json({ message: 'user could not be found!' });
@@ -98,7 +133,11 @@ async function createGroup(req: Request, res: Response) {
             })
                 .then((user) => {
                     group.addUser(user as Users);
-                    res.status(200).json({ groupId: group.id });
+                    res.status(200).json({
+                        id: group.id,
+                        moduleCode: moduleCode,
+                        name: groupName
+                    });
                 })
                 .catch(() => {
                     res.status(404).json({ message: 'user could not be found!' })
@@ -190,4 +229,4 @@ async function removeUserFromGroup(req: Request, res: Response) {
         });
 }
 
-export default { getGroupId, getGroups, createGroup, deleteGroup, addUserToGroup, removeUserFromGroup };
+export default { getGroupId, getGroups, getUsersInGroup, createGroup, deleteGroup, addUserToGroup, removeUserFromGroup };
