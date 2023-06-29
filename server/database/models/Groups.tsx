@@ -38,7 +38,7 @@ Groups.init({
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
     },
     moduleCode: {
         type: DataTypes.STRING(30),
