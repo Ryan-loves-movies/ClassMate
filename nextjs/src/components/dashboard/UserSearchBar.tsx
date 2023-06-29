@@ -1,12 +1,15 @@
 import React, { Dispatch, useState } from "react";
-import styles from "@components/dashboard/modSearchBar.module.css";
+import styles from "@components/dashboard/userSearchBar.module.css";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import config from '@/config';
 const { expressHost } = config;
 
-interface respBody {
-    code: string;
-    name: string;
+interface user {
+    username: string;
+    photo: {
+        type: string,
+        data: []
+    }
 }
 
 /**
@@ -16,10 +19,10 @@ interface respBody {
     * width: width of the search bar
     * }
     * */
-export default function PeopleSearchBar({ handleKeyDown, setSearchRes, width }:
+export default function UserSearchBar({ handleKeyDown, setSearchRes, width }:
     {
         handleKeyDown: (elem: React.KeyboardEvent<HTMLInputElement>) => void,
-        setSearchRes: Dispatch<string[]>,
+        setSearchRes: Dispatch<user[]>,
         width: string
     }) {
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +45,7 @@ export default function PeopleSearchBar({ handleKeyDown, setSearchRes, width }:
                 })
                 .catch((err: AxiosError) => {
                     console.log('Error:', err);
+                    alert(`Error encountered when finding users: ${err}`);
                 });
         }
     };
@@ -51,7 +55,7 @@ export default function PeopleSearchBar({ handleKeyDown, setSearchRes, width }:
             <div className={styles['search-wrapper']}>
                 <input className={styles['search-input']}
                     type="text"
-                    placeholder="Add module"
+                    placeholder="Add friends"
                     onChange={handleSearch}
                     onKeyDown={handleKeyDown}
                 />
