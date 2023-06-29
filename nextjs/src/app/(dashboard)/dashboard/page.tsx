@@ -2,16 +2,35 @@
 import "@app/(dashboard)/globals.css";
 import styles from "@app/(dashboard)/dashboard/dashboard.module.css";
 import GroupBox from "@components/dashboard/GroupBox";
-import PeopleSearchBar from "@components/dashboard/PeopleSearchBar";
+import UserSearchBar from "@components/dashboard/UserSearchBar";
 import PeopleBar from "@components/PeopleBar";
 import AddProjectButton from "@components/dashboard/AddProjectButton";
 import { useEffect, useState } from "react";
 import GroupForm from "@components/dashboard/GroupForm";
+import axios, { AxiosResponse } from "axios";
+import config from '@/config';
+import { bufferToBase64 } from "@components/dashboard/PhotoRenderer";
+const { expressHost } = config;
+
+interface groupWithoutUsers {
+    id: number;
+    moduleCode: string;
+    name: string;
+}
 
 interface group {
     id: number;
     moduleCode: string;
     name: string;
+    users: user[];
+}
+
+interface user {
+    username: string;
+    photo: {
+        type: string,
+        data: Array<number>;
+    }
 }
 
 export default function Dashboard() {
@@ -21,29 +40,97 @@ export default function Dashboard() {
     const day = currentDate.getDate();
     const formattedDate = `${month}, ${day}`;
 
-    const [hasNewGroup, setHasNewGroup] = useState(false);
+    const [newGroup, setNewGroup] = useState<groupWithoutUsers>();
     const [groups, setGroups] = useState<group[]>([]);
-    const [searchRes, setSearchRes] = useState<string[]>([]);
+    const [searchRes, setSearchRes] = useState<user[]>([]);
     const [formVisible, setFormVisible] = useState(false);
 
     // Rendering of all the GroupBoxes
-    const groupBoxes = () => {
-        return groups.map((oneGroup: group) => {
-            <GroupBox backgroundColor={"#fee4cb"} header="CS2030" subheader={oneGroup.name} width="50%" />
-        })
+    const groupBoxColors = ['#fee4cb', '#e9e7fd', '#ffd3e2', '#c8f7dc', '#d5deff', ''];
+    const GroupBoxes = () => {
+        return (
+            <>
+                {groups.map((oneGroup: group, index: number) => {
+                    const color = groupBoxColors[index % 6]
+                    return (
+                        <GroupBox backgroundColor={color} header={oneGroup.moduleCode} subheader={oneGroup.name} users={oneGroup.users} width="50%" key={oneGroup.id} />
+                    );
+                })}
+            </>
+        )
     }
 
+    // Rendering of all the users
+    const FoundUsers = () => {
+        return (
+            <>
+                {searchRes.map((user) => {
+                    return (
+                        <PeopleBar name={user.username} bio="hihi wanna do CS2030 together?" photo={`data:image/*;base64,${bufferToBase64(user.photo.data)}`} key={user.username} />
+                    );
+                })}
+            </>
+        );
+    }
+
+    // Set all groups
+    const getUsersInGroups = (groups: groupWithoutUsers[]) => {
+        return Promise.all(
+            groups.map(async (group) => {
+                return await axios.get(`${expressHost}/authorized/group`, {
+                    headers: {
+                        Authorization: sessionStorage.getItem('token')
+                    },
+                    params: {
+                        groupId: group.id
+                    }
+                })
+                    .then((res: AxiosResponse) => {
+                        console.log('2');
+                        return {
+                            id: group.id,
+                            moduleCode: group.moduleCode,
+                            name: group.name,
+                            users: res.data.users as user[]
+                        } as group;
+                    })
+                    .catch((err) => {
+                        alert(`Error when fetching users for group: ${err}`);
+                    });
+            }));
+    }
+
+    const getGroups = async () => {
+        return await axios.get(`${expressHost}/authorized/group/user`, {
+            headers: {
+                Authorization: sessionStorage.getItem('token')
+            },
+            params: {
+                username: sessionStorage.getItem('username')
+            }
+        })
+            .then((res: AxiosResponse) => {
+                console.log('3');
+                const groups: groupWithoutUsers[] = res.data.groups;
+                getUsersInGroups(groups).then((groups) => setGroups(groups as group[]));
+            })
+            .catch((err) => {
+                alert(`Error when finding groups associated: ${err}`);
+            });
+    }
+
+    // Functionality for addProjectButton
     const addGroup = () => {
         setFormVisible(true);
     }
 
     // Search Bar Functionalities
-    const handleKeyDown = () => {};
+    const handleKeyDown = () => { };
 
     useEffect(() => {
+        getGroups();
         console.log('1');
-        setHasNewGroup(false);
-    }, [hasNewGroup])
+    }, [newGroup])
 
     return (
         <>
@@ -54,27 +141,19 @@ export default function Dashboard() {
                     <AddProjectButton clickHandler={addGroup} />
                 </div>
                 <div className={styles['project-boxes']}>
-                    <GroupBox backgroundColor={"#fee4cb"} header="CS2030" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#e9e7fd"} header="CS2040" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={""} header="BT2102" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#ffd3e2"} header="LAF1201" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#c8f7dc"} header="GEX1015" subheader="Prototyping" width="50%" />
-                    <GroupBox backgroundColor={"#d5deff"} header="IS1108" subheader="Prototyping" width="50%" />
+                    <GroupBoxes />
                 </div>
             </div>
             <div className={styles['messages-section']}>
                 <div className={styles['projects-section-header']}>
                     <p>Add people</p>
-                    <PeopleSearchBar handleKeyDown={handleKeyDown} setSearchRes={setSearchRes} width="80%" />
+                    <UserSearchBar handleKeyDown={handleKeyDown} setSearchRes={setSearchRes} width="80%" />
                 </div>
                 <div className={styles['messages']}>
-                    <PeopleBar name="Stephanie" bio="hihi wanna do CS2030 together?" />
-                    <PeopleBar name="Ethan" bio={"I want to study French 1 next sem, you think you want to take it tgt? We can help each other!"} />
-                    <PeopleBar name="David" bio={`ok i'm down! lets take it together with james too then.`} />
-                    <PeopleBar name="Jessica" bio="I have to take BT2102 next sem, wbu?" />
+                    <FoundUsers />
                 </div>
             </div>
-            <GroupForm visibility={formVisible} setVisibility={setFormVisible} setHasNew={setHasNewGroup} />
+            <GroupForm visibility={formVisible} setVisibility={setFormVisible} setNewGroup={setNewGroup} />
         </>
     )
 }
