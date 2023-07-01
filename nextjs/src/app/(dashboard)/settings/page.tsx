@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "@app/(dashboard)/settings/settings.module.css";
-import DevButtons from "@components/dashboard/DevButtons";
-import ProfilePhotoButton from "@components/dashboard/ProfilePhotoButton";
+import DevButtons from "@components/dashboard/settings/DevButtons";
+import ProfilePhotoButton from "@components/dashboard/settings/ProfilePhotoButton";
 
 export default function timetable() {
     return (

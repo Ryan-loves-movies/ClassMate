@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import config from '@/config';
 import styles from "@app/(dashboard)/timetable/timetable.module.css";
-import Timetable from "@components/dashboard/Timetable";
-import ModSearchBar from "@components/dashboard/ModSearchBar";
+import Timetable from "@components/dashboard/timetable/Timetable";
+import ModSearchBar from "@components/dashboard/timetable/ModSearchBar";
 
 interface attributes {
     mpes1: boolean;
