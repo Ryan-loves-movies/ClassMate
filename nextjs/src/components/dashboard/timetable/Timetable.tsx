@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef } from "react";
-import styles from "@components/dashboard/timetable.module.css";
+import styles from "@components/dashboard/timetable/timetable.module.css";
 
 interface modDet {
     code: string;

@@ -1,5 +1,5 @@
 import React, { Dispatch, useState } from "react";
-import styles from "@components/dashboard/modSearchBar.module.css";
+import styles from "@components/dashboard/timetable/modSearchBar.module.css";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import config from '@/config';
 const { expressHost } = config;

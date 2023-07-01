@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "@components/dashboard/addProjectButton.module.css";
+import styles from "@components/dashboard/dashboard/addProjectButton.module.css";
 
 export default function AddProjectButton({ clickHandler }: { clickHandler: () => void }) {
     return (

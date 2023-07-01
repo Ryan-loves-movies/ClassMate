@@ -1,4 +1,4 @@
-import styles from '@components/dashboard/groupForm.module.css';
+import styles from '@components/dashboard/dashboard/groupForm.module.css';
 import { Dispatch, KeyboardEvent, MouseEvent, useEffect, useRef } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import LocalError from '@components/login/LocalError';
@@ -44,12 +44,12 @@ export default function GroupForm({ visibility, setVisibility, setNewGroup }: {
                 Authorization: sessionStorage.getItem('token')
             }
         })
-            .then((group) => {
+        .then((res: AxiosResponse) => {
                 setVisibility(false);
                 setNewGroup({
-                    id: group.data.id,
-                    moduleCode: group.data.moduleCode,
-                    name: group.data.name
+                    id: res.data.id,
+                    moduleCode: res.data.moduleCode,
+                    name: res.data.name
                 });
             })
             .catch((err) => {

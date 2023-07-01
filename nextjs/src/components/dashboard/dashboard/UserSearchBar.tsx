@@ -1,5 +1,5 @@
-import React, { Dispatch, useState } from "react";
-import styles from "@components/dashboard/userSearchBar.module.css";
+import React, { Dispatch, useEffect, useRef } from "react";
+import styles from "@components/dashboard/dashboard/userSearchBar.module.css";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import config from '@/config';
 const { expressHost } = config;
@@ -19,12 +19,15 @@ interface user {
     * width: width of the search bar
     * }
     * */
-export default function UserSearchBar({ handleKeyDown, setSearchRes, width }:
+export default function UserSearchBar({ focused, handleKeyDown, setSearchRes, width }:
     {
+        focused: boolean,
         handleKeyDown: (elem: React.KeyboardEvent<HTMLInputElement>) => void,
         setSearchRes: Dispatch<user[]>,
         width: string
     }) {
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
 
@@ -50,12 +53,21 @@ export default function UserSearchBar({ handleKeyDown, setSearchRes, width }:
         }
     };
 
+    useEffect(() => {
+        if (focused) {
+            searchInputRef?.current?.focus();
+        } else {
+            searchInputRef?.current?.blur();
+        }
+    }, [focused])
+
     return (
         <div className={styles['search-field']} style={{ maxWidth: width }}>
             <div className={styles['search-wrapper']}>
                 <input className={styles['search-input']}
                     type="text"
                     placeholder="Add friends"
+                    ref={searchInputRef}
                     onChange={handleSearch}
                     onKeyDown={handleKeyDown}
                 />

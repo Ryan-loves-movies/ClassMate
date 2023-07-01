@@ -1,6 +1,14 @@
-import React from "react";
-import styles from "@components/dashboard/groupBox.module.css";
-import PhotoRenderer from "./PhotoRenderer";
+import React, { Dispatch } from "react";
+import styles from "@components/dashboard/dashboard/groupBox.module.css";
+import PhotoRenderer from "@components/dashboard/PhotoRenderer";
+import TrashIcon from "@components/dashboard/dashboard/TrashIcon";
+
+interface group {
+    id: number,
+    moduleCode: string
+    name: string,
+    users: user[]
+}
 
 interface user {
     username: string;
@@ -11,14 +19,17 @@ interface user {
 }
 
 export default function GroupBox({
-    backgroundColor, header, subheader, users, width
+    waiting, backgroundColor, id, header, subheader, users, width, setGroupChosen
 }:
     {
-        backgroundColor: string,
+    waiting: boolean,
+    backgroundColor: string,
+        id: number,
         header: string,
         subheader: string,
         users: user[],
-        width: string
+        width: string,
+        setGroupChosen: Dispatch<group>
     }) {
     const ProfilePhotos = ({ users }: { users: user[] }) => {
         return (
@@ -31,10 +42,22 @@ export default function GroupBox({
             </>
         );
     }
+
+    const newUserHandler = () => {
+        setGroupChosen({
+            id: id,
+            moduleCode: header,
+            name: subheader,
+            users: users
+        });
+    }
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
-            <div className={styles['project-box']} style={{ backgroundColor: backgroundColor }}>
+        <div className={`${styles['project-box']} ${waiting ? styles['waiting'] : ''}`} style={{ backgroundColor: backgroundColor }}>
                 <div className={styles['project-box-header']}>
+                    <div className={styles['trash']}>
+                        <TrashIcon />
+                    </div>
                     <div className={styles['more-wrapper']}>
                         <button className={styles['project-btn-more']} type="button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className='feather feather-more-vertical'>
@@ -53,7 +76,7 @@ export default function GroupBox({
                 <div className={styles['project-box-footer']}>
                     <div className={styles['participants']}>
                         <ProfilePhotos users={users} />
-                        <button className={styles['add-participant']} style={{ color: "#ff942e" }} type="button">
+                        <button className={styles['add-participant']} style={{ color: "#ff942e" }} type="button" onClick={newUserHandler}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className='feather feather-plus'>
                                 <path d="M12 5v14M5 12h14" />
                                 <title>Add Friend</title>
