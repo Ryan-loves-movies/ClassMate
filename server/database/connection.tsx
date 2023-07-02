@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 
 /* const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
     host: 'db.tubxvcrohjakulghoizg.supabase.co',
@@ -6,19 +6,19 @@ const Sequelize = require('sequelize');
     dialect: 'postgres'
 });
  */
-const sequelize = new Sequelize('classmate', 'root', 'Classmate123!', {
-    host: '127.0.0.1',
+const sequelize = new Sequelize("classmate", "root", "Classmate123!", {
+    host: "127.0.0.1",
     port: 3306,
-    dialect: 'mysql'
-}) 
+    dialect: "mysql",
+});
 export function createSequelizeConnection(instance: typeof Sequelize) {
     try {
         instance.authenticate();
-        console.log('Connection to database established!');
-        return 'Connection to database established!';
+        console.log("Connection to database established!");
+        return "Connection to database established!";
     } catch (err) {
         console.error("Unable to connect to database", err);
-        return 'Failed to connect to database!';
+        return "Failed to connect to database!";
     }
 }
 

@@ -1,9 +1,31 @@
-import sequelize from '@server/database/connection';
-import { Association, BelongsToCreateAssociationMixin, BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin, BelongsToManySetAssociationsMixin, BelongsToSetAssociationMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import Modules from '@models/Modules';
-import Users from '@models/Users';
+import sequelize from "@server/database/connection";
+import {
+    Association,
+    BelongsToCreateAssociationMixin,
+    BelongsToGetAssociationMixin,
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyAddAssociationsMixin,
+    BelongsToManyCountAssociationsMixin,
+    BelongsToManyCreateAssociationMixin,
+    BelongsToManyGetAssociationsMixin,
+    BelongsToManyHasAssociationMixin,
+    BelongsToManyHasAssociationsMixin,
+    BelongsToManyRemoveAssociationMixin,
+    BelongsToManyRemoveAssociationsMixin,
+    BelongsToManySetAssociationsMixin,
+    BelongsToSetAssociationMixin,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
+import Modules from "@models/Modules";
+import Users from "@models/Users";
 
-class Groups extends Model<InferAttributes<Groups>, InferCreationAttributes<Groups>> {
+class Groups extends Model<
+    InferAttributes<Groups>,
+    InferCreationAttributes<Groups>
+> {
     declare id: number | null;
     declare name: string;
     declare moduleCode: string;
@@ -28,31 +50,34 @@ class Groups extends Model<InferAttributes<Groups>, InferCreationAttributes<Grou
     };
 }
 
-Groups.init({
-    id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true,
-        autoIncrement: true,
-        primaryKey: true
+Groups.init(
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: true,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        moduleCode: {
+            type: DataTypes.STRING(30),
+            allowNull: false,
+            references: {
+                model: "Modules",
+                key: "code",
+            },
+        },
     },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    moduleCode: {
-        type: DataTypes.STRING(30),
-        allowNull: false,
-        references: {
-            model: "Modules",
-            key: "code"
-        }
+    {
+        sequelize,
+        tableName: "Groups",
+        timestamps: false,
     }
-}, {
-    sequelize,
-    tableName: 'Groups',
-    timestamps: false
-});
+);
 
 Groups.sync();
 
