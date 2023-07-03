@@ -11,8 +11,9 @@ export default function Sidebar() {
         <div className={styles['app-sidebar']}>
             <Link
                 href="/dashboard"
-                className={`${styles['app-sidebar-container']} ${pathName === '/dashboard' ? styles['active'] : ''
-                    }`}
+                className={`${styles['app-sidebar-container']} ${
+                    pathName === '/dashboard' ? styles['active'] : ''
+                }`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -34,8 +35,9 @@ export default function Sidebar() {
             </Link>
             <Link
                 href="/timetable"
-                className={`${styles['app-sidebar-container']} ${pathName === '/timetable' ? styles['active'] : ''
-                    }`}
+                className={`${styles['app-sidebar-container']} ${
+                    pathName === '/timetable' ? styles['active'] : ''
+                }`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -59,8 +61,9 @@ export default function Sidebar() {
             </Link>
             <Link
                 href="/settings"
-                className={`${styles['app-sidebar-container']} ${pathName === '/settings' ? styles['active'] : ''
-                    }`}
+                className={`${styles['app-sidebar-container']} ${
+                    pathName === '/settings' ? styles['active'] : ''
+                }`}
             >
                 <svg
                     className="link-icon feather feather-settings "

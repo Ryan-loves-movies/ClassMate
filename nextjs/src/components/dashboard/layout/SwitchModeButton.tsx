@@ -23,8 +23,9 @@ export default function SwitchModeButton() {
 
     return (
         <button
-            className={`${styles['mode-switch']} ${isActive ? styles['active'] : ''
-                }`}
+            className={`${styles['mode-switch']} ${
+                isActive ? styles['active'] : ''
+            }`}
             onClick={toggleTheme}
             title="Switch Theme"
             type="button"

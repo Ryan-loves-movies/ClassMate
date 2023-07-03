@@ -64,8 +64,9 @@ export default function GroupBox({
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
-                className={`${styles['project-box']} ${waiting ? styles['waiting'] : ''
-                    }`}
+                className={`${styles['project-box']} ${
+                    waiting ? styles['waiting'] : ''
+                }`}
                 style={{ backgroundColor: backgroundColor }}
             >
                 <div className={styles['project-box-header']}>

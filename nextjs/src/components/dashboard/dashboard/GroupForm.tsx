@@ -98,8 +98,9 @@ export default function GroupForm({
 
     return (
         <div
-            className={`${styles['popup']} ${visibility ? styles['visible'] : ''
-                }`}
+            className={`${styles['popup']} ${
+                visibility ? styles['visible'] : ''
+            }`}
             onClick={handleOutsideClick}
             onKeyDown={handleEscape}
         >

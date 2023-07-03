@@ -130,8 +130,9 @@ export default function Home() {
                     </div>
 
                     <div
-                        className={`user_options-forms ${bounceDir ? 'bounceLeft' : 'bounceRight'
-                            }`}
+                        className={`user_options-forms ${
+                            bounceDir ? 'bounceLeft' : 'bounceRight'
+                        }`}
                         id="user_options-forms"
                     >
                         <div className="user_forms-login">

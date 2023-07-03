@@ -88,11 +88,11 @@ export default function TimetableMain() {
                     const modTimetable = (
                         isSem1
                             ? (res.data as modInfo).semesterData.filter(
-                                (lesson) => lesson.semester === 1
-                            )
+                                  (lesson) => lesson.semester === 1
+                              )
                             : (res.data as modInfo).semesterData.filter(
-                                (lesson) => lesson.semester === 2
-                            )
+                                  (lesson) => lesson.semester === 2
+                              )
                     )[0].timetable;
                     const lab = modTimetable.filter(
                         (lesson) => lesson.lessonType === 'Laboratory'
@@ -196,7 +196,7 @@ export default function TimetableMain() {
         /* getModules()
             .then(() => updateAddedMod())
             .then((updatedMod) => pushToDB(updatedMod)); */
-    }, [isSem1, addedMod]);
+    }, [isSem1, addedMod, mods]);
 
     return (
         <div className={styles['projects-section']}>

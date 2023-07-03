@@ -174,8 +174,9 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     const Col = ({ gray = false }) => {
         return (
             <div
-                className={`${styles['s-hour-row']} ${gray ? styles['gray-col'] : ''
-                    }`}
+                className={`${styles['s-hour-row']} ${
+                    gray ? styles['gray-col'] : ''
+                }`}
             >
                 <div
                     className={`${styles['s-hour-wrapper']}`}

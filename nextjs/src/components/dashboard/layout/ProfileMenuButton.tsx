@@ -46,8 +46,9 @@ export default function ProfileMenuButton() {
             <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />
             <span>{username}</span>
             <div
-                className={`${styles['dropdown-wrapper']} ${isDropdownActive ? styles['active'] : ''
-                    }`}
+                className={`${styles['dropdown-wrapper']} ${
+                    isDropdownActive ? styles['active'] : ''
+                }`}
                 id="dropdownWrapper"
             >
                 <div className={styles['dropdown-profile-details']}>
