@@ -71,3 +71,8 @@
     fill: var(--star);
     transition: 0.2s;
 }
+
+.status {
+    display: flex;
+    justify-content: right;
+}

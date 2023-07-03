@@ -67,11 +67,11 @@ export default function PeopleBar({
             <div className={styles['message-content']}>
                 <div className={styles['message-header']}>
                     <div className={styles['name']}>{user.username}</div>
-                    <StatusBar
+                    {/* <StatusBar
                         color="#404040"
-                        descriptor="ttenjksadn"
+                        descriptor="team A"
                         height="20px"
-                    />
+                    /> */}
                     <div className={styles['star-checkbox']}>
                         <input type="checkbox" id={starId} />
                         <label htmlFor={starId}>
@@ -94,6 +94,14 @@ export default function PeopleBar({
                     </div>
                 </div>
                 <p className={styles['message-line']}>{bio}</p>
+                {/* <div className={styles['message-line']}>{bio}</div> */}
+                <div className={styles['status']}>
+                    <StatusBar
+                        color="#404040"
+                        descriptor="team A"
+                        height="20px"
+                    />
+                </div>
             </div>
         </div>
     );
