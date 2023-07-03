@@ -1,8 +1,8 @@
-'use client'
-import React, { useLayoutEffect, useState } from "react";
-import { useTheme } from "next-themes";
-import Link from "next/link";
-import styles from "@components/dashboard/layout/logo.module.css";
+'use client';
+import React, { useLayoutEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import styles from '@components/dashboard/layout/logo.module.css';
 
 export default function Logo() {
     const [mounted, setMounted] = useState(false);
@@ -10,7 +10,7 @@ export default function Logo() {
 
     useLayoutEffect(() => {
         setMounted(true);
-    })
+    }, []);
 
     if (!mounted) {
         return null;
@@ -18,7 +18,13 @@ export default function Logo() {
 
     return (
         <Link href="/dashboard">
-            <img src={(theme.theme === "light") ? "/logoDark.png" : "/logoWhite.png"} className={styles['logo']} alt="Logo" />
+            <img
+                src={
+                    theme.theme === 'light' ? '/logoDark.png' : '/logoWhite.png'
+                }
+                className={styles['logo']}
+                alt="Logo"
+            />
         </Link>
     );
 }

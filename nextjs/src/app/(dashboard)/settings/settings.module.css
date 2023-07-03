@@ -40,4 +40,11 @@
 
 .settings-description {
     margin: 12px 0 0 0;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.settings-description action {
+    align-self: self-end;
 }

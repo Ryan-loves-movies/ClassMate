@@ -1,34 +1,45 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import sequelize from '@server/database/connection';
+import {
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
+import sequelize from "@server/database/connection";
 
-class Users_Modules_Lessons extends Model<InferAttributes<Users_Modules_Lessons>, InferCreationAttributes<Users_Modules_Lessons>> {
+class Users_Modules_Lessons extends Model<
+    InferAttributes<Users_Modules_Lessons>,
+    InferCreationAttributes<Users_Modules_Lessons>
+> {
     declare userId: number;
     declare lessonId: number;
 }
 
-Users_Modules_Lessons.init({
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        references: {
-            model: 'Users_Modules',
-            key: 'id',
-        }
+Users_Modules_Lessons.init(
+    {
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            references: {
+                model: "Users_Modules",
+                key: "id",
+            },
+        },
+        lessonId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            references: {
+                model: "Lessons",
+                key: "id",
+            },
+        },
     },
-    lessonId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        references: {
-            model: 'Lessons',
-            key: 'id',
-        }
+    {
+        sequelize,
+        tableName: "Users_Modules_Lessons",
+        timestamps: false,
     }
-}, {
-    sequelize,
-    tableName: 'Users_Modules_Lessons',
-    timestamps: false
-});
+);
 
 export default Users_Modules_Lessons;

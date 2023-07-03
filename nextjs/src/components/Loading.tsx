@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import styles from '@components/loading.module.css';
 
 export default function Loading() {

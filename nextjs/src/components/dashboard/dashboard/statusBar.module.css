@@ -1,0 +1,22 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.background {
+    display: flex;
+    position: absolute;
+    border-radius: 4em;
+    opacity: 0.2;
+    justify-content: center;
+}
+
+.description {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    font-size: 0.7em;
+    opacity: 0.99;
+    color: var(--main-color);
+}

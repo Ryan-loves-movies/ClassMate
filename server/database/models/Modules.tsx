@@ -1,8 +1,27 @@
-import sequelize from '@server/database/connection';
-import { Association, DataTypes, BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin, BelongsToManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import Users from '@models/Users';
+import sequelize from "@server/database/connection";
+import {
+    Association,
+    DataTypes,
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyAddAssociationsMixin,
+    BelongsToManyCountAssociationsMixin,
+    BelongsToManyCreateAssociationMixin,
+    BelongsToManyGetAssociationsMixin,
+    BelongsToManyHasAssociationMixin,
+    BelongsToManyHasAssociationsMixin,
+    BelongsToManyRemoveAssociationMixin,
+    BelongsToManyRemoveAssociationsMixin,
+    BelongsToManySetAssociationsMixin,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
+import Users from "@models/Users";
 
-class Modules extends Model<InferAttributes<Modules>, InferCreationAttributes<Modules>> {
+class Modules extends Model<
+    InferAttributes<Modules>,
+    InferCreationAttributes<Modules>
+> {
     declare code: string;
     declare name: string;
 
@@ -22,22 +41,25 @@ class Modules extends Model<InferAttributes<Modules>, InferCreationAttributes<Mo
     };
 }
 
-Modules.init({
-    code: {
-        type: DataTypes.STRING(10),
-        allowNull: false,
-        unique: true,
-        primaryKey: true
+Modules.init(
+    {
+        code: {
+            type: DataTypes.STRING(30),
+            allowNull: false,
+            unique: true,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
+    {
+        sequelize,
+        tableName: "Modules",
+        timestamps: false,
     }
-}, {
-    sequelize,
-    tableName: 'Modules',
-    timestamps: false
-});
+);
 
 Modules.sync();
 

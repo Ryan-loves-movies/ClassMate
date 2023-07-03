@@ -1,4 +1,4 @@
 export default {
-    JWT_SECRET: 'your_secret_value'
+    JWT_SECRET: "your_secret_value",
     // Other configuration properties...
-}
+};

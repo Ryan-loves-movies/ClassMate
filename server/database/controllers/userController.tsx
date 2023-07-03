@@ -1,13 +1,10 @@
 // Users for connection with mySQL and { Request, Response } with express api
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import config from '@server/config';
-import validateRequest from '@controllers/authController';
-import Users from '@models/Users';
-import Modules from '@models/Modules';
-import Lessons from '@models/Lessons';
-import Users_Modules from '@models/Users_Modules';
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "@server/config";
+import Users from "@models/Users";
+import { Op } from "sequelize";
 
 interface profile {
     email: string;
@@ -40,6 +37,47 @@ const saltRounds = 10;
 /**
     Creates new user with empty details in the database
 @param req: {
+    params: {
+        query: string,
+        limit: number
+    }
+}
+@param res {express.Response}
+@returns void
+**/
+const getUsers = async (req: Request, res: Response) => {
+    const query = req.query.query as string;
+    const limit = parseInt(req.query.limit as string);
+    let ans;
+
+    if (limit === 0) {
+        ans = await Users.findAll({
+            where: {
+                username: {
+                    [Op.like]: `%${query}%`,
+                },
+            },
+            attributes: ["username", "photo"],
+        });
+    } else {
+        ans = await Users.findAll({
+            limit: limit,
+            where: {
+                username: {
+                    [Op.like]: `%${query}%`,
+                },
+            },
+            attributes: ["username", "photo"],
+        });
+    }
+
+    res.status(200).json({ users: ans.map((model) => model.toJSON()) });
+    return ans;
+};
+
+/**
+    Creates new user with empty details in the database
+@param req: {
     body: {
         username: string,
         password: string (encoded),
@@ -58,15 +96,21 @@ const createUser = (req: Request, res: Response) => {
                 throw err;
             }
             if (hashedPassword) {
-                return Users.create({ username: username, email: email, password: hashedPassword });
+                return Users.create(
+                    { username: username, email: email, password: hashedPassword },
+                    { ignoreDuplicates: true }
+                );
             }
         });
-        res.status(201).json({ message: 'Users created successfully!' });
+        res.status(201).json({ message: "Users created successfully!" });
     } catch (err) {
-        console.log("Error while making new user in createUser() - userController.tsx, line 65\n", err);
-        res.status(500).json({ message: 'Server Error' });
+        console.log(
+            "Error while making new user in createUser() - userController.tsx, line 65\n",
+            err
+        );
+        res.status(500).json({ message: "Server Error" });
     }
-}
+};
 
 /**
     req: {
@@ -82,29 +126,40 @@ async function logIn(req: Request, res: Response) {
     try {
         await Users.findOne({
             where: {
-                username: username
-            }
+                username: username,
+            },
         }).then((user) => {
             if (!user) {
-                return res.status(404).json({ message: 'No existing user found' });
+                return res.status(404).json({ message: "No existing user found" });
             }
-            bcrypt.compare(password, user.dataValues.password as string, (err, authenticated) => {
-                if (err) {
-                    throw err;
+            bcrypt.compare(
+                password,
+                user.dataValues.password as string,
+                (err, authenticated) => {
+                    if (err) {
+                        throw err;
+                    }
+                    if (authenticated) {
+                        const token = jwt.sign(req.body, config.JWT_SECRET, {
+                            expiresIn: "1d",
+                        });
+                        return res.status(200).json({
+                            message: "Users authenticated",
+                            token: token,
+                        });
+                    } else {
+                        return res.status(401).json({
+                            message: "Wrong password or something wrong with server!",
+                        });
+                    }
                 }
-                if (authenticated) {
-                    const token = jwt.sign(req.body, config.JWT_SECRET, { expiresIn: '1d' })
-                    return res.status(200).json({
-                        message: 'Users authenticated',
-                        token: token
-                    });
-                } else {
-                    return res.status(401).json({ message: 'Wrong password or something wrong with server!' });
-                }
-            });
+            );
         });
     } catch (err) {
-        console.log("Error while logging in in logIn() function in userController.tsx - line 95\n", err);
+        console.log(
+            "Error while logging in in logIn() function in userController.tsx - line 95\n",
+            err
+        );
     }
 }
 
@@ -118,9 +173,8 @@ Verifies token of user, then return log out successful message.
     Note: Deletion of JSON web token to be done on client side
 **/
 async function logOut(req: Request, res: Response) {
-    validateRequest(req, res);
     // Clear JWT token on client-side AND invalidate token on server-side
-    res.status(200).json({ message: 'Logout successful!' });
+    res.status(200).json({ message: "Logout successful!" });
 }
 
 /**
@@ -139,42 +193,36 @@ Search for the user profile on the database and returns first matching username.
 **/
 async function getProfile(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         const username = req.query.username as string;
         if (!username) {
-            res.status(500).json({ message: "No username passed in params" })
+            res.status(500).json({ message: "No username passed in params" });
             return;
         }
-        if (req.query.mods === 'false') {
-            return await Users.findOne({
-                where: {
-                    username: username
-                },
+        /* if (req.query.mods === 'false') { */
+        return await Users.findByPk(username).then((user) => {
+            if (!user) {
+                return res.status(404).json({ message: "No existing user found" });
+            }
+            return res.status(200).json({
+                username: user.get("username"),
+                email: user.get("email"),
+                photo: user.get("photo"),
+            });
+        });
+        /* } */
+        /* return await Users.findByPk(username, {
+                include: [
+                    {
+                        model: Users_Modules,
+                        include: [
+                            {
+                                model: Lessons
+                            },
+                            {
+                                model: Modules
+                            }]
+                    }]
             })
-                .then((user) => {
-                    if (!user) {
-                        return res.status(404).json({ message: 'No existing user found' });
-                    }
-                    return res.status(200).json({
-                        username: user.get("username"),
-                        email: user.get("email"),
-                    });
-
-                });
-        }
-        return await Users.findByPk(username, {
-            include: [
-                {
-                    model: Users_Modules,
-                    include: [
-                        {
-                            model: Lessons
-                        },
-                        {
-                            model: Modules
-                        }]
-                }]
-        })
             .then((user) => {
                 if (!user) {
                     return res.status(404).json({ message: 'No existing user found' });
@@ -185,7 +233,7 @@ async function getProfile(req: Request, res: Response) {
                 return res.status(200).json({
                     username: user.get("username"),
                     email: user.get("email"),
-
+        
                     mods: user.get('Modules')
                     // .map((module) => {
                     //     return {
@@ -194,7 +242,7 @@ async function getProfile(req: Request, res: Response) {
                     //             .map((lessonType) => user.get(`${lessonType.name}Id`))
                     //             .filter((lesson) => lesson !== null)
                     //     }
-
+        
                     // })
                     // [
                     //     {
@@ -220,11 +268,40 @@ async function getProfile(req: Request, res: Response) {
                     //     }
                     // ]
                 });
-            })
+            }) */
+    } catch (err) {
+        console.log(
+            "Error while getting profile details in getProfile() - userController.tsx - line 400?\n",
+            err
+        );
     }
-    catch (err) {
-        console.log("Error while getting profile details in getProfile() - userController.tsx - line 400?\n", err);
+}
+
+/**
+    req: {
+    headers: {
+        Authorization: ~token~
+    },
+    body: {
+        username: string,
+        photo: blob
     }
+}
+Updates the values of the user profile in the database and returns the number of values updated
+**/
+async function updateProfilePhoto(req: Request, res: Response) {
+    const { username, photo } = req.body;
+    console.log(photo);
+    return await Users.findByPk(username)
+        .then((user) => {
+            user?.update({
+                photo: photo.data,
+            });
+            res.status(200).json({ message: "photo updated!" });
+        })
+        .catch(() => {
+            res.status(404).json({ message: "user not found!" });
+        });
 }
 
 /**
@@ -241,24 +318,25 @@ Updates the values of the user profile in the database and returns the number of
 **/
 async function updateProfile(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         const { username, ...updatedValsRaw } = req.body;
         const updatedVals = updatedValsRaw as modType;
         await Users.findOne({
             where: {
-                username: username
-            }
+                username: username,
+            },
         }).then((details) => {
             // Check if module in database already
             //     If not yet, then get last empty mod number
             //     Else, then get mod number of module
-            const allMods = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => details?.get(`mod${num}`) || null);
+            const allMods = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
+                (num) => details?.get(`mod${num}`) || null
+            );
             console.log(details);
             console.log(allMods.find((modCode) => modCode === updatedVals.code));
             console.log(allMods.filter((modCode) => modCode !== null));
             const modNoToChange =
                 allMods.find((modCode) => modCode === updatedVals.code) ||
-                (allMods.filter((modCode) => modCode !== null).length + 1)
+                allMods.filter((modCode) => modCode !== null).length + 1;
             const updatedDet = {
                 [`mod${modNoToChange}`]: updatedVals.code,
                 [`mod${modNoToChange}LecCode`]: updatedVals.lecture.code,
@@ -272,23 +350,32 @@ async function updateProfile(req: Request, res: Response) {
                 [`mod${modNoToChange}TutCode`]: updatedVals.tutorial.code,
                 [`mod${modNoToChange}TutDay`]: updatedVals.tutorial.day,
                 [`mod${modNoToChange}TutStartTime`]: updatedVals.tutorial.startTime,
-                [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime
-            }
+                [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime,
+            };
             Users.update(updatedDet, {
                 where: {
-                    username: username
-                }
+                    username: username,
+                },
             })
                 .then((rowsUpdated: number[]) => {
                     res.status(200).json({ message: `Updated rows ${rowsUpdated}.` });
                 })
                 .catch((error: Error) => {
-                    res.status(500).json({ message: 'Error updating rows in database using updateProfile() in userController.tsx -- line 514:' });
-                    console.log('Error updating rows in database using updateProfile() in userController.tsx -- line 514:', error);
+                    res.status(500).json({
+                        message:
+                            "Error updating rows in database using updateProfile() in userController.tsx -- line 514:",
+                    });
+                    console.log(
+                        "Error updating rows in database using updateProfile() in userController.tsx -- line 514:",
+                        error
+                    );
                 });
         });
     } catch (err) {
-        console.log("Error when updating profile in updateProfile() - line 430 in userController.tsx\n", err);
+        console.log(
+            "Error when updating profile in updateProfile() - line 430 in userController.tsx\n",
+            err
+        );
     }
 }
 
@@ -309,27 +396,35 @@ async function resetPassword(req: Request, res: Response) {
     // Do user authentication first
     // Update password after
     try {
-        validateRequest(req, res);
         return await Users.update(req.body, {
             where: {
-                password: req.body.password
-            }
-        }).then((rowsUpdated: number[]) => {
-            res.status(200).json({ message: `Updated ${rowsUpdated} rows.` });
-        }).catch((error: Error) => {
-            res.status(200).json({ message: `Error updating row for password: ${error}` });
-        });
+                password: req.body.password,
+            },
+        })
+            .then((rowsUpdated: number[]) => {
+                res.status(200).json({ message: `Updated ${rowsUpdated} rows.` });
+            })
+            .catch((error: Error) => {
+                res
+                    .status(200)
+                    .json({ message: `Error updating row for password: ${error}` });
+            });
     } catch (err) {
-        console.log("Error when updating profile in resetPassword() - line 462 in userController.tsx\n", err);
+        console.log(
+            "Error when updating profile in resetPassword() - line 462 in userController.tsx\n",
+            err
+        );
     }
 }
 
 async function verifyEmail(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
-        return res.json({ message: 'Email verified???????' });
+        return res.json({ message: "Email verified???????" });
     } catch (err) {
-        console.log("Error when updating profile in verifyEmail() - line 471 in userController.tsx\n", err);
+        console.log(
+            "Error when updating profile in verifyEmail() - line 471 in userController.tsx\n",
+            err
+        );
     }
 }
 
@@ -348,19 +443,34 @@ Deletes the user and user profile details from the database
 **/
 async function deleteUser(req: Request, res: Response) {
     try {
-        validateRequest(req, res);
         return await Users.destroy({
             where: {
-                username: req.body.username
-            }
-        }).then((rowsDeleted: number) => {
-            console.log(`Deleted ${rowsDeleted} rows.`);
-        }).catch((error: Error) => {
-            console.error('Error deleting row:', error);
-        });
+                username: req.body.username,
+            },
+        })
+            .then((rowsDeleted: number) => {
+                console.log(`Deleted ${rowsDeleted} rows.`);
+            })
+            .catch((error: Error) => {
+                console.error("Error deleting row:", error);
+            });
     } catch (err) {
-        console.log("Error when updating profile in deleteUser() - line 501 in userController.tsx\n", err);
+        console.log(
+            "Error when updating profile in deleteUser() - line 501 in userController.tsx\n",
+            err
+        );
     }
 }
 
-export default { createUser, logIn, logOut, getProfile, updateProfile, resetPassword, verifyEmail, deleteUser };
+export default {
+    getUsers,
+    createUser,
+    logIn,
+    logOut,
+    getProfile,
+    updateProfilePhoto,
+    updateProfile,
+    resetPassword,
+    verifyEmail,
+    deleteUser,
+};
