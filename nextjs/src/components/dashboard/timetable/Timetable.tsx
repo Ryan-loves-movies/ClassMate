@@ -33,36 +33,6 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     ];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    // For each day of the week,
-    //     Extract all start and end times to determine max no. of overlaps
-    // const maxOverlapsEachDay = days.map((day: string) => {
-    //     const dayActivities = activities
-    //         .map((mod: modType) => {
-    //             const lecture = (mod.lecture.day === day)
-    //                 ? {
-    //                     startTime: mod.lecture.startTime,
-    //                     endTime: mod.lecture.endTime
-    //                 }
-    //                 : {};
-    //             const tutorial = (mod.tutorial.day === day)
-    //                 ? {
-    //                     startTime: mod.tutorial.startTime,
-    //                     endTime: mod.tutorial.endTime
-    //                 }
-    //                 : {};
-    //             const lab = (mod.lab.day === day)
-    //                 ? {
-    //                     startTime: mod.lab.startTime,
-    //                     endTime: mod.lab.endTime
-    //                 }
-    //                 : {};
-    //             return [lecture, tutorial, lab];
-    //         })
-    //         .reduce((mod1, mod2) => mod1.concat(mod2))
-    //         .filter((singleActivity) => singleActivity)
-    //         .filter((singleActivity) => singleActivity.startTime);
-    //         // dayActivities.sort(())
-    // });
     // Components for the module tabs
     const toMin = (hours: number, minutes: number, time = ''): number => {
         if (time === null || time.length === 0) {
