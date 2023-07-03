@@ -39,7 +39,9 @@
     margin-right: 0.5rem;
     padding: 1.5rem;
     background-color: #fff;
-    box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08), 0 2px 4px 0 rgba(50, 50, 93, 0.05), 0 4px 8px 0 rgba(136, 152, 170, 0.08);
+    box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08),
+        0 2px 4px 0 rgba(50, 50, 93, 0.05),
+        0 4px 8px 0 rgba(136, 152, 170, 0.08);
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     text-align: right;
     opacity: 0;
@@ -74,7 +76,7 @@
 }
 
 .dropdown-links a {
-    color: #525F7F;
+    color: #525f7f;
     text-decoration: none;
     padding-bottom: 1rem;
     transition: all 0.1s linear;

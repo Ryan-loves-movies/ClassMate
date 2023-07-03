@@ -1,5 +1,5 @@
 .DM_Sans {
-    font-family: "DM Sans", sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .schedule {
@@ -133,7 +133,7 @@
 }
 
 .s-act-tab.red {
-    background: linear-gradient(to right, #CB356B, #BD3F32);
+    background: linear-gradient(to right, #cb356b, #bd3f32);
 }
 
 .s-act-tab.yellow {
@@ -141,7 +141,7 @@
 }
 
 .s-act-tab.blue {
-    background: linear-gradient(to right, #36D1DC, #5B86E5);
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
 }
 
 .s-act-tab.pink {

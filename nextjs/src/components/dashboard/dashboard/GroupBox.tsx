@@ -26,7 +26,7 @@ export default function GroupBox({
     subheader,
     users,
     width,
-    setGroupChosen,
+    setGroupChosen
 }: {
     waiting: boolean;
     backgroundColor: string;
@@ -58,15 +58,14 @@ export default function GroupBox({
             id: id,
             moduleCode: header,
             name: subheader,
-            users: users,
+            users: users
         });
     };
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
-                className={`${styles['project-box']} ${
-                    waiting ? styles['waiting'] : ''
-                }`}
+                className={`${styles['project-box']} ${waiting ? styles['waiting'] : ''
+                    }`}
                 style={{ backgroundColor: backgroundColor }}
             >
                 <div className={styles['project-box-header']}>

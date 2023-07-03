@@ -30,7 +30,7 @@ function getHeight(width: string, heightRatio: number) {
 export default function StatusBar({
     color,
     height,
-    descriptor,
+    descriptor
 }: {
     color: string;
     height: string;
@@ -51,7 +51,7 @@ export default function StatusBar({
                 style={{
                     backgroundColor: color,
                     width: `${width}px`,
-                    height: height,
+                    height: height
                 }}
             />
             <div

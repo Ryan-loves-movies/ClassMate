@@ -11,7 +11,7 @@ interface respBody {
 
 export default function ModSearchBar({
     setAddedActivity,
-    width,
+    width
 }: {
     setAddedActivity: Dispatch<string>;
     width: string;
@@ -52,12 +52,12 @@ export default function ModSearchBar({
             await axios
                 .get(`${expressHost}/authorized/search/modules`, {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
+                        Authorization: sessionStorage.getItem('token')
                     },
                     params: {
                         query: query,
-                        limit: 0,
-                    },
+                        limit: 0
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     setSearchRes(res.data.modules);

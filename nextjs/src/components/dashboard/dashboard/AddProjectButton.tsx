@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '@components/dashboard/dashboard/addProjectButton.module.css';
 
 export default function AddProjectButton({
-    clickHandler,
+    clickHandler
 }: {
     clickHandler: () => void;
 }) {

@@ -9,12 +9,12 @@ export default function DevButtons() {
             .post(
                 `${expressHost}/authorized/allModules`,
                 {
-                    ay: '2023-2024',
+                    ay: '2023-2024'
                 },
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
-                    },
+                        Authorization: sessionStorage.getItem('token')
+                    }
                 }
             )
             .then(() => alert('Modules Updated!'))
@@ -27,12 +27,12 @@ export default function DevButtons() {
             .post(
                 `${expressHost}/authorized/allLessons`,
                 {
-                    ay: '2023-2024',
+                    ay: '2023-2024'
                 },
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
-                    },
+                        Authorization: sessionStorage.getItem('token')
+                    }
                 }
             )
             .then(() => alert('Lessons Updated!'))

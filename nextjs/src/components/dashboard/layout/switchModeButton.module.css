@@ -13,7 +13,7 @@
 
 .mode-switch:hover {
     background-color: var(--link-color-hover);
-    color: var(--link-color-active)
+    color: var(--link-color-active);
 }
 
 .mode-switch.active svg {

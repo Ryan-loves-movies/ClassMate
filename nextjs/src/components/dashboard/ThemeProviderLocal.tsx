@@ -3,7 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import { ReactElement } from 'react';
 
 export default function ThemeProviderLocal({
-    children,
+    children
 }: {
     children: ReactElement;
 }) {

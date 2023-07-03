@@ -16,11 +16,11 @@ export default function ProfileMenuButton() {
         axios
             .get(`${expressHost}/authorized/profile`, {
                 headers: {
-                    Authorization: window['sessionStorage'].getItem('token'),
+                    Authorization: window['sessionStorage'].getItem('token')
                 },
                 params: {
-                    username: window['sessionStorage'].getItem('username'),
-                },
+                    username: window['sessionStorage'].getItem('username')
+                }
             })
             .then((res: AxiosResponse) => {
                 if (res.status === 200) {
@@ -46,9 +46,8 @@ export default function ProfileMenuButton() {
             <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />
             <span>{username}</span>
             <div
-                className={`${styles['dropdown-wrapper']} ${
-                    isDropdownActive ? styles['active'] : ''
-                }`}
+                className={`${styles['dropdown-wrapper']} ${isDropdownActive ? styles['active'] : ''
+                    }`}
                 id="dropdownWrapper"
             >
                 <div className={styles['dropdown-profile-details']}>

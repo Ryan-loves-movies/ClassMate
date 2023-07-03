@@ -58,7 +58,7 @@ export default function Dashboard() {
         '#ffd3e2',
         '#c8f7dc',
         '#d5deff',
-        '',
+        ''
     ];
     const GroupBoxes = () => {
         return (
@@ -129,11 +129,11 @@ export default function Dashboard() {
                     return await axios
                         .get(`${expressHost}/authorized/group`, {
                             headers: {
-                                Authorization: sessionStorage.getItem('token'),
+                                Authorization: sessionStorage.getItem('token')
                             },
                             params: {
-                                groupId: group.id,
-                            },
+                                groupId: group.id
+                            }
                         })
                         .then((res: AxiosResponse) => {
                             console.log('2');
@@ -141,7 +141,7 @@ export default function Dashboard() {
                                 id: group.id,
                                 moduleCode: group.moduleCode,
                                 name: group.name,
-                                users: res.data.users as user[],
+                                users: res.data.users as user[]
                             } as group;
                         })
                         .catch((err) => {
@@ -156,11 +156,11 @@ export default function Dashboard() {
             return await axios
                 .get(`${expressHost}/authorized/group/user`, {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
+                        Authorization: sessionStorage.getItem('token')
                     },
                     params: {
-                        username: sessionStorage.getItem('username'),
-                    },
+                        username: sessionStorage.getItem('username')
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     console.log('3');

@@ -1,26 +1,26 @@
 .app-cover {
-    --app-cover-size: calc(30*var(--lid-height));
+    --app-cover-size: calc(30 * var(--lid-height));
 
     --lid-height: 1.2px;
-    --lid-width: calc(12.5*var(--lid-height));
+    --lid-width: calc(12.5 * var(--lid-height));
 
-    --before-lid-width: calc(2.5*var(--lid-height));
-    --before-lid-height: calc(1.5*var(--lid-height));
+    --before-lid-width: calc(2.5 * var(--lid-height));
+    --before-lid-height: calc(1.5 * var(--lid-height));
 
-    --btn-icon-width: calc(10.5*var(--lid-height));
-    --btn-icon-height: calc(14.5*var(--lid-height));
-    --btn-icon-margin: calc(-7.25*var(--lid-height));
+    --btn-icon-width: calc(10.5 * var(--lid-height));
+    --btn-icon-height: calc(14.5 * var(--lid-height));
+    --btn-icon-margin: calc(-7.25 * var(--lid-height));
 
-    --box-height: calc(13*var(--lid-height));
+    --box-height: calc(13 * var(--lid-height));
 
-    --inner-box-width: calc(8.5*var(--lid-height));
-    --inner-box-height: calc(11*var(--lid-height));
+    --inner-box-width: calc(8.5 * var(--lid-height));
+    --inner-box-height: calc(11 * var(--lid-height));
 
-    --btn-lines-width: calc(0.75*var(--lid-height));
-    --btn-lines-height: calc(7.5*var(--lid-height));
+    --btn-lines-width: calc(0.75 * var(--lid-height));
+    --btn-lines-height: calc(7.5 * var(--lid-height));
 
     --transition-time: 0.3s;
-    --lid-end-height: calc(-3*var(--lid-height));
+    --lid-end-height: calc(-3 * var(--lid-height));
     --box-end-rotate: -10deg;
 }
 
@@ -78,27 +78,28 @@
     position: relative;
     width: var(--lid-width);
     height: var(--lid-height);
-    left: calc(-1*var(--lid-height));
+    left: calc(-1 * var(--lid-height));
     border-radius: var(--lid-height);
 }
 
 .lid:before {
-    content: "";
+    content: '';
     position: absolute;
-    top: calc(-1*var(--lid-height));
+    top: calc(-1 * var(--lid-height));
     right: 0;
     left: 0;
     width: var(--before-lid-width);
     height: var(--before-lid-height);
     margin: 0 auto;
-    border-radius: calc(2.5*var(--lid-height)) calc(2.5*var(--lid-height)) 0 0;
+    border-radius: calc(2.5 * var(--lid-height)) calc(2.5 * var(--lid-height)) 0
+        0;
 }
 
 .box {
     position: relative;
     height: var(--box-height);
-    margin-top: calc(0.5*var(--lid-height));
-    border-radius: 0 0 calc(2*var(--lid-height)) calc(2*var(--lid-height));
+    margin-top: calc(0.5 * var(--lid-height));
+    border-radius: 0 0 calc(2 * var(--lid-height)) calc(2 * var(--lid-height));
 }
 
 .box-inner {
@@ -108,12 +109,13 @@
     height: var(--inner-box-height);
     margin: 0 auto;
     background-color: #fff;
-    border-radius: 0 0 calc(1.25*var(--lid-height)) calc(1.25*var(--lid-height));
+    border-radius: 0 0 calc(1.25 * var(--lid-height))
+        calc(1.25 * var(--lid-height));
 }
 
 .bin-lines {
     position: relative;
-    top: calc(1.75*var(--lid-height));
+    top: calc(1.75 * var(--lid-height));
     margin: 0 auto;
 }
 
@@ -127,16 +129,16 @@
 
 .bin-lines:before,
 .bin-lines:after {
-    content: "";
+    content: '';
     position: absolute;
 }
 
 .bin-lines:before {
-    left: calc(-2.5*var(--lid-height));
+    left: calc(-2.5 * var(--lid-height));
 }
 
 .bin-lines:after {
-    left: calc(2.5*var(--lid-height));
+    left: calc(2.5 * var(--lid-height));
 }
 
 .lid,
@@ -172,7 +174,7 @@
     top: var(--lid-end-height);
     transform: rotateZ(15deg);
     transition: all var(--transition-time) ease;
-    animation: lift-up var(--transition-time) ease; 
+    animation: lift-up var(--transition-time) ease;
     /* animation: lift-up 0.8s ease 0.1s, shake_u 0.8s ease 0.1s, */
     /* shake_l 0.2s ease 0.8s; */
 }

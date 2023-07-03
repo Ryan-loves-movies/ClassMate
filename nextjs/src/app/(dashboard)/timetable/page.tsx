@@ -80,19 +80,19 @@ export default function TimetableMain() {
                     `https://api.nusmods.com/v2/2021-2022/modules/${addedMod}.json`,
                     {
                         headers: {
-                            Accept: 'application/json',
-                        },
+                            Accept: 'application/json'
+                        }
                     }
                 )
                 .then((res: AxiosResponse) => {
                     const modTimetable = (
                         isSem1
                             ? (res.data as modInfo).semesterData.filter(
-                                  (lesson) => lesson.semester === 1
-                              )
+                                (lesson) => lesson.semester === 1
+                            )
                             : (res.data as modInfo).semesterData.filter(
-                                  (lesson) => lesson.semester === 2
-                              )
+                                (lesson) => lesson.semester === 2
+                            )
                     )[0].timetable;
                     const lab = modTimetable.filter(
                         (lesson) => lesson.lessonType === 'Laboratory'
@@ -111,20 +111,20 @@ export default function TimetableMain() {
                             code: lecture?.classNo,
                             day: lecture?.day,
                             startTime: lecture?.startTime,
-                            endTime: lecture?.endTime,
+                            endTime: lecture?.endTime
                         },
                         lab: {
                             code: lab?.classNo,
                             day: lab?.day,
                             startTime: lab?.startTime,
-                            endTime: lab?.endTime,
+                            endTime: lab?.endTime
                         },
                         tutorial: {
                             code: tutorial?.classNo,
                             day: tutorial?.day,
                             startTime: tutorial?.startTime,
-                            endTime: tutorial?.endTime,
-                        },
+                            endTime: tutorial?.endTime
+                        }
                     };
                     // NOT SURE WHY WE NEED TO USE THE filter() function FOR NOW? Since there are already checks above?
                     // But without it, the setMods() doesn't update properly.
@@ -142,13 +142,12 @@ export default function TimetableMain() {
             return await axios
                 .get(`${config.expressHost}/authorized/profile`, {
                     headers: {
-                        Authorization:
-                            window['sessionStorage'].getItem('token'),
+                        Authorization: window['sessionStorage'].getItem('token')
                     },
                     params: {
                         username: window['sessionStorage'].getItem('username'),
-                        mods: true,
-                    },
+                        mods: true
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
@@ -176,13 +175,13 @@ export default function TimetableMain() {
                     `${config.expressHost}/authorized/profile`,
                     {
                         username: window['sessionStorage'].getItem('username'),
-                        ...updatedMod,
+                        ...updatedMod
                     },
                     {
                         headers: {
                             Authorization:
-                                window['sessionStorage'].getItem('token'),
-                        },
+                                window['sessionStorage'].getItem('token')
+                        }
                     }
                 )
                 .then((res: AxiosResponse) => {

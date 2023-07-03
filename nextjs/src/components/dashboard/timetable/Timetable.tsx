@@ -29,7 +29,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
         'gray',
         'orange',
         'red',
-        'yellow',
+        'yellow'
     ];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -88,7 +88,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
         startTime = '0800',
         endTime = '2200',
         color = 'blue',
-        lessonType = 'Tutorial[C1]',
+        lessonType = 'Tutorial[C1]'
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
@@ -97,7 +97,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                 className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
                 style={{
                     left: `${start}%`,
-                    width: `${width}%`,
+                    width: `${width}%`
                 }}
             >
                 <div className={styles['s-act-name']}>{code}</div>
@@ -112,7 +112,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
             (mod: modType, index: number) => {
                 return {
                     ...mod,
-                    color: colors[index],
+                    color: colors[index]
                 };
             }
         );
@@ -174,9 +174,8 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     const Col = ({ gray = false }) => {
         return (
             <div
-                className={`${styles['s-hour-row']} ${
-                    gray ? styles['gray-col'] : ''
-                }`}
+                className={`${styles['s-hour-row']} ${gray ? styles['gray-col'] : ''
+                    }`}
             >
                 <div
                     className={`${styles['s-hour-wrapper']}`}
