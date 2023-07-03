@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ReactNode, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,9 @@ import config from '@/config';
 interface childrenElems {
     children?: ReactNode | ReactNode[];
 }
-export default function AuthorizationComponent({ children }: childrenElems): JSX.Element {
+export default function AuthorizationComponent({
+    children,
+}: childrenElems): JSX.Element {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -17,11 +19,13 @@ export default function AuthorizationComponent({ children }: childrenElems): JSX
     // and validate it
     useLayoutEffect(() => {
         const updateAuthorization = async () => {
-            await axios.get(`${config.expressHost}/authorized/user`, {
-                headers: {
-                    Authorization: window['sessionStorage'].getItem("token")
-                }
-            })
+            await axios
+                .get(`${config.expressHost}/authorized/user`, {
+                    headers: {
+                        Authorization:
+                            window['sessionStorage'].getItem('token'),
+                    },
+                })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
                         // Render the children components if the user is authenticated
@@ -33,18 +37,26 @@ export default function AuthorizationComponent({ children }: childrenElems): JSX
                     }
                 })
                 .catch((err: AxiosError) => {
-                    console.error('Axios authentication error:', err);
+                    router.push('/');
+                    if (err.status === 401) {
+                        alert('Token expired, Please sign back in!');
+                    } else {
+                        alert('Something went wrong! Please sign back in!');
+                    }
                 });
         };
         updateAuthorization();
-    }, []);
+    });
     if (isLoading) {
-        return (<Loading />);
+        return <Loading />;
     }
     if (isAuthorized) {
-        return (<>{children}</>);
+        return <>{children}</>;
     } else {
-        return (<div><h1>You are an unauthorized user!</h1></div>);
-
+        return (
+            <div>
+                <h1>You are an unauthorized user!</h1>
+            </div>
+        );
     }
 }
