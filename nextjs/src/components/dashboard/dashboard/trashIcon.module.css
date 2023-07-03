@@ -24,16 +24,6 @@
     --box-end-rotate: -10deg;
 }
 
-.app-cover input {
-    cursor: url(http://k003.kiwi6.com/hotlink/vp054ir5gt/c1.png) 32 32, auto;
-    cursor: -webkit-image-set(url(http://k003.kiwi6.com/hotlink/vp054ir5gt/c1.png) 1x,url(http://k003.kiwi6.com/hotlink/z6fy599487/c2.png) 2x) 32 32, auto;
-}
-
-.app-cover input:active {
-    cursor: url(http://k003.kiwi6.com/hotlink/3p6w4icbzt/c1a.png) 32 32, auto;
-    cursor: -webkit-image-set( url(http://k003.kiwi6.com/hotlink/3p6w4icbzt/c1a.png) 1x, url(http://k003.kiwi6.com/hotlink/6ma7828al1/c2a.png) 2x ) 32 32, auto;
-}
-
 .app-cover {
     position: relative;
     width: var(--app-cover-size);
@@ -175,7 +165,7 @@
     transform: rotateZ(15deg);
     transition: all var(--transition-time) ease;
     animation: lift-up var(--transition-time) ease;
-    /* animation: lift-up 0.8s ease 0.1s, shake_u 0.8s ease 0.1s, */
+    /* animation: li0.8s ease 0.1s, shake_u 0.8s ease 0.1s, */
     /* shake_l 0.2s ease 0.8s; */
 }
 
