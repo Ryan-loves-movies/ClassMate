@@ -1,6 +1,6 @@
-'use client'
-import React, { useRef } from "react";
-import styles from "@components/dashboard/timetable/timetable.module.css";
+'use client';
+import React, { useRef } from 'react';
+import styles from '@components/dashboard/timetable/timetable.module.css';
 
 interface modDet {
     code: string;
@@ -29,7 +29,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
         'gray',
         'orange',
         'red',
-        'yellow'
+        'yellow',
     ];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -79,18 +79,25 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     };
 
     const minToPerc = (min: number): number => {
-        return (min / (120 * 7) * 100);
+        return (min / (120 * 7)) * 100;
     };
 
     // One Activitiy Tab
-    const Activity = ({ code = 'BT1101', startTime = '0800', endTime = '2200', color = 'blue', lessonType = 'Tutorial[C1]' }) => {
+    const Activity = ({
+        code = 'BT1101',
+        startTime = '0800',
+        endTime = '2200',
+        color = 'blue',
+        lessonType = 'Tutorial[C1]',
+    }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
-            <div className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
+            <div
+                className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
                 style={{
                     left: `${start}%`,
-                    width: `${width}%`
+                    width: `${width}%`,
                 }}
             >
                 <div className={styles['s-act-name']}>{code}</div>
@@ -101,12 +108,14 @@ export default function Timetable({ activities }: { activities: modType[] }) {
 
     // Activities for the whole week
     const Activities = () => {
-        const activitiesWithColors = activities.map((mod: modType, index: number) => {
-            return {
-                ...mod,
-                color: colors[index]
+        const activitiesWithColors = activities.map(
+            (mod: modType, index: number) => {
+                return {
+                    ...mod,
+                    color: colors[index],
+                };
             }
-        });
+        );
         return (
             <>
                 {days.map((day) => {
@@ -117,16 +126,15 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
-                                            key=''
+                                            key=""
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lecture.startTime}
                                             endTime={mod.lecture.endTime}
                                             lessonType={mod.lecture.code}
                                         />
-                                    )
-                                })
-                            }
+                                    );
+                                })}
                             {activitiesWithColors
                                 .filter((mod) => mod.lab.day === day)
                                 .map((mod) => {
@@ -139,9 +147,8 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                             endTime={mod.lab.endTime}
                                             lessonType={mod.lab.code}
                                         />
-                                    )
-                                })
-                            }
+                                    );
+                                })}
                             {activitiesWithColors
                                 .filter((mod) => mod.tutorial.day === day)
                                 .map((mod) => {
@@ -154,9 +161,8 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                             endTime={mod.tutorial.endTime}
                                             lessonType={mod.tutorial.code}
                                         />
-                                    )
-                                })
-                            }
+                                    );
+                                })}
                         </div>
                     );
                 })}
@@ -167,8 +173,15 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     // Component for the background
     const Col = ({ gray = false }) => {
         return (
-            <div className={`${styles['s-hour-row']} ${gray ? styles['gray-col'] : ''}`}>
-                <div className={`${styles['s-hour-wrapper']}`} ref={twoHourBox} />
+            <div
+                className={`${styles['s-hour-row']} ${
+                    gray ? styles['gray-col'] : ''
+                }`}
+            >
+                <div
+                    className={`${styles['s-hour-wrapper']}`}
+                    ref={twoHourBox}
+                />
                 <div className={`${styles['s-hour-wrapper']}`} />
                 <div className={`${styles['s-hour-wrapper']}`} />
                 <div className={`${styles['s-hour-wrapper']}`} />

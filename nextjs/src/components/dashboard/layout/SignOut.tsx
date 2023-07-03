@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -9,10 +9,12 @@ export default function SignOut() {
         sessionStorage.removeItem('token');
 
         // Redirect to the root URL
-        router.push("/");
+        router.push('/');
     };
 
     return (
-        <a onClick={handleLogout} type="button">Sign out</a>
+        <a onClick={handleLogout} type="button">
+            Sign out
+        </a>
     );
 }

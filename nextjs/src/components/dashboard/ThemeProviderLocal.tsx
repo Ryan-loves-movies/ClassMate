@@ -1,14 +1,18 @@
-'use client'
+'use client';
 import { ThemeProvider } from 'next-themes';
 import { ReactElement } from 'react';
 
-export default function ThemeProviderLocal({ children }: { children: ReactElement }) {
+export default function ThemeProviderLocal({
+    children,
+}: {
+    children: ReactElement;
+}) {
     return (
         <ThemeProvider
-            defaultTheme='system'
+            defaultTheme="system"
             enableColorScheme={true}
             themes={['light', 'dark']}
-            attribute='data-theme'
+            attribute="data-theme"
         >
             {children}
         </ThemeProvider>

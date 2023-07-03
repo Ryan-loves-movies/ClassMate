@@ -1,20 +1,23 @@
-import sequelize from "@sqlite/modulesConnection";
+import sequelize from '@sqlite/modulesConnection';
 import { DataTypes } from 'sequelize';
 
-const modules = sequelize.define('ModulesForMods', {
-    code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        primaryKey: true,
-        unique: true,
+const modules = sequelize.define(
+    'ModulesForMods',
+    {
+        code: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            primaryKey: true,
+            unique: true,
+        },
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-}, {
-    timestamps: false
-} 
+    {
+        timestamps: false,
+    }
 );
 
 export default modules;
