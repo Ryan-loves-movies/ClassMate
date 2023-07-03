@@ -29,40 +29,10 @@ export default function Timetable({ activities }: { activities: modType[] }) {
         'gray',
         'orange',
         'red',
-        'yellow',
+        'yellow'
     ];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    // For each day of the week,
-    //     Extract all start and end times to determine max no. of overlaps
-    // const maxOverlapsEachDay = days.map((day: string) => {
-    //     const dayActivities = activities
-    //         .map((mod: modType) => {
-    //             const lecture = (mod.lecture.day === day)
-    //                 ? {
-    //                     startTime: mod.lecture.startTime,
-    //                     endTime: mod.lecture.endTime
-    //                 }
-    //                 : {};
-    //             const tutorial = (mod.tutorial.day === day)
-    //                 ? {
-    //                     startTime: mod.tutorial.startTime,
-    //                     endTime: mod.tutorial.endTime
-    //                 }
-    //                 : {};
-    //             const lab = (mod.lab.day === day)
-    //                 ? {
-    //                     startTime: mod.lab.startTime,
-    //                     endTime: mod.lab.endTime
-    //                 }
-    //                 : {};
-    //             return [lecture, tutorial, lab];
-    //         })
-    //         .reduce((mod1, mod2) => mod1.concat(mod2))
-    //         .filter((singleActivity) => singleActivity)
-    //         .filter((singleActivity) => singleActivity.startTime);
-    //         // dayActivities.sort(())
-    // });
     // Components for the module tabs
     const toMin = (hours: number, minutes: number, time = ''): number => {
         if (time === null || time.length === 0) {
@@ -88,7 +58,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
         startTime = '0800',
         endTime = '2200',
         color = 'blue',
-        lessonType = 'Tutorial[C1]',
+        lessonType = 'Tutorial[C1]'
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
@@ -97,7 +67,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                 className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
                 style={{
                     left: `${start}%`,
-                    width: `${width}%`,
+                    width: `${width}%`
                 }}
             >
                 <div className={styles['s-act-name']}>{code}</div>
@@ -112,7 +82,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
             (mod: modType, index: number) => {
                 return {
                     ...mod,
-                    color: colors[index],
+                    color: colors[index]
                 };
             }
         );

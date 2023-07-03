@@ -23,7 +23,7 @@ export default function UserSearchBar({
     focused,
     handleKeyDown,
     setSearchRes,
-    width,
+    width
 }: {
     focused: boolean;
     handleKeyDown: (elem: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -41,12 +41,12 @@ export default function UserSearchBar({
             await axios
                 .get(`${expressHost}/authorized/users`, {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
+                        Authorization: sessionStorage.getItem('token')
                     },
                     params: {
                         query: query,
-                        limit: 0,
-                    },
+                        limit: 0
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     setSearchRes(res.data.users);

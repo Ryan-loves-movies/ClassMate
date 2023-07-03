@@ -18,12 +18,12 @@ export default function Home() {
     const {
         register: registerLogIn,
         handleSubmit: handleLogInSubmit,
-        formState: { errors: errorsLogIn },
+        formState: { errors: errorsLogIn }
     } = useForm();
     const {
         register: registerRegistration,
         handleSubmit: handleRegistrationSubmit,
-        formState: { errors: errorsRegistration },
+        formState: { errors: errorsRegistration }
     } = useForm();
 
     const handleLogIn = async (data: FieldValues) => {
@@ -31,7 +31,7 @@ export default function Home() {
         return await axios
             .post(`${config.expressHost}/login`, {
                 username: username,
-                password: password,
+                password: password
             })
             .then((res: AxiosResponse) => {
                 if (res.status === 200) {
@@ -61,13 +61,13 @@ export default function Home() {
         const {
             emailRegistration: email,
             usernameRegistration: username,
-            passwordRegistration: password,
+            passwordRegistration: password
         } = data;
         return axios
             .post(`${config.expressHost}/register`, {
                 email: email,
                 username: username,
-                password: password,
+                password: password
             })
             .then((res: AxiosResponse) => {
                 if (res.status === 201) {
@@ -150,13 +150,12 @@ export default function Home() {
                                             {...registerLogIn('usernameLogIn', {
                                                 required: {
                                                     value: true,
-                                                    message:
-                                                        'Username required',
+                                                    message: 'Username required'
                                                 },
                                                 pattern: {
                                                     value: regUsername,
-                                                    message: 'Invalid username',
-                                                },
+                                                    message: 'Invalid username'
+                                                }
                                             })}
                                         />
                                         <div>
@@ -179,13 +178,12 @@ export default function Home() {
                                             {...registerLogIn('passwordLogIn', {
                                                 required: {
                                                     value: true,
-                                                    message:
-                                                        'Password required',
+                                                    message: 'Password required'
                                                 },
                                                 pattern: {
                                                     value: regPassword,
-                                                    message: 'Invalid password',
-                                                },
+                                                    message: 'Invalid password'
+                                                }
                                             })}
                                         />
                                         <div>
@@ -236,12 +234,12 @@ export default function Home() {
                                                     required: {
                                                         value: true,
                                                         message:
-                                                            'Email required',
+                                                            'Email required'
                                                     },
                                                     pattern: {
                                                         value: regEmail,
-                                                        message: `Please provide a valid email. Examples: 'test@gmail.com'`,
-                                                    },
+                                                        message: `Please provide a valid email. Examples: 'test@gmail.com'`
+                                                    }
                                                 }
                                             )}
                                         />
@@ -268,13 +266,13 @@ export default function Home() {
                                                     required: {
                                                         value: true,
                                                         message:
-                                                            'Username required',
+                                                            'Username required'
                                                     },
                                                     pattern: {
                                                         value: regUsername,
                                                         message:
-                                                            'Username has to start with a letter and be 6~15 characters long',
-                                                    },
+                                                            'Username has to start with a letter and be 6~15 characters long'
+                                                    }
                                                 }
                                             )}
                                         />
@@ -301,13 +299,13 @@ export default function Home() {
                                                     required: {
                                                         value: true,
                                                         message:
-                                                            'Password required',
+                                                            'Password required'
                                                     },
                                                     pattern: {
                                                         value: regPassword,
                                                         message:
-                                                            'Password has to consist of alphabet and numbers. Spaces are not allowed. Special characters not allowed are : ~',
-                                                    },
+                                                            'Password has to consist of alphabet and numbers. Spaces are not allowed. Special characters not allowed are : ~'
+                                                    }
                                                 }
                                             )}
                                         />

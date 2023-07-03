@@ -12,7 +12,7 @@ export function bufferToBase64(arr: number[]) {
 
 export default function PhotoRenderer({
     arrBuffer,
-    alt,
+    alt
 }: {
     arrBuffer: number[];
     alt: string;

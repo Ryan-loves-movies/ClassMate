@@ -10,12 +10,12 @@ export default function ProfilePhotoButton() {
                 `${expressHost}/authorized/profile/photo`,
                 {
                     username: sessionStorage.getItem('username'),
-                    photo: photo,
+                    photo: photo
                 },
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
-                    },
+                        Authorization: sessionStorage.getItem('token')
+                    }
                 }
             )
             .then(() => alert('Photo updated!'))

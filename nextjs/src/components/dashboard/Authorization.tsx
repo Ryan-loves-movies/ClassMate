@@ -9,7 +9,7 @@ interface childrenElems {
     children?: ReactNode | ReactNode[];
 }
 export default function AuthorizationComponent({
-    children,
+    children
 }: childrenElems): JSX.Element {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -22,9 +22,8 @@ export default function AuthorizationComponent({
             await axios
                 .get(`${config.expressHost}/authorized/user`, {
                     headers: {
-                        Authorization:
-                            window['sessionStorage'].getItem('token'),
-                    },
+                        Authorization: window['sessionStorage'].getItem('token')
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {

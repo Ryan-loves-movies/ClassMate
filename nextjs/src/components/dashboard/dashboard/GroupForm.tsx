@@ -15,7 +15,7 @@ interface group {
 export default function GroupForm({
     visibility,
     setVisibility,
-    setNewGroup,
+    setNewGroup
 }: {
     visibility: boolean;
     setVisibility: Dispatch<boolean>;
@@ -26,7 +26,7 @@ export default function GroupForm({
         register: registerGroup,
         handleSubmit: handleGroupSubmit,
         reset: resetInputs,
-        formState: { errors: errorsGroup, isSubmitSuccessful },
+        formState: { errors: errorsGroup, isSubmitSuccessful }
     } = useForm();
 
     // Adding group functionality
@@ -38,12 +38,12 @@ export default function GroupForm({
                 {
                     groupName,
                     moduleCode,
-                    username: sessionStorage.getItem('username'),
+                    username: sessionStorage.getItem('username')
                 },
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
-                    },
+                        Authorization: sessionStorage.getItem('token')
+                    }
                 }
             )
             .then((res: AxiosResponse) => {
@@ -51,7 +51,7 @@ export default function GroupForm({
                 setNewGroup({
                     id: res.data.id,
                     moduleCode: res.data.moduleCode,
-                    name: res.data.name,
+                    name: res.data.name
                 });
             })
             .catch((err) => {
@@ -64,11 +64,11 @@ export default function GroupForm({
         const moduleExists = await axios
             .get(`${expressHost}/authorized/module`, {
                 headers: {
-                    Authorization: sessionStorage.getItem('token'),
+                    Authorization: sessionStorage.getItem('token')
                 },
                 params: {
-                    moduleCode: input,
-                },
+                    moduleCode: input
+                }
             })
             .catch(() => {
                 return { status: 404 };
@@ -119,13 +119,13 @@ export default function GroupForm({
                                 {...registerGroup('moduleCode', {
                                     required: {
                                         value: true,
-                                        message: 'Module code required',
+                                        message: 'Module code required'
                                     },
                                     validate: {
                                         checkModule: async (input: string) =>
                                             (await validateModule(input)) ||
-                                            "Module doesn't exist!",
-                                    },
+                                            "Module doesn't exist!"
+                                    }
                                 })}
                             />
                             <div className={styles['error']}>
@@ -147,8 +147,8 @@ export default function GroupForm({
                                 {...registerGroup('groupName', {
                                     required: {
                                         value: true,
-                                        message: 'Group name required',
-                                    },
+                                        message: 'Group name required'
+                                    }
                                 })}
                             />
                             <div className={styles['error']}>

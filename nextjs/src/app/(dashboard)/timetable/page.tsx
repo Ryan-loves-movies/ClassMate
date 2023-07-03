@@ -80,8 +80,8 @@ export default function TimetableMain() {
                     `https://api.nusmods.com/v2/2021-2022/modules/${addedMod}.json`,
                     {
                         headers: {
-                            Accept: 'application/json',
-                        },
+                            Accept: 'application/json'
+                        }
                     }
                 )
                 .then((res: AxiosResponse) => {
@@ -111,20 +111,20 @@ export default function TimetableMain() {
                             code: lecture?.classNo,
                             day: lecture?.day,
                             startTime: lecture?.startTime,
-                            endTime: lecture?.endTime,
+                            endTime: lecture?.endTime
                         },
                         lab: {
                             code: lab?.classNo,
                             day: lab?.day,
                             startTime: lab?.startTime,
-                            endTime: lab?.endTime,
+                            endTime: lab?.endTime
                         },
                         tutorial: {
                             code: tutorial?.classNo,
                             day: tutorial?.day,
                             startTime: tutorial?.startTime,
-                            endTime: tutorial?.endTime,
-                        },
+                            endTime: tutorial?.endTime
+                        }
                     };
                     // NOT SURE WHY WE NEED TO USE THE filter() function FOR NOW? Since there are already checks above?
                     // But without it, the setMods() doesn't update properly.
@@ -142,13 +142,12 @@ export default function TimetableMain() {
             return await axios
                 .get(`${config.expressHost}/authorized/profile`, {
                     headers: {
-                        Authorization:
-                            window['sessionStorage'].getItem('token'),
+                        Authorization: window['sessionStorage'].getItem('token')
                     },
                     params: {
                         username: window['sessionStorage'].getItem('username'),
-                        mods: true,
-                    },
+                        mods: true
+                    }
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
@@ -176,13 +175,13 @@ export default function TimetableMain() {
                     `${config.expressHost}/authorized/profile`,
                     {
                         username: window['sessionStorage'].getItem('username'),
-                        ...updatedMod,
+                        ...updatedMod
                     },
                     {
                         headers: {
                             Authorization:
-                                window['sessionStorage'].getItem('token'),
-                        },
+                                window['sessionStorage'].getItem('token')
+                        }
                     }
                 )
                 .then((res: AxiosResponse) => {
@@ -197,7 +196,7 @@ export default function TimetableMain() {
         /* getModules()
             .then(() => updateAddedMod())
             .then((updatedMod) => pushToDB(updatedMod)); */
-    }, [isSem1, addedMod]);
+    }, [isSem1, addedMod, mods]);
 
     return (
         <div className={styles['projects-section']}>

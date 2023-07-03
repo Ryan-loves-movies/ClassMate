@@ -27,7 +27,7 @@ let starIdCounter = 0;
 export default function PeopleBar({
     user,
     group,
-    bio,
+    bio
 }: {
     user: user;
     group: group | undefined;
@@ -42,12 +42,12 @@ export default function PeopleBar({
                 `${expressHost}/authorized/group/user`,
                 {
                     username: user.username,
-                    groupId: group.id,
+                    groupId: group.id
                 },
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem('token'),
-                    },
+                        Authorization: sessionStorage.getItem('token')
+                    }
                 }
             )
             .catch((err: AxiosError) => {

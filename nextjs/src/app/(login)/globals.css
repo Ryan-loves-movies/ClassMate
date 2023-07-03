@@ -18,6 +18,7 @@
 .button {
     font-size: 2em;
 }
+
 /**
  * * General configs
  * */
@@ -26,11 +27,12 @@
 }
 
 body {
-    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/timetable.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+        url('/timetable.jpg');
     background-blend-mode: multiply;
     background-position: center;
     background-size: cover;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 12px;
     line-height: 1em;
 }
@@ -49,26 +51,26 @@ input {
     border: 0;
     outline: 0;
 }
-input[type=submit] {
+input[type='submit'] {
     cursor: pointer;
 }
 input::-moz-placeholder {
     font-size: 0.85rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     letter-spacing: 0.1rem;
     color: #ccc;
 }
 input:-ms-input-placeholder {
     font-size: 0.85rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     letter-spacing: 0.1rem;
     color: #ccc;
 }
 input::placeholder {
     font-size: 0.85rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     letter-spacing: 0.1rem;
     color: #ccc;
@@ -240,7 +242,7 @@ input::placeholder {
     width: 100%;
     border-bottom: 1px solid #ccc;
     padding: 6px 20px 6px 6px;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
     font-weight: 300;
     color: gray;
@@ -257,7 +259,7 @@ input::placeholder {
     margin-top: 35px;
 }
 .user_options-forms .forms_buttons-forgot {
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     letter-spacing: 0.1rem;
     color: #ccc;
     text-decoration: underline;
@@ -271,7 +273,7 @@ input::placeholder {
     border-radius: 3px;
     padding: 10px 35px;
     font-size: 1rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     color: #fff;
     text-transform: uppercase;
@@ -289,7 +291,8 @@ input::placeholder {
     width: calc(100% - 80px);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out, transform 0.5s ease-in-out;
+    transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out,
+        transform 0.5s ease-in-out;
 }
 .user_options-forms .user_forms-signup {
     transform: translate3d(120px, 0, 0);

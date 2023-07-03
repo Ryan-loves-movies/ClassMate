@@ -26,7 +26,7 @@ export default function GroupBox({
     subheader,
     users,
     width,
-    setGroupChosen,
+    setGroupChosen
 }: {
     waiting: boolean;
     backgroundColor: string;
@@ -58,7 +58,7 @@ export default function GroupBox({
             id: id,
             moduleCode: header,
             name: subheader,
-            users: users,
+            users: users
         });
     };
     return (
