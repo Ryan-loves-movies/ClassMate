@@ -1,9 +1,9 @@
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize('classmate', 'root', 'Classmate123!', {
+const sequelize = new Sequelize('ClassMate', 'postgres', 'postgres', {
     host: 'localhost',
-    port: 3306,
-    dialect: 'mysql'
+    port: 5432,
+    dialect: 'postgres'
 });
 /* const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
     host: 'db.tubxvcrohjakulghoizg.supabase.co',

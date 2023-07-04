@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
-import Users from "@models/Users";
-import Modules from "@models/Modules";
-import Users_Modules from "@models/Users_Modules";
-import Lessons from "@models/Lessons";
-import { Op } from "sequelize";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import axiosRateLimit from "axios-rate-limit";
+import { Request, Response } from 'express';
+import Users from '@models/Users';
+import Modules from '@models/Modules';
+import Users_Modules from '@models/Users_Modules';
+import Lessons from '@models/Lessons';
+import { EmptyResultError, Op } from 'sequelize';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import axiosRateLimit from 'axios-rate-limit';
+import { error } from 'console';
 
 interface lesson {
     lessonId: string;
@@ -61,24 +62,32 @@ async function populateModules(req: Request, res: Response) {
                 .filter((module: ModuleResponse) => module.moduleCode !== null)
                 .map((module: ModuleResponse) => ({
                     code: module.moduleCode,
-                    name: module.title,
+                    name: module.title
                 }))
                 .map((module: Module, index: number) => {
                     if ((index + 1) % 1000 === 0) {
-                        console.log("Another 1000 records updated");
+                        console.log('Another 1000 records updated');
                     }
-                    Modules.create(module, { ignoreDuplicates: true }).then(() => { });
+                    Modules.create(module, { ignoreDuplicates: true }).catch(
+                        (err) => {
+                            if (err instanceof EmptyResultError) {
+                                console.log('Entry already exists');
+                            }
+                        }
+                    );
                 });
             Promise.all(modules)
                 .then(() => {
-                    return res.status(200).json({ message: "database updated!" });
+                    return res
+                        .status(200)
+                        .json({ message: 'database updated!' });
                 })
                 .catch((err) => {
                     return res.status(500).json({ message: err });
                 });
         })
         .catch((err: AxiosError) => {
-            console.error("Error populating database:", err.message);
+            console.error('Error populating database:', err.message);
             return res.status(500).json({ message: err });
         });
 }
@@ -98,7 +107,7 @@ async function populateLessons(req: Request, res: Response) {
     await Modules.sync();
     let counter = 0;
     const axiosPromises: Promise<Response | void>[] = [];
-    const axiosRateLimited = axiosRateLimit(axios.create(), { maxRPS: 200 });
+    const axiosRateLimited = axiosRateLimit(axios.create(), { maxRPS: 50 });
     const fakeModules: string[] = [];
     await Modules.findAll().then((modules) => {
         modules.forEach((module) => {
@@ -108,24 +117,30 @@ async function populateLessons(req: Request, res: Response) {
                 )
                 .then((axiosRes: AxiosResponse) => {
                     const modData = axiosRes.data;
-                    modData.semesterData.forEach((semData: semesterDataResponse) => {
-                        semData.timetable.forEach(async (timetable) => {
-                            await Lessons.create(
-                                {
-                                    moduleCode: modData.moduleCode,
-                                    lessonId: timetable.classNo,
-                                    lessonType: timetable.lessonType,
-                                    sem: semData.semester,
-                                    day: timetable.day,
-                                    startTime: timetable.startTime,
-                                    endTime: timetable.endTime,
-                                },
-                                { ignoreDuplicates: true }
-                            );
-                            counter++;
-                            console.log(counter);
-                        });
-                    });
+                    modData.semesterData.forEach(
+                        (semData: semesterDataResponse) => {
+                            semData.timetable.forEach(async (timetable) => {
+                                await Lessons.create(
+                                    {
+                                        moduleCode: modData.moduleCode,
+                                        lessonId: timetable.classNo,
+                                        lessonType: timetable.lessonType,
+                                        sem: semData.semester,
+                                        day: timetable.day,
+                                        startTime: timetable.startTime,
+                                        endTime: timetable.endTime
+                                    },
+                                    { ignoreDuplicates: true }
+                                ).catch((err) => {
+                                    if (err instanceof EmptyResultError) {
+                                        console.log('Entry already exists!');
+                                    }
+                                });
+                                counter++;
+                                console.log(counter);
+                            });
+                        }
+                    );
                 })
                 .catch((err: AxiosError) => {
                     console.log("Axios Error: Module doesn't exist", err);
@@ -136,29 +151,35 @@ async function populateLessons(req: Request, res: Response) {
     });
     await Promise.all(axiosPromises)
         .then(() => {
-            console.log("lessons updated!");
+            console.log('lessons updated!');
             return res
                 .status(200)
-                .json({ message: "database updated!", fakeModules });
+                .json({ message: 'database updated!', fakeModules });
         })
         .catch((err) => {
-            console.log("Error populating database:", err);
+            console.log('Error populating database:', err);
             return res.status(500).json({ message: err });
         });
 }
 
 async function hasModule(req: Request, res: Response) {
     const moduleCode = req.query.moduleCode as string;
-    return await Modules.findByPk(moduleCode)
+    return await Modules.findOne({
+        where: {
+            code: {
+                [Op.iLike]: `%${moduleCode}%`
+            }
+        }
+    })
         .then((module) => {
             if (module) {
-                return res.status(200).json({ message: "Module exists!" });
+                return res.status(200).json({ message: 'Module exists!' });
             } else {
                 throw Error;
             }
         })
         .catch(() => {
-            return res.status(404).json({ message: "Module does not exist!" });
+            return res.status(404).json({ message: 'Module does not exist!' });
         });
 }
 
@@ -172,25 +193,24 @@ async function searchModules(req: Request, res: Response) {
                 [Op.or]: [
                     {
                         code: {
-                            [Op.iLike]: `%${query}%`,
-                        },
+                            [Op.iLike]: `%${query}%`
+                        }
                     },
                     {
                         name: {
-                            [Op.iLike]: `%${query}%`,
-                        },
-                    },
-                ],
-            },
+                            [Op.iLike]: `%${query}%`
+                        }
+                    }
+                ]
+            }
         })
             .then((modules) => {
-                console.log(modules.slice(0, 5));
-                res
+                return res
                     .status(200)
                     .json({ modules: modules.map((model) => model.toJSON()) });
             })
             .catch((err) => {
-                res.status(401).json({ message: err });
+                return res.status(401).json({ message: err });
             });
     }
     return await Modules.findAll({
@@ -199,19 +219,21 @@ async function searchModules(req: Request, res: Response) {
             [Op.or]: [
                 {
                     code: {
-                        [Op.like]: `%${query}%`,
-                    },
+                        [Op.iLike]: `%${query}%`
+                    }
                 },
                 {
                     name: {
-                        [Op.like]: `%${query}%`,
-                    },
-                },
-            ],
-        },
+                        [Op.iLike]: `%${query}%`
+                    }
+                }
+            ]
+        }
     })
         .then((modules) => {
-            res.status(200).json({ modules: modules.map((model) => model.toJSON()) });
+            res.status(200).json({
+                modules: modules.map((model) => model.toJSON())
+            });
         })
         .catch((err) => {
             res.status(401).json({ message: err });
@@ -228,16 +250,16 @@ async function getModules(req: Request, res: Response) {
             [Op.or]: [
                 {
                     code: {
-                        [Op.like]: `%${query}%`,
-                    },
+                        [Op.like]: `%${query}%`
+                    }
                 },
                 {
                     name: {
-                        [Op.like]: `%${query}%`,
-                    },
-                },
-            ],
-        },
+                        [Op.like]: `%${query}%`
+                    }
+                }
+            ]
+        }
     });
 
     res.status(200).json({ modules: ans.map((model) => model.toJSON()) });
@@ -266,9 +288,9 @@ async function addModule(req: Request, res: Response) {
     await Users.findByPk(username, {
         include: [
             {
-                model: Modules,
-            },
-        ],
+                model: Modules
+            }
+        ]
     }).then((user) => {
         Modules.findByPk(moduleCode).then((module) => {
             user?.addModule(module as Modules);
@@ -277,20 +299,22 @@ async function addModule(req: Request, res: Response) {
     await Users.findByPk(username, {
         include: [
             {
-                model: Users_Modules,
-            },
-        ],
+                model: Users_Modules
+            }
+        ]
     }).then((user) => {
         lessons.map((lesson: lesson) => {
             Lessons.findOne({
                 where: {
                     moduleCode: moduleCode,
                     lessonType: lesson.lessonType,
-                    lessonId: lesson.lessonId,
-                },
+                    lessonId: lesson.lessonId
+                }
             }).then((lesson) => {
                 user?.users_modules
-                    ?.find((user_module) => user_module.moduleCode === moduleCode)
+                    ?.find(
+                        (user_module) => user_module.moduleCode === moduleCode
+                    )
                     ?.addLesson(lesson as Lessons);
             });
         });
@@ -314,9 +338,9 @@ async function removeModule(req: Request, res: Response) {
     await Users.findByPk(username, {
         include: [
             {
-                model: Modules,
-            },
-        ],
+                model: Modules
+            }
+        ]
     }).then((user) => {
         Modules.findByPk(moduleCode).then((module) => {
             user?.removeModule(module as Modules);
@@ -346,14 +370,14 @@ async function updateLesson(req: Request, res: Response) {
                 model: Users_Modules,
                 include: [
                     {
-                        model: Lessons,
+                        model: Lessons
                     },
                     {
-                        model: Modules,
-                    },
-                ],
-            },
-        ],
+                        model: Modules
+                    }
+                ]
+            }
+        ]
     }).then((user) => {
         const user_module = user?.users_modules?.find(
             (user_module) => user_module.moduleCode === moduleCode
@@ -361,15 +385,16 @@ async function updateLesson(req: Request, res: Response) {
         user_module?.getLessons().then((lessons) => {
             const lessonToRemove = lessons.find(
                 (lesson) =>
-                    lesson.moduleCode === moduleCode && lesson.lessonType === lessonType
+                    lesson.moduleCode === moduleCode &&
+                    lesson.lessonType === lessonType
             );
             user_module.removeLesson(lessonToRemove);
             Lessons.findOne({
                 where: {
                     lessonId: lessonId,
                     lessonType: lessonType,
-                    moduleCode: moduleCode,
-                },
+                    moduleCode: moduleCode
+                }
             }).then((lessonToAdd) => {
                 user_module.addLesson(lessonToAdd as Lessons);
             });
@@ -385,5 +410,5 @@ export default {
     getModules,
     addModule,
     removeModule,
-    updateLesson,
+    updateLesson
 };

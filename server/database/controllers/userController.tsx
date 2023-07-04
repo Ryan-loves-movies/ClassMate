@@ -1,10 +1,10 @@
 // Users for connection with mySQL and { Request, Response } with express api
-import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import config from "@server/config";
-import Users from "@models/Users";
-import { Op } from "sequelize";
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from '@server/config';
+import Users from '@models/Users';
+import { Op } from 'sequelize';
 
 interface profile {
     email: string;
@@ -54,20 +54,20 @@ const getUsers = async (req: Request, res: Response) => {
         ans = await Users.findAll({
             where: {
                 username: {
-                    [Op.like]: `%${query}%`,
-                },
+                    [Op.like]: `%${query}%`
+                }
             },
-            attributes: ["username", "photo"],
+            attributes: ['username', 'photo']
         });
     } else {
         ans = await Users.findAll({
             limit: limit,
             where: {
                 username: {
-                    [Op.like]: `%${query}%`,
-                },
+                    [Op.like]: `%${query}%`
+                }
             },
-            attributes: ["username", "photo"],
+            attributes: ['username', 'photo']
         });
     }
 
@@ -97,18 +97,22 @@ const createUser = (req: Request, res: Response) => {
             }
             if (hashedPassword) {
                 return Users.create(
-                    { username: username, email: email, password: hashedPassword },
+                    {
+                        username: username,
+                        email: email,
+                        password: hashedPassword
+                    },
                     { ignoreDuplicates: true }
                 );
             }
         });
-        res.status(201).json({ message: "Users created successfully!" });
+        res.status(201).json({ message: 'Users created successfully!' });
     } catch (err) {
         console.log(
-            "Error while making new user in createUser() - userController.tsx, line 65\n",
+            'Error while making new user in createUser() - userController.tsx, line 65\n',
             err
         );
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -124,32 +128,33 @@ Verifies password of user, then returns a JSON web token with expiry in 24 hours
 async function logIn(req: Request, res: Response) {
     const { username, password }: minProfile = req.body;
     try {
-        await Users.findOne({
-            where: {
-                username: username,
-            },
+        await Users.findByPk(username, {
+            attributes: ['username', 'password']
         }).then((user) => {
             if (!user) {
-                return res.status(404).json({ message: "No existing user found" });
+                return res
+                    .status(404)
+                    .json({ message: 'No existing user found' });
             }
             bcrypt.compare(
                 password,
-                user.dataValues.password as string,
+                user.password as string,
                 (err, authenticated) => {
                     if (err) {
                         throw err;
                     }
                     if (authenticated) {
                         const token = jwt.sign(req.body, config.JWT_SECRET, {
-                            expiresIn: "1d",
+                            expiresIn: '1d'
                         });
                         return res.status(200).json({
-                            message: "Users authenticated",
-                            token: token,
+                            message: 'Users authenticated',
+                            token: token
                         });
                     } else {
                         return res.status(401).json({
-                            message: "Wrong password or something wrong with server!",
+                            message:
+                                'Wrong password or something wrong with server!'
                         });
                     }
                 }
@@ -157,7 +162,7 @@ async function logIn(req: Request, res: Response) {
         });
     } catch (err) {
         console.log(
-            "Error while logging in in logIn() function in userController.tsx - line 95\n",
+            'Error while logging in in logIn() function in userController.tsx - line 95\n',
             err
         );
     }
@@ -174,7 +179,7 @@ Verifies token of user, then return log out successful message.
 **/
 async function logOut(req: Request, res: Response) {
     // Clear JWT token on client-side AND invalidate token on server-side
-    res.status(200).json({ message: "Logout successful!" });
+    res.status(200).json({ message: 'Logout successful!' });
 }
 
 /**
@@ -195,18 +200,20 @@ async function getProfile(req: Request, res: Response) {
     try {
         const username = req.query.username as string;
         if (!username) {
-            res.status(500).json({ message: "No username passed in params" });
+            res.status(500).json({ message: 'No username passed in params' });
             return;
         }
         /* if (req.query.mods === 'false') { */
         return await Users.findByPk(username).then((user) => {
             if (!user) {
-                return res.status(404).json({ message: "No existing user found" });
+                return res
+                    .status(404)
+                    .json({ message: 'No existing user found' });
             }
             return res.status(200).json({
-                username: user.get("username"),
-                email: user.get("email"),
-                photo: user.get("photo"),
+                username: user.get('username'),
+                email: user.get('email'),
+                photo: user.get('photo')
             });
         });
         /* } */
@@ -271,7 +278,7 @@ async function getProfile(req: Request, res: Response) {
             }) */
     } catch (err) {
         console.log(
-            "Error while getting profile details in getProfile() - userController.tsx - line 400?\n",
+            'Error while getting profile details in getProfile() - userController.tsx - line 400?\n',
             err
         );
     }
@@ -294,12 +301,12 @@ async function updateProfilePhoto(req: Request, res: Response) {
     return await Users.findByPk(username)
         .then((user) => {
             user?.update({
-                photo: photo.data,
+                photo: photo.data
             });
-            res.status(200).json({ message: "photo updated!" });
+            res.status(200).json({ message: 'photo updated!' });
         })
         .catch(() => {
-            res.status(404).json({ message: "user not found!" });
+            res.status(404).json({ message: 'user not found!' });
         });
 }
 
@@ -321,8 +328,8 @@ async function updateProfile(req: Request, res: Response) {
         const updatedVals = updatedValsRaw as modType;
         await Users.findOne({
             where: {
-                username: username,
-            },
+                username: username
+            }
         }).then((details) => {
             // Check if module in database already
             //     If not yet, then get last empty mod number
@@ -331,7 +338,9 @@ async function updateProfile(req: Request, res: Response) {
                 (num) => details?.get(`mod${num}`) || null
             );
             console.log(details);
-            console.log(allMods.find((modCode) => modCode === updatedVals.code));
+            console.log(
+                allMods.find((modCode) => modCode === updatedVals.code)
+            );
             console.log(allMods.filter((modCode) => modCode !== null));
             const modNoToChange =
                 allMods.find((modCode) => modCode === updatedVals.code) ||
@@ -340,7 +349,8 @@ async function updateProfile(req: Request, res: Response) {
                 [`mod${modNoToChange}`]: updatedVals.code,
                 [`mod${modNoToChange}LecCode`]: updatedVals.lecture.code,
                 [`mod${modNoToChange}LecDay`]: updatedVals.lecture.day,
-                [`mod${modNoToChange}LecStartTime`]: updatedVals.lecture.startTime,
+                [`mod${modNoToChange}LecStartTime`]:
+                    updatedVals.lecture.startTime,
                 [`mod${modNoToChange}LecEndTime`]: updatedVals.lecture.endTime,
                 [`mod${modNoToChange}LabCode`]: updatedVals.lab.code,
                 [`mod${modNoToChange}LabDay`]: updatedVals.lab.day,
@@ -348,31 +358,34 @@ async function updateProfile(req: Request, res: Response) {
                 [`mod${modNoToChange}LabEndTime`]: updatedVals.lab.endTime,
                 [`mod${modNoToChange}TutCode`]: updatedVals.tutorial.code,
                 [`mod${modNoToChange}TutDay`]: updatedVals.tutorial.day,
-                [`mod${modNoToChange}TutStartTime`]: updatedVals.tutorial.startTime,
-                [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime,
+                [`mod${modNoToChange}TutStartTime`]:
+                    updatedVals.tutorial.startTime,
+                [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime
             };
             Users.update(updatedDet, {
                 where: {
-                    username: username,
-                },
+                    username: username
+                }
             })
                 .then((rowsUpdated: number[]) => {
-                    res.status(200).json({ message: `Updated rows ${rowsUpdated}.` });
+                    res.status(200).json({
+                        message: `Updated rows ${rowsUpdated}.`
+                    });
                 })
                 .catch((error: Error) => {
                     res.status(500).json({
                         message:
-                            "Error updating rows in database using updateProfile() in userController.tsx -- line 514:",
+                            'Error updating rows in database using updateProfile() in userController.tsx -- line 514:'
                     });
                     console.log(
-                        "Error updating rows in database using updateProfile() in userController.tsx -- line 514:",
+                        'Error updating rows in database using updateProfile() in userController.tsx -- line 514:',
                         error
                     );
                 });
         });
     } catch (err) {
         console.log(
-            "Error when updating profile in updateProfile() - line 430 in userController.tsx\n",
+            'Error when updating profile in updateProfile() - line 430 in userController.tsx\n',
             err
         );
     }
@@ -397,20 +410,22 @@ async function resetPassword(req: Request, res: Response) {
     try {
         return await Users.update(req.body, {
             where: {
-                password: req.body.password,
-            },
+                password: req.body.password
+            }
         })
             .then((rowsUpdated: number[]) => {
-                res.status(200).json({ message: `Updated ${rowsUpdated} rows.` });
+                res.status(200).json({
+                    message: `Updated ${rowsUpdated} rows.`
+                });
             })
             .catch((error: Error) => {
-                res
-                    .status(200)
-                    .json({ message: `Error updating row for password: ${error}` });
+                res.status(200).json({
+                    message: `Error updating row for password: ${error}`
+                });
             });
     } catch (err) {
         console.log(
-            "Error when updating profile in resetPassword() - line 462 in userController.tsx\n",
+            'Error when updating profile in resetPassword() - line 462 in userController.tsx\n',
             err
         );
     }
@@ -418,10 +433,10 @@ async function resetPassword(req: Request, res: Response) {
 
 async function verifyEmail(req: Request, res: Response) {
     try {
-        return res.json({ message: "Email verified???????" });
+        return res.json({ message: 'Email verified???????' });
     } catch (err) {
         console.log(
-            "Error when updating profile in verifyEmail() - line 471 in userController.tsx\n",
+            'Error when updating profile in verifyEmail() - line 471 in userController.tsx\n',
             err
         );
     }
@@ -444,18 +459,18 @@ async function deleteUser(req: Request, res: Response) {
     try {
         return await Users.destroy({
             where: {
-                username: req.body.username,
-            },
+                username: req.body.username
+            }
         })
             .then((rowsDeleted: number) => {
                 console.log(`Deleted ${rowsDeleted} rows.`);
             })
             .catch((error: Error) => {
-                console.error("Error deleting row:", error);
+                console.error('Error deleting row:', error);
             });
     } catch (err) {
         console.log(
-            "Error when updating profile in deleteUser() - line 501 in userController.tsx\n",
+            'Error when updating profile in deleteUser() - line 501 in userController.tsx\n',
             err
         );
     }
@@ -471,5 +486,5 @@ export default {
     updateProfile,
     resetPassword,
     verifyEmail,
-    deleteUser,
+    deleteUser
 };

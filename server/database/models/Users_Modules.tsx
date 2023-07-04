@@ -13,12 +13,12 @@ import {
     DataTypes,
     InferAttributes,
     InferCreationAttributes,
-    Model,
-} from "sequelize";
-import sequelize from "@server/database/connection";
-import Users from "@models/Users";
-import Lessons from "@models/Lessons";
-import Modules from "@models/Modules";
+    Model
+} from 'sequelize';
+import sequelize from '@server/database/connection';
+import Users from '@models/Users';
+import Lessons from '@models/Lessons';
+import Modules from '@models/Modules';
 
 class Users_Modules extends Model<
     InferAttributes<Users_Modules>,
@@ -35,7 +35,10 @@ class Users_Modules extends Model<
     declare addLessons: BelongsToManyAddAssociationsMixin<Lessons, number>;
     declare setLessons: BelongsToManySetAssociationsMixin<Lessons, number>;
     declare removeLesson: BelongsToManyRemoveAssociationMixin<Lessons, number>;
-    declare removeLessons: BelongsToManyRemoveAssociationsMixin<Lessons, number>;
+    declare removeLessons: BelongsToManyRemoveAssociationsMixin<
+        Lessons,
+        number
+    >;
     declare hasLesson: BelongsToManyHasAssociationMixin<Lessons, number>;
     declare hasLessons: BelongsToManyHasAssociationsMixin<Lessons, number>;
     declare countLessons: BelongsToManyCountAssociationsMixin;
@@ -53,36 +56,31 @@ Users_Modules.init(
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true,
+            autoIncrement: true
         },
         username: {
             type: DataTypes.STRING(30),
             allowNull: false,
             references: {
-                model: "Users",
-                key: "username",
+                model: 'Users',
+                key: 'username'
             },
+            unique: 'fakeCompositePrimaryKey'
         },
         moduleCode: {
             type: DataTypes.STRING(30),
             allowNull: false,
             references: {
-                model: "Modules",
-                key: "code",
+                model: 'Modules',
+                key: 'code'
             },
-        },
+            unique: 'fakeCompositePrimaryKey'
+        }
     },
     {
         sequelize,
-        tableName: "Users_Modules",
-        timestamps: false,
-        indexes: [
-            {
-                unique: true,
-                fields: ["username", "moduleCode"],
-                name: "fakeCompositePrimaryKey",
-            },
-        ],
+        tableName: 'Users_Modules',
+        timestamps: false
     }
 );
 

@@ -1,4 +1,4 @@
-import sequelize from "@server/database/connection";
+import sequelize from '@server/database/connection';
 import {
     Association,
     BelongsToManyAddAssociationMixin,
@@ -14,9 +14,9 @@ import {
     DataTypes,
     InferAttributes,
     InferCreationAttributes,
-    Model,
-} from "sequelize";
-import Users_Modules from "@models/Users_Modules";
+    Model
+} from 'sequelize';
+import Users_Modules from '@models/Users_Modules';
 
 class Lessons extends Model<
     InferAttributes<Lessons>,
@@ -73,53 +73,49 @@ Lessons.init(
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
-            primaryKey: true,
+            primaryKey: true
         },
         lessonId: {
             type: DataTypes.STRING(10),
             allowNull: false,
+            unique: 'fakeCompositePrimaryKey'
         },
         moduleCode: {
             type: DataTypes.STRING(30),
             allowNull: false,
             references: {
-                model: "Modules",
-                key: "code",
+                model: 'Modules',
+                key: 'code'
             },
+            unique: 'fakeCompositePrimaryKey'
         },
         lessonType: {
             type: DataTypes.STRING(30),
             allowNull: false,
+            unique: 'fakeCompositePrimaryKey'
         },
         sem: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: false,
+            unique: false
         },
         day: {
             type: DataTypes.STRING(10),
-            allowNull: false,
+            allowNull: false
         },
         startTime: {
             type: DataTypes.STRING(4),
-            allowNull: false,
+            allowNull: false
         },
         endTime: {
             type: DataTypes.STRING(4),
-            allowNull: false,
-        },
+            allowNull: false
+        }
     },
     {
         sequelize,
-        tableName: "Lessons",
-        timestamps: false,
-        indexes: [
-            {
-                unique: true,
-                fields: ["lessonId", "moduleCode", "lessonType"],
-                name: "fakeCompositePrimaryKey",
-            },
-        ],
+        tableName: 'Lessons',
+        timestamps: false
     }
 );
 

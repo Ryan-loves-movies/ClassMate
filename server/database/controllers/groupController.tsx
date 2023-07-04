@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import Groups from '@models/Groups';
 import Users from '@models/Users';
 import Users_Groups from '@models/Users_Groups';
+import Modules from '@models/Modules';
+import { Op } from 'sequelize';
 
 /** 
     req: {
@@ -132,40 +134,54 @@ async function getUsersInGroup(req: Request, res: Response) {
         username: string[]
     }
 }
+Checks if module code exists and is correct, if not in correct format -> Corrects it!
 Create a new group with the list of users, return groupId
 **/
 async function createGroup(req: Request, res: Response) {
     const { groupName, moduleCode, color, username } = req.body;
-    await Groups.create({
-        name: groupName,
-        moduleCode: moduleCode,
-        color: color
+    await Modules.findOne({
+        where: {
+            code: {
+                [Op.iLike]: `%${moduleCode}%`
+            }
+        }
     })
-        .then((group) => {
-            Users.findByPk(username, {
-                include: [
-                    {
-                        model: Groups
-                    }
-                ]
+        .then((module) => {
+            const moduleCode = module?.code as string;
+            Groups.create({
+                name: groupName,
+                moduleCode: moduleCode,
+                color: color
             })
-                .then((user) => {
-                    group.addUser(user as Users);
-                    res.status(200).json({
-                        id: group.id,
-                        moduleCode: moduleCode,
-                        name: groupName,
-                        color: color
-                    });
+                .then((group) => {
+                    Users.findByPk(username, {
+                        include: [
+                            {
+                                model: Groups
+                            }
+                        ]
+                    })
+                        .then((user) => {
+                            group.addUser(user as Users);
+                            res.status(200).json({
+                                id: group.id,
+                                moduleCode: moduleCode,
+                                name: groupName,
+                                color: color
+                            });
+                        })
+                        .catch(() => {
+                            res.status(404).json({
+                                message: 'user could not be found!'
+                            });
+                        });
                 })
-                .catch(() => {
-                    res.status(404).json({
-                        message: 'user could not be found!'
-                    });
+                .catch((err) => {
+                    res.status(401).json({ message: err.message });
                 });
         })
-        .catch((err) => {
-            res.status(401).json({ message: err.message });
+        .catch(() => {
+            return res.status(404).json({ message: 'Module does not exist!' });
         });
 }
 
@@ -224,17 +240,19 @@ async function addUserToGroup(req: Request, res: Response) {
         ]
     })
         .then((group) => {
-            Users.findByPk(username)
+            return Users.findByPk(username)
                 .then((user) => {
                     group?.addUser(user as Users);
-                    res.status(200).json({ message: 'User added to group!' });
+                    return res
+                        .status(200)
+                        .json({ message: 'User added to group!' });
                 })
                 .catch(() => {
-                    res.status(404).json({ message: 'User not found!' });
+                    return res.status(404).json({ message: 'User not found!' });
                 });
         })
         .catch(() => {
-            res.status(404).json({ message: 'Group not found!' });
+            return res.status(404).json({ message: 'Group not found!' });
         });
 }
 
