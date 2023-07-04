@@ -75,4 +75,19 @@
 .status {
     display: flex;
     justify-content: right;
+    align-items: center;
+}
+
+.add-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    /* background-color: rgba(255, 255, 255, 0.6); */
+    background-color: var(--app-container);
+    margin-left: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }

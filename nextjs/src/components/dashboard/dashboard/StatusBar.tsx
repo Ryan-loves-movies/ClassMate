@@ -1,6 +1,6 @@
 'use client';
 import styles from '@components/dashboard/dashboard/statusBar.module.css';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 /*
  * Returns a status bar to show descriptor and see-through background - Width is dynamically rendered based on string with minimum width of 20px
@@ -26,7 +26,10 @@ export default function StatusBar({
     }, [ref, width]);
 
     return (
-        <div className={styles['wrapper']}>
+        <div
+            className={styles['wrapper']}
+            style={{ width: `${width + 5}px`, height: height }}
+        >
             <div
                 className={styles['background']}
                 style={{
