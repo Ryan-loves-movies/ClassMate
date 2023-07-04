@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize('orbital', 'root', 'Classmate123!', {
+const sequelize = new Sequelize('classmate', 'root', 'Classmate123!', {
     host: 'localhost',
     port: 3306,
     dialect: 'mysql'

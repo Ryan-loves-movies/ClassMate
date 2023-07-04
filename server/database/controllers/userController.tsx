@@ -291,7 +291,6 @@ Updates the values of the user profile in the database and returns the number of
 **/
 async function updateProfilePhoto(req: Request, res: Response) {
     const { username, photo } = req.body;
-    console.log(photo);
     return await Users.findByPk(username)
         .then((user) => {
             user?.update({

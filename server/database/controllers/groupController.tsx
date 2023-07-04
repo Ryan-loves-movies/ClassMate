@@ -1,8 +1,8 @@
-import { AxiosError } from "axios";
-import { Request, Response } from "express";
-import Groups from "@models/Groups";
-import Users from "@models/Users";
-import Users_Groups from "@models/Users_Groups";
+import { AxiosError } from 'axios';
+import { Request, Response } from 'express';
+import Groups from '@models/Groups';
+import Users from '@models/Users';
+import Users_Groups from '@models/Users_Groups';
 
 /** 
     req: {
@@ -21,23 +21,23 @@ async function getGroupId(req: Request, res: Response) {
     const { usernames, groupName } = req.body;
     await Groups.findOne({
         where: {
-            name: groupName,
+            name: groupName
         },
         include: [
             {
                 model: Users,
                 where: {
-                    username: usernames,
-                },
-            },
-        ],
+                    username: usernames
+                }
+            }
+        ]
     })
         .then((group) => {
             res.status(200).json({ groupId: group?.id });
         })
         .catch((error: AxiosError) => {
             console.log(error);
-            res.status(500).json({ message: "Group not found!", error: error });
+            res.status(500).json({ message: 'Group not found!', error: error });
         });
 }
 
@@ -58,26 +58,27 @@ async function getGroups(req: Request, res: Response) {
     await Users.findByPk(username, {
         include: [
             {
-                model: Groups,
-            },
-        ],
+                model: Groups
+            }
+        ]
     })
         .then((user) => {
-            user
-                ?.getGroups()
+            user?.getGroups()
                 .then((groups) => {
-                    res
-                        .status(200)
-                        .json({ groups: groups.map((group) => group.toJSON()) });
+                    return res.status(200).json({
+                        groups: groups.map((group) => group.toJSON())
+                    });
                 })
                 .catch((err) => {
-                    res.status(404).json({
-                        message: `error occurred when trying to find groups associated with user: ${err}`,
+                    return res.status(404).json({
+                        message: `error occurred when trying to find groups associated with user: ${err}`
                     });
                 });
         })
         .catch(() => {
-            res.status(404).json({ message: "user could not be found!" });
+            return res
+                .status(404)
+                .json({ message: 'user could not be found!' });
         });
 }
 
@@ -98,24 +99,26 @@ async function getUsersInGroup(req: Request, res: Response) {
     await Groups.findByPk(groupId, {
         include: [
             {
-                model: Users,
-            },
-        ],
+                model: Users
+            }
+        ]
     })
         .then(async (group) => {
             await group
                 ?.getUsers()
                 .then((users) => {
-                    res.status(200).json({ users: users.map((user) => user.toJSON()) });
+                    res.status(200).json({
+                        users: users.map((user) => user.toJSON())
+                    });
                 })
                 .catch((err) => {
                     res.status(404).json({
-                        message: `error occurred when trying to find groups associated with user: ${err}`,
+                        message: `error occurred when trying to find groups associated with user: ${err}`
                     });
                 });
         })
         .catch(() => {
-            res.status(404).json({ message: "user could not be found!" });
+            res.status(404).json({ message: 'user could not be found!' });
         });
 }
 
@@ -132,18 +135,19 @@ async function getUsersInGroup(req: Request, res: Response) {
 Create a new group with the list of users, return groupId
 **/
 async function createGroup(req: Request, res: Response) {
-    const { groupName, moduleCode, username } = req.body;
+    const { groupName, moduleCode, color, username } = req.body;
     await Groups.create({
         name: groupName,
         moduleCode: moduleCode,
+        color: color
     })
         .then((group) => {
             Users.findByPk(username, {
                 include: [
                     {
-                        model: Groups,
-                    },
-                ],
+                        model: Groups
+                    }
+                ]
             })
                 .then((user) => {
                     group.addUser(user as Users);
@@ -151,10 +155,13 @@ async function createGroup(req: Request, res: Response) {
                         id: group.id,
                         moduleCode: moduleCode,
                         name: groupName,
+                        color: color
                     });
                 })
                 .catch(() => {
-                    res.status(404).json({ message: "user could not be found!" });
+                    res.status(404).json({
+                        message: 'user could not be found!'
+                    });
                 });
         })
         .catch((err) => {
@@ -177,14 +184,22 @@ async function deleteGroup(req: Request, res: Response) {
     const { groupId } = req.body;
     await Groups.destroy({
         where: {
-            id: groupId,
-        },
-    });
-    await Users_Groups.destroy({
-        where: {
-            groupId: groupId,
-        },
-    });
+            id: groupId
+        }
+    })
+        .then(() => {
+            Users_Groups.destroy({
+                where: {
+                    groupId: groupId
+                }
+            });
+        })
+        .then(() => {
+            res.status(200).json({ message: 'Group successfully deleted' });
+        })
+        .catch((err) => {
+            res.status(401).json({ message: err });
+        });
 }
 
 /** 
@@ -204,22 +219,22 @@ async function addUserToGroup(req: Request, res: Response) {
     return await Groups.findByPk(groupId, {
         include: [
             {
-                model: Users,
-            },
-        ],
+                model: Users
+            }
+        ]
     })
         .then((group) => {
             Users.findByPk(username)
                 .then((user) => {
                     group?.addUser(user as Users);
-                    res.status(200).json({ message: "User added to group!" });
+                    res.status(200).json({ message: 'User added to group!' });
                 })
                 .catch(() => {
-                    res.status(404).json({ message: "User not found!" });
+                    res.status(404).json({ message: 'User not found!' });
                 });
         })
         .catch(() => {
-            res.status(404).json({ message: "Group not found!" });
+            res.status(404).json({ message: 'Group not found!' });
         });
 }
 
@@ -236,18 +251,55 @@ async function addUserToGroup(req: Request, res: Response) {
 Modifies the lessons being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function removeUserFromGroup(req: Request, res: Response) {
-    const { username, groupId } = req.body;
-    await Groups.findByPk(groupId, {
+    const username = req.query.username as string;
+    const groupId = parseInt(req.query.groupId as string);
+    return await Groups.findByPk(groupId, {
         include: [
             {
-                model: Users,
-            },
-        ],
-    }).then((group) => {
-        Users.findByPk(username).then((user) => {
-            group?.removeUser(user as Users);
+                model: Users
+            }
+        ]
+    })
+        .then((group) => {
+            if (group?.countUsers().then((userCount) => userCount === 1)) {
+                return Groups.destroy({
+                    where: {
+                        id: groupId
+                    }
+                })
+                    .then(() => {
+                        return Users_Groups.destroy({
+                            where: {
+                                groupId: groupId
+                            }
+                        })
+                            .then(() => {
+                                return res
+                                    .status(200)
+                                    .json({ message: 'Removed User!' });
+                            })
+                            .catch((err) => {
+                                return res.status(401).json({ message: err });
+                            });
+                    })
+                    .catch((err) => res.status(401).json({ message: err }));
+            }
+            return Users.findByPk(username).then((user) => {
+                return group
+                    ?.removeUser(user as Users)
+                    .then(() => {
+                        return res
+                            .status(200)
+                            .json({ message: 'Removed User!' });
+                    })
+                    .catch((err) => {
+                        return res.status(401).json({ message: err });
+                    });
+            });
+        })
+        .catch(() => {
+            return res.status(404).json({ message: 'Cannot find group!' });
         });
-    });
 }
 
 export default {
@@ -257,5 +309,5 @@ export default {
     createGroup,
     deleteGroup,
     addUserToGroup,
-    removeUserFromGroup,
+    removeUserFromGroup
 };

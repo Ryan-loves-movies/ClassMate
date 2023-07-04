@@ -29,6 +29,7 @@ class Groups extends Model<
     declare id: number | null;
     declare name: string;
     declare moduleCode: string;
+    declare color: string;
 
     declare getUsers: BelongsToManyGetAssociationsMixin<Users>;
     declare addUser: BelongsToManyAddAssociationMixin<Users, number>;
@@ -71,6 +72,10 @@ Groups.init(
                 key: "code",
             },
         },
+        color: {
+            type: DataTypes.STRING(10),
+            allowNull: false
+        }
     },
     {
         sequelize,
