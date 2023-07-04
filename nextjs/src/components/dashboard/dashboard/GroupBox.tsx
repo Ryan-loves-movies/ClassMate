@@ -1,65 +1,78 @@
 import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
-import PhotoRenderer from '@components/dashboard/PhotoRenderer';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
+import axios from 'axios';
+import config from '@/config';
+const { expressHost } = config;
 
-interface group {
-    id: number;
-    moduleCode: string;
-    name: string;
-    users: user[];
-}
+import { groupWithUsersNoEmail } from '@models/group';
+import { userWithoutEmail } from '@models/user';
+import PhotoRenderer from '@components/dashboard/PhotoRenderer';
 
-interface user {
-    username: string;
-    photo: {
-        type: string;
-        data: Array<number>;
-    };
-}
+const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
+    return (
+        <>
+            {users.map((user: userWithoutEmail) => (
+                <PhotoRenderer
+                    arrBuffer={user.photo.data}
+                    alt={user.username}
+                    key={user.username}
+                />
+            ))}
+        </>
+    );
+};
 
 export default function GroupBox({
     waiting,
+    setWaiting,
     backgroundColor,
     id,
     header,
     subheader,
     users,
     width,
-    setGroupChosen
+    setGroupChosen,
+    setGroupsUpdated,
+    setUserChosen
 }: {
     waiting: boolean;
+    setWaiting: Dispatch<boolean>;
     backgroundColor: string;
     id: number;
     header: string;
     subheader: string;
-    users: user[];
+    users: userWithoutEmail[];
     width: string;
-    setGroupChosen: Dispatch<group>;
+    setGroupChosen: Dispatch<groupWithUsersNoEmail>;
+    setGroupsUpdated: Dispatch<boolean>;
+    setUserChosen: Dispatch<userWithoutEmail | undefined>;
 }) {
-    const ProfilePhotos = ({ users }: { users: user[] }) => {
-        return (
-            <>
-                {users.map((user: user) => {
-                    return (
-                        <PhotoRenderer
-                            arrBuffer={user.photo.data}
-                            alt={user.username}
-                            key={user.username}
-                        />
-                    );
-                })}
-            </>
-        );
-    };
-
     const newUserHandler = () => {
         setGroupChosen({
             id: id,
             moduleCode: header,
             name: subheader,
+            color: backgroundColor,
             users: users
         });
+        setWaiting(false);
+        setUserChosen(undefined);
+    };
+
+    const deleteGroupHandler = () => {
+        axios
+            .delete(`${expressHost}/authorized/group/user`, {
+                headers: {
+                    Authorization: sessionStorage.getItem('token')
+                },
+                params: {
+                    username: sessionStorage.getItem('username'),
+                    groupId: id
+                }
+            })
+            .catch(() => alert('failed to delete group!'));
+        setGroupsUpdated(true);
     };
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
@@ -71,7 +84,7 @@ export default function GroupBox({
             >
                 <div className={styles['project-box-header']}>
                     <div className={styles['trash']}>
-                        <TrashIcon />
+                        <TrashIcon clickHandler={deleteGroupHandler} />
                     </div>
                     <div className={styles['more-wrapper']}>
                         <button

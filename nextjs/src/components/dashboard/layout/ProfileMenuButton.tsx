@@ -11,6 +11,9 @@ const { expressHost } = config;
 export default function ProfileMenuButton() {
     const [username, setUsername] = useState<string | null>();
     const [photoArrBuffer, setPhotoArrBuffer] = useState<number[]>([]);
+    const Photo = () => {
+        return <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />;
+    };
     useLayoutEffect(() => {
         setUsername(window['sessionStorage'].getItem('username'));
         axios
@@ -43,7 +46,7 @@ export default function ProfileMenuButton() {
             onClick={toggleDropdown}
             type="button"
         >
-            <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />
+            <Photo />
             <span>{username}</span>
             <div
                 className={`${styles['dropdown-wrapper']} ${

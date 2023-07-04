@@ -4,13 +4,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
-interface user {
-    username: string;
-    photo: {
-        type: string;
-        data: [];
-    };
-}
+import { userWithoutEmail } from '@models/user';
 
 /**
  * @params {
@@ -27,7 +21,7 @@ export default function UserSearchBar({
 }: {
     focused: boolean;
     handleKeyDown: (elem: React.KeyboardEvent<HTMLInputElement>) => void;
-    setSearchRes: Dispatch<user[]>;
+    setSearchRes: Dispatch<userWithoutEmail[]>;
     width: string;
 }) {
     const searchInputRef = useRef<HTMLInputElement>(null);

@@ -1,14 +1,6 @@
 'use client';
-import { useEffect } from 'react';
-
-export function bufferToBase64(arr: number[]) {
-    return btoa(
-        arr.reduce(
-            (data: string, byte: number) => data + String.fromCharCode(byte),
-            ''
-        )
-    );
-}
+import { usePhotoCache } from '@components/dashboard/photoCache';
+import Image from 'next/image';
 
 export default function PhotoRenderer({
     arrBuffer,
@@ -17,11 +9,5 @@ export default function PhotoRenderer({
     arrBuffer: number[];
     alt: string;
 }) {
-    const photoUrl = `data:image/*;base64,${bufferToBase64(arrBuffer)}`;
-
-    useEffect(() => {
-        return () => URL.revokeObjectURL(photoUrl);
-    });
-
-    return <img src={photoUrl} alt={alt} />;
+    return <Image src={usePhotoCache(arrBuffer)} width={100} height={100} alt={alt} />;
 }

@@ -1,77 +1,81 @@
-import React from 'react';
+import React, { Dispatch, useEffect, useState } from 'react';
 import styles from '@components/peopleBar.module.css';
-import PhotoRenderer from '@components/dashboard/PhotoRenderer';
-import AddProjectButton from '@components/dashboard/dashboard/AddProjectButton';
 import StatusBar from '@components/dashboard/dashboard/StatusBar';
+import PhotoRenderer from '@components/dashboard/PhotoRenderer';
 import config from '@/config';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 const { expressHost } = config;
 
-interface group {
-    id: number;
-    moduleCode: string;
-    name: string;
-    users: user[];
-}
-
-interface user {
-    username: string;
-    photo: {
-        type: string;
-        data: Array<number>;
-    };
-}
+import group from '@models/group';
+import { userWithoutEmail } from '@models/user';
 
 let starIdCounter = 0;
 
 export default function PeopleBar({
     user,
-    group,
-    bio
+    bio,
+    setUserChosen,
 }: {
-    user: user;
-    group: group | undefined;
+    user: userWithoutEmail;
     bio: string;
+    setUserChosen: Dispatch<userWithoutEmail>;
 }) {
     const starId = `star-${starIdCounter++}`;
+    const [groups, setGroups] = useState<group[]>([]);
 
-    // Functionality for adding user to group
-    const addUserToGroup = (user: user, group: group) => {
-        axios
-            .put(
-                `${expressHost}/authorized/group/user`,
-                {
-                    username: user.username,
-                    groupId: group.id
-                },
-                {
-                    headers: {
-                        Authorization: sessionStorage.getItem('token')
-                    }
-                }
-            )
-            .catch((err: AxiosError) => {
-                alert(`Error encountered when adding user to group: ${err}`);
-            });
+    const Groups = () => {
+        return (
+            <>
+                {groups.map((group) => {
+                    return (
+                        <StatusBar
+                            color={group.color}
+                            height="20px"
+                            descriptor={group.name}
+                            key={group.id}
+                        />
+                    );
+                })}
+            </>
+        );
     };
 
     const addGroupButton = () => {
-        if (group) {
-            return <></>;
-        }
-        return <></>;
+        setUserChosen(user);
     };
+
+    useEffect(() => {
+        const getGroups = async (username: string) => {
+            return await axios
+                .get(`${expressHost}/authorized/group/user`, {
+                    headers: {
+                        Authorization: sessionStorage.getItem('token')
+                    },
+                    params: {
+                        username: username
+                    }
+                })
+                .then((res: AxiosResponse) => {
+                    if (res.status !== 200) {
+                        alert(
+                            'Problem occurred when retrieving groups of user!'
+                        );
+                        return [];
+                    }
+                    return res.data.groups;
+                })
+                .catch(() =>
+                    alert('Problem occurred when retrieving groups of user!')
+                );
+        };
+        getGroups(user.username).then((groups) => setGroups(groups));
+    }, [user.username]);
     return (
         <div className={styles['message-box']}>
             <PhotoRenderer arrBuffer={user.photo.data} alt="Profile" />
             <div className={styles['message-content']}>
                 <div className={styles['message-header']}>
                     <div className={styles['name']}>{user.username}</div>
-                    {/* <StatusBar
-                        color="#404040"
-                        descriptor="team A"
-                        height="20px"
-                    /> */}
                     <div className={styles['star-checkbox']}>
                         <input type="checkbox" id={starId} />
                         <label htmlFor={starId}>
@@ -94,13 +98,30 @@ export default function PeopleBar({
                     </div>
                 </div>
                 <p className={styles['message-line']}>{bio}</p>
-                {/* <div className={styles['message-line']}>{bio}</div> */}
                 <div className={styles['status']}>
-                    <StatusBar
-                        color="#404040"
-                        descriptor="team A"
-                        height="20px"
-                    />
+                    <Groups />
+                    <button
+                        className={styles['add-btn']}
+                        style={{ color: '#ff942e' }}
+                        type="button"
+                        onClick={addGroupButton}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="feather feather-plus"
+                        >
+                            <path d="M12 5v14M5 12h14" />
+                            <title>Add Friend</title>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>

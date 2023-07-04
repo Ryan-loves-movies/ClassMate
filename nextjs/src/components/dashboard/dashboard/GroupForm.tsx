@@ -6,11 +6,7 @@ import config from '@/config';
 import axios, { AxiosResponse } from 'axios';
 const { expressHost } = config;
 
-interface group {
-    id: number;
-    moduleCode: string;
-    name: string;
-}
+import group from '@models/group';
 
 export default function GroupForm({
     visibility,
@@ -29,15 +25,27 @@ export default function GroupForm({
         formState: { errors: errorsGroup, isSubmitSuccessful }
     } = useForm();
 
+    const groupBoxColors = [
+        '#fee4cb',
+        '#e9e7fd',
+        '#ffd3e2',
+        '#c8f7dc',
+        '#d5deff'
+    ];
+    const randomIndex = () => Math.floor(Math.random() * groupBoxColors.length);
+
     // Adding group functionality
     const handleGroupAdd = async (data: FieldValues) => {
         const { moduleCode, groupName } = data;
+        const color = groupBoxColors[randomIndex()];
+
         return await axios
             .post(
                 `${expressHost}/authorized/group`,
                 {
                     groupName,
                     moduleCode,
+                    color: color,
                     username: sessionStorage.getItem('username')
                 },
                 {
@@ -51,7 +59,8 @@ export default function GroupForm({
                 setNewGroup({
                     id: res.data.id,
                     moduleCode: res.data.moduleCode,
-                    name: res.data.name
+                    name: res.data.name,
+                    color: res.data.color
                 });
             })
             .catch((err) => {
