@@ -90,13 +90,13 @@ export default function Timetable({ activities }: { activities: modType[] }) {
             <>
                 {days.map((day) => {
                     return (
-                        <div className={styles['s-act-row']} key="">
+                        <div className={styles['s-act-row']} key={day}>
                             {activitiesWithColors
                                 .filter((mod) => mod.lecture.day === day)
                                 .map((mod) => {
                                     return (
                                         <Activity
-                                            key=""
+                                            key={mod.code}
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lecture.startTime}
@@ -110,7 +110,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
-                                            key=""
+                                            key={mod.code}
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.lab.startTime}
@@ -124,7 +124,7 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                                 .map((mod) => {
                                     return (
                                         <Activity
-                                            key=""
+                                            key={mod.code}
                                             code={mod.code}
                                             color={mod.color}
                                             startTime={mod.tutorial.startTime}
