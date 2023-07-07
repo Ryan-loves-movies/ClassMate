@@ -14,3 +14,7 @@ export interface userWithoutEmail {
         data: Array<number>;
     }
 }
+
+export interface userWithoutEmailPhoto {
+    username: string;
+}
