@@ -25,6 +25,7 @@ interface Group {
     users: User[];
     modules: Module[];
 }
+
 function solveTimetable(
     students: userWithoutEmailPhoto[],
 ): Record<string, number> {

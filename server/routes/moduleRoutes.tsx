@@ -7,7 +7,7 @@ const {
     populateLessons,
     hasModule,
     searchModules,
-    getModules,
+    getLessons,
     addModule,
     removeModule,
     updateLesson,
@@ -17,9 +17,9 @@ expressRouter.post("/allModules", populateModules);
 expressRouter.post("/allLessons", populateLessons);
 expressRouter.get("/search/modules", searchModules);
 expressRouter.get("/module", hasModule);
-expressRouter.get("/modules", getModules);
 expressRouter.put("/modules", addModule);
 expressRouter.delete("/modules", removeModule);
 expressRouter.put("/lessons", updateLesson);
+expressRouter.get("/lessons", getLessons);
 
 export default expressRouter;

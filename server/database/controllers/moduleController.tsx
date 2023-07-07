@@ -239,7 +239,32 @@ async function searchModules(req: Request, res: Response) {
         });
 }
 
-async function getModules(req: Request, res: Response) {
+/**
+ * @returns
+ * {
+ *     username: string,
+ *     modules: [
+ *         {
+ *             code: string,
+ *             name: string,
+ *             lessons: [
+ *                 {
+ *                     id: number,
+ *                     lessonId: number,
+ *                     moduleCode: string,
+ *                     lessonType: string,
+ *                     sem: number,
+ *                     day: string,
+ *                     startTime: string,
+ *                     endTime: string
+ *                 },
+ *                 ...
+ *             ]
+ *         }, ...
+ *     ]
+ * }
+ * */
+async function getLessons(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
 
@@ -406,7 +431,7 @@ export default {
     populateModules,
     hasModule,
     searchModules,
-    getModules,
+    getLessons,
     addModule,
     removeModule,
     updateLesson
