@@ -4,8 +4,8 @@ import userController from "@controllers/userController";
 
 const {
     getUsers,
-    createUser,
-    logIn,
+    // createUser,
+    // logIn,
     logOut,
     getProfile,
     updateProfilePhoto,
@@ -17,8 +17,8 @@ const {
 
 // User routes
 expressRouter.get("/users", getUsers);
-expressRouter.post("/register", createUser);
-expressRouter.post("/login", logIn);
+// expressRouter.post("/register", createUser);
+// expressRouter.post("/login", logIn);
 expressRouter.post("/logout", logOut);
 expressRouter.get("/profile", getProfile);
 expressRouter.put("/profile/photo", updateProfilePhoto);

@@ -6,7 +6,6 @@ import Lessons from '@models/Lessons';
 import { EmptyResultError, Op } from 'sequelize';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
-import { error } from 'console';
 
 interface lesson {
     lessonId: string;
