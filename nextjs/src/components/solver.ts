@@ -1,231 +1,248 @@
-import { Variable, Constraint, Strength, Solver } from '@lume/kiwi';
-import { userWithoutEmail, userWithoutEmailPhoto } from '@models/user';
-import group from '@models/group';
-import module from '@models/module';
 import lesson from '@models/lesson';
-import axios from 'axios';
+import module from '@models/module';
+import { userWithoutEmailPhoto } from '@models/user';
 
-interface moduleWithLesson extends module {
+import { Arith, init } from 'z3-solver';
+
+interface fullModule extends module {
     lessons: lesson[];
 }
 
 interface fullUser extends userWithoutEmailPhoto {
-    modules: moduleWithLesson[];
+    modules: fullModule[];
 }
 
-interface Module {
-    id: string;
-    lectureStart: number;
-    lectureEnd: number;
-    tutorialStart: number;
-    tutorialEnd: number;
-}
+/** @param users: fullUser[] - The lessons field should consist of all valid lessons that can be taken by each user
+ * */
+export default async function timetableGenerator(
+    users: fullUser[],
+    commonModule: module
+) {
+    const { Context } = await init();
+    const { Solver, Int, If, Or } = Context('main');
 
-interface Group {
-    users: User[];
-    modules: Module[];
-}
+    interface modifiedLesson extends lesson {
+        startTimeVar: Arith<'main'>;
+        endTimeVar: Arith<'main'>;
+        boolVar: Arith<'main'>;
+    }
 
-function solveTimetable(
-    students: userWithoutEmailPhoto[],
-): Record<string, number> {
+    interface modifiedModule extends module {
+        lessons: modifiedLesson[][]; // To split into groups of lesson types so nested array
+    }
 
-    // Retrieve all the necessary information first
-    const fullStudents = students.map((student) => {
-        return axios.get
-    })
+    interface modifiedUser extends userWithoutEmailPhoto {
+        modules: modifiedModule[];
+        commonModule: modifiedModule;
+    }
+
+    interface modifiedUsers {
+        users: modifiedUser[];
+        commonModule: modifiedModule;
+    }
 
     const solver = new Solver();
-    const userTimeslots: Record<string, Variable> = {};
 
-    // Create variables for each user's timeslot
-    for (const group of groups) {
-        for (const user of group.users) {
-            for (const module of modules) {
-                const timeslotVar = new Variable();
-                userTimeslots[`${user.id}-${module.id}`] = timeslotVar;
-                solver.addEditVariable(timeslotVar, Strength.required);
-            }
+    // Add boolVar, startTimeVar, endTimeVar to each lesson. THERE MUST BE A COMMON MODULE
+    const commonModuleLessons = users[0].modules.find(
+        (user_mod) => user_mod.code === commonModule.code
+    )!;
+    const commonLessonTypes = [
+        ...new Set(commonModuleLessons?.lessons.map((less) => less.lessonType))
+    ];
+    const modUsers = {
+        users: users.map((user) => {
+            return {
+                username: user.username,
+                modules: user.modules
+                    .filter((user_mod) => user_mod.code !== commonModule.code)
+                    .map((user_mod) => {
+                        const lessonTypes = [
+                            ...new Set(
+                                user_mod.lessons.map((less) => less.lessonType)
+                            )
+                        ];
+                        return {
+                            code: user_mod.code,
+                            name: user_mod.name,
+                            lessons: lessonTypes.map((lessonType) => {
+                                return user_mod.lessons
+                                    .filter(
+                                        (less) => less.lessonType === lessonType
+                                    )
+                                    .map((less) => {
+                                        const boolVar = Int.const(
+                                            `${user.username}_${user_mod.code}_${less.id}_bool`
+                                        );
+                                        const startTimeVar = Int.const(
+                                            `${user.username}_${user_mod.code}_${less.id}_startTime`
+                                        );
+                                        const endTimeVar = Int.const(
+                                            `${user.username}_${user_mod.code}_${less.id}_endTime`
+                                        );
+                                        solver.add(
+                                            Or(boolVar.eq(0), boolVar.eq(1)),
+                                            If(
+                                                boolVar.eq(0),
+                                                startTimeVar.eq(0),
+                                                startTimeVar.eq(
+                                                    parseInt(less.startTime)
+                                                )
+                                            ),
+                                            If(
+                                                boolVar.eq(0),
+                                                endTimeVar.eq(0),
+                                                endTimeVar.eq(
+                                                    parseInt(less.startTime)
+                                                )
+                                            )
+                                        );
+                                        return {
+                                            ...less,
+                                            startTimeVar: startTimeVar,
+                                            endTimeVar: endTimeVar,
+                                            boolVar: boolVar
+                                        };
+                                    });
+                            })
+                        };
+                    })
+            } as modifiedUser;
+        }),
+        commonModule: {
+            code: commonModule.code,
+            name: commonModule.name,
+            lessons: commonLessonTypes.map((lessType) => {
+                return commonModuleLessons.lessons
+                    .filter((less) => less.lessonType === lessType)
+                    .map((less) => {
+                        const boolVar = Int.const(
+                            `${commonModule.code}_${less.id}_bool`
+                        );
+                        const startTimeVar = Int.const(
+                            `${commonModule.code}_${less.id}_startTime`
+                        );
+                        const endTimeVar = Int.const(
+                            `${commonModule.code}_${less.id}_endTime`
+                        );
+                        solver.add(
+                            Or(boolVar.eq(0), boolVar.eq(1)),
+                            If(
+                                boolVar.eq(0),
+                                startTimeVar.eq(0),
+                                startTimeVar.eq(parseInt(less.startTime))
+                            ),
+                            If(
+                                boolVar.eq(0),
+                                endTimeVar.eq(0),
+                                endTimeVar.eq(parseInt(less.startTime))
+                            )
+                        );
+                        return {
+                            ...less,
+                            startTimeVar: startTimeVar,
+                            endTimeVar: endTimeVar,
+                            boolVar: boolVar
+                        };
+                    });
+            })
         }
-    }
+    } as modifiedUsers;
 
-    // Add constraints for same lecture and tutorial slots for modules shared by the group
-    for (const group of groups) {
-        const sharedModules = group.modules;
-        for (const module of sharedModules) {
-            const timeslots = group.users.map(
-                (user) => userTimeslots[`${user.id}-${module.id}`]
+    // Constraint 1: Must have only 1 lesson for each lesson type
+    modUsers.users.forEach((modUser) => {
+        modUser.modules.forEach((specificMod) => {
+            specificMod.lessons.forEach((lessType) => {
+                const initial = lessType[0].boolVar;
+                const lessTypeSum = lessType
+                    .slice(1)
+                    .reduce(
+                        (firstLess, secLess) => firstLess.add(secLess.boolVar),
+                        initial
+                    );
+                solver.add(lessTypeSum.eq(1));
+            });
+        });
+    });
+    modUsers.commonModule.lessons.forEach((lessType) => {
+        const initial = lessType[0].boolVar;
+        const lessTypeSum = lessType
+            .slice(1)
+            .reduce(
+                (firstLess, secLess) => firstLess.add(secLess.boolVar),
+                initial
             );
-            for (let i = 1; i < timeslots.length; i++) {
-                const constraint = new Constraint(
-                    timeslots[i - 1],
-                    timeslots[i],
-                    Strength.required
-                );
-                solver.addConstraint(constraint);
-            }
+        solver.add(lessTypeSum.eq(1));
+    });
+
+    // Constraint 2: No overlap in time slots for the modules not shared by the group
+    modUsers.users.forEach((modUser) => {
+        for (let modInd = 0; modInd < modUser.modules.length; modInd++) {
+            const specificMod = modUser.modules[modInd];
+
+            // Presume that lesson types of modules will never clash
+            specificMod.lessons.forEach((lessType) => {
+                lessType.forEach((less) => {
+                    // Check with each and every lesson for every other module
+                    for (
+                        let nextModInd = modInd + 1;
+                        nextModInd < modUser.modules.length;
+                        nextModInd++
+                    ) {
+                        const nextSpecificMod = modUser.modules[nextModInd];
+
+                        nextSpecificMod.lessons.forEach((nextLessType) => {
+                            nextLessType.forEach((nextLess) => {
+                                solver.add(
+                                    Or(
+                                        Or(
+                                            less.boolVar.eq(0),
+                                            nextLess.boolVar.eq(0)
+                                        ),
+                                        Or(
+                                            less.endTimeVar.le(
+                                                nextLess.startTimeVar
+                                            ),
+                                            less.startTimeVar.ge(
+                                                nextLess.endTimeVar
+                                            )
+                                        )
+                                    )
+                                );
+                            });
+                        });
+                    }
+                    // Add constraint for common module as well
+                    modUsers.commonModule.lessons.forEach((nextLessType) => {
+                        nextLessType.forEach((nextLess) => {
+                            solver.add(
+                                Or(
+                                    Or(
+                                        less.boolVar.eq(0),
+                                        nextLess.boolVar.eq(0)
+                                    ),
+                                    Or(
+                                        less.endTimeVar.le(
+                                            nextLess.startTimeVar
+                                        ),
+                                        less.startTimeVar.ge(
+                                            nextLess.endTimeVar
+                                        )
+                                    )
+                                )
+                            );
+                        });
+                    });
+                });
+            });
         }
-    }
+    });
 
-    // Add constraints for non-overlapping timeslots of lecture and tutorial slots for each user
-    for (const group of groups) {
-        for (const user of group.users) {
-            const userModules = modules.filter((module) =>
-                user.modules.includes(module.id)
-            );
-            for (let i = 0; i < userModules.length; i++) {
-                const module1 = userModules[i];
-                const timeslot1 = userTimeslots[`${user.id}-${module1.id}`];
-                for (let j = i + 1; j < userModules.length; j++) {
-                    const module2 = userModules[j];
-                    const timeslot2 = userTimeslots[`${user.id}-${module2.id}`];
-                    const lecture1Constraint = new Constraint(
-                        timeslot1,
-                        timeslot1,
-                        Strength.required
-                    );
-                    const lecture2Constraint = new Constraint(
-                        timeslot2,
-                        timeslot2,
-                        Strength.required
-                    );
-                    const tutorial1Constraint = new Constraint(
-                        timeslot1,
-                        timeslot1,
-                        Strength.required
-                    );
-                    const tutorial2Constraint = new Constraint(
-                        timeslot2,
-                        timeslot2,
-                        Strength.required
-                    );
-
-                    // Add constraints for non-overlapping lecture timeslots
-                    solver.addConstraint(
-                        lecture1Constraint.suggestValue(
-                            module1.lectureStart,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        lecture1Constraint.suggestValue(
-                            module1.lectureEnd,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        lecture2Constraint.suggestValue(
-                            module2.lectureStart,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        lecture2Constraint.suggestValue(
-                            module2.lectureEnd,
-                            Strength.required
-                        )
-                    );
-
-                    // Add constraints for non-overlapping tutorial timeslots
-                    solver.addConstraint(
-                        tutorial1Constraint.suggestValue(
-                            module1.tutorialStart,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        tutorial1Constraint.suggestValue(
-                            module1.tutorialEnd,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        tutorial2Constraint.suggestValue(
-                            module2.tutorialStart,
-                            Strength.required
-                        )
-                    );
-                    solver.addConstraint(
-                        tutorial2Constraint.suggestValue(
-                            module2.tutorialEnd,
-                            Strength.required
-                        )
-                    );
-                }
-            }
+    solver.check().then((result) => {
+        if (result === 'sat') {
+            solver.model();
+        } else {
+            console.log('No valid timetable exists for the group.');
         }
-    }
-
-    // Solve the constraints
-    solver.updateVariables();
-    solver.resolve();
-
-    // Retrieve the solved timeslots
-    const solvedTimeslots: Record<string, number> = {};
-    for (const [key, timeslot] of Object.entries(userTimeslots)) {
-        solvedTimeslots[key] = timeslot.value();
-    }
-
-    return solvedTimeslots;
+    });
 }
-
-// Example usage
-const groups: Group[] = [
-    {
-        users: [
-            { id: 'user1', modules: ['module1', 'module2'] },
-            { id: 'user2', modules: ['module1', 'module3'] },
-            { id: 'user3', modules: ['module2', 'module3'] }
-        ],
-        modules: [
-            {
-                id: 'module1',
-                lectureStart: 8,
-                lectureEnd: 10,
-                tutorialStart: 14,
-                tutorialEnd: 16
-            },
-            {
-                id: 'module2',
-                lectureStart: 9,
-                lectureEnd: 11,
-                tutorialStart: 16,
-                tutorialEnd: 18
-            },
-            {
-                id: 'module3',
-                lectureStart: 10,
-                lectureEnd: 12,
-                tutorialStart: 14,
-                tutorialEnd: 16
-            }
-        ]
-    }
-];
-
-const modules: Module[] = [
-    {
-        id: 'module1',
-        lectureStart: 8,
-        lectureEnd: 10,
-        tutorialStart: 14,
-        tutorialEnd: 16
-    },
-    {
-        id: 'module2',
-        lectureStart: 9,
-        lectureEnd: 11,
-        tutorialStart: 16,
-        tutorialEnd: 18
-    },
-    {
-        id: 'module3',
-        lectureStart: 10,
-        lectureEnd: 12,
-        tutorialStart: 14,
-        tutorialEnd: 16
-    }
-];
-
-const solvedTimeslots = solveTimetable(groups, modules);
-console.log(solvedTimeslots);
