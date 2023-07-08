@@ -3,7 +3,7 @@ const expressRouter = express.Router();
 import userController from "@controllers/userController";
 
 const {
-    getUsers,
+    searchUsers,
     // createUser,
     // logIn,
     logOut,
@@ -16,7 +16,7 @@ const {
 } = userController;
 
 // User routes
-expressRouter.get("/users", getUsers);
+expressRouter.get("/users", searchUsers);
 // expressRouter.post("/register", createUser);
 // expressRouter.post("/login", logIn);
 expressRouter.post("/logout", logOut);
