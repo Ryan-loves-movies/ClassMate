@@ -45,7 +45,7 @@ const saltRounds = 10;
 @param res {express.Response}
 @returns void
 **/
-const getUsers = async (req: Request, res: Response) => {
+const searchUsers = async (req: Request, res: Response) => {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
     let ans;
@@ -477,7 +477,7 @@ async function deleteUser(req: Request, res: Response) {
 }
 
 export default {
-    getUsers,
+    searchUsers,
     createUser,
     logIn,
     logOut,
