@@ -1,5 +1,6 @@
 import {
     Association,
+    BelongsToGetAssociationMixin,
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
     BelongsToManyCountAssociationsMixin,
@@ -28,8 +29,8 @@ class Users_Modules extends Model<
     declare username: string;
     declare moduleCode: string;
 
-    declare getUser: BelongsToManyGetAssociationsMixin<Users>;
-    declare getModule: BelongsToManyGetAssociationsMixin<Modules>;
+    declare getUser: BelongsToGetAssociationMixin<Users>;
+    declare getModule: BelongsToGetAssociationMixin<Modules>;
     declare getLessons: BelongsToManyGetAssociationsMixin<Lessons>;
     declare addLesson: BelongsToManyAddAssociationMixin<Lessons, number>;
     declare addLessons: BelongsToManyAddAssociationsMixin<Lessons, number>;

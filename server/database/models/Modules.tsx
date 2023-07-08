@@ -15,8 +15,10 @@ import {
     InferAttributes,
     InferCreationAttributes,
     Model,
+    HasManyGetAssociationsMixin,
 } from "sequelize";
 import Users from "@models/Users";
+import Lessons from "@models/Lessons";
 
 class Modules extends Model<
     InferAttributes<Modules>,
@@ -36,8 +38,11 @@ class Modules extends Model<
     declare countUsers: BelongsToManyCountAssociationsMixin;
     declare createUser: BelongsToManyCreateAssociationMixin<Users>;
 
+    declare getLessons: HasManyGetAssociationsMixin<Lessons>;
+
     declare static associations: {
         users: Association<Modules, Users>;
+        lessons: Association<Modules, Lessons>;
     };
 }
 
