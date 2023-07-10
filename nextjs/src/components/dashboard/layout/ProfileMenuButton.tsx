@@ -10,7 +10,11 @@ const { expressHost } = config;
 
 export default function ProfileMenuButton() {
     const [username, setUsername] = useState<string | null>();
+<<<<<<< Updated upstream
     const [photoArrBuffer, setPhotoArrBuffer] = useState<number[]>([]);
+=======
+    const [photoArrBuffer, setPhotoArrBuffer] = useState<number[]>();
+>>>>>>> Stashed changes
     useLayoutEffect(() => {
         setUsername(window['sessionStorage'].getItem("username"));
         axios.get(`${expressHost}/authorized/profile`, {
@@ -35,8 +39,21 @@ export default function ProfileMenuButton() {
     const toggleDropdown = () => setDropdownActive(!isDropdownActive);
 
     return (
+<<<<<<< Updated upstream
         <button className={styles["profile-btn"]} onClick={toggleDropdown} type="button">
             <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />
+=======
+        <button
+            className={styles['profile-btn']}
+            onClick={toggleDropdown}
+            type="button"
+        >
+            {photoArrBuffer === undefined ? (
+                <></>
+            ) : (
+                <PhotoRenderer arrBuffer={photoArrBuffer} alt="Profile" />
+            )}
+>>>>>>> Stashed changes
             <span>{username}</span>
             <div className={`${styles['dropdown-wrapper']} ${(isDropdownActive ? styles['active'] : '')}`} id='dropdownWrapper'>
                 <div className={styles['dropdown-profile-details']}>
