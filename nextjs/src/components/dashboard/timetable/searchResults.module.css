@@ -1,0 +1,33 @@
+.list {
+    width: 97%;
+    margin-top: 0px;
+    padding-left: 0px;
+    list-style: none;
+    position: relative;
+    display: inline-flexbox;
+    overflow-y: scroll;
+    box-shadow: 0 1px 0px 1px rgba(0, 0, 0, 0.15);
+    background: #fff;
+    z-index: 999;
+}
+
+.list li {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+}
+
+.selected {
+    background-color: var(--app-container);
+}
+
+.module-code {
+    display: flex;
+    width: 15%;
+    margin-left: 20px;
+}
+
+.module-title {
+    display: flex;
+    width: 85%;
+}

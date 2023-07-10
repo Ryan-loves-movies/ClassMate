@@ -7,7 +7,8 @@
     font-weight: 400;
     font-display: swap;
     src: url('/DM_Sans_400_ext.woff2') format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+        U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 /* latin */
@@ -17,7 +18,9 @@
     font-weight: 400;
     font-display: swap;
     src: url('/DM_Sans_400.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* latin-ext */
 @font-face {
@@ -26,7 +29,8 @@
     font-weight: 500;
     font-display: swap;
     src: url('/DM_Sans_500_ext.woff2') format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+        U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
@@ -35,7 +39,9 @@
     font-weight: 500;
     font-display: swap;
     src: url('/DM_Sans_500.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* latin-ext */
 @font-face {
@@ -44,7 +50,8 @@
     font-weight: 700;
     font-display: swap;
     src: url('/DM_Sans_700_ext.woff2') format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+        U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
@@ -53,7 +60,9 @@
     font-weight: 700;
     font-display: swap;
     src: url('/DM_Sans_700.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 * {
@@ -63,7 +72,7 @@
 :root {
     --app-container: #f3f6fd;
     --main-color: #1f1c2e;
-    --secondary-color: #4A4A4A;
+    --secondary-color: #4a4a4a;
     --link-color: #1f1c2e;
     --link-color-hover: #c3cff4;
     --link-color-active: #fff;
@@ -72,7 +81,7 @@
     --message-box-hover: #fafcff;
     --message-box-border: #e9ebf0;
     --more-list-bg: #fff;
-    --more-list-bg-hover:  #f6fbff;
+    --more-list-bg-hover: #f6fbff;
     --more-list-shadow: rgba(209, 209, 209, 0.4);
     --button-bg: #1f1c24;
     --search-area-bg: #fff;
@@ -84,38 +93,40 @@
     --app-container: #1f1d2b;
     --app-container: #111827;
     --main-color: #fff;
-    --secondary-color: rgba(255,255,255,.8);
+    --secondary-color: rgba(255, 255, 255, 0.8);
     --projects-section: #1f2937;
-    --link-color: rgba(255,255,255,.8);
+    --link-color: rgba(255, 255, 255, 0.8);
     --link-color-hover: rgba(195, 207, 244, 0.1);
     --link-color-active-bg: rgba(195, 207, 244, 0.2);
     --button-bg: #1f2937;
     --search-area-bg: #1f2937;
     --message-box-hover: #243244;
-    --message-box-border: rgba(255,255,255,.1);
+    --message-box-border: rgba(255, 255, 255, 0.1);
     --star: #ffd92c;
-    --light-font: rgba(255,255,255,.8);
+    --light-font: rgba(255, 255, 255, 0.8);
     --more-list-bg: #2f3142;
-    --more-list-bg-hover:  rgba(195, 207, 244, 0.1);
+    --more-list-bg-hover: rgba(195, 207, 244, 0.1);
     --more-list-shadow: rgba(195, 207, 244, 0.1);
     --message-btn: rgba(195, 207, 244, 0.1);
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100vh;
     margin: 0;
 }
 
 body {
-    font-family: "DM Sans", sans-serif;
+    font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     display: flex;
     justify-content: center;
     background-color: var(--app-container);
 }
 
-button, a {
+button,
+a {
     cursor: pointer;
 }
 
@@ -129,8 +140,12 @@ button, a {
     max-width: 1800px;
 }
 
-.app-container button, .app-container input, .app-container optgroup, .app-container select, .app-container textarea {
-    font-family: "DM Sans", sans-serif;
+.app-container button,
+.app-container input,
+.app-container optgroup,
+.app-container select,
+.app-container textarea {
+    font-family: 'DM Sans', sans-serif;
 }
 
 .app-content {
@@ -149,7 +164,8 @@ button, a {
     position: relative;
 }
 
-.app-header-left, .app-header-right {
+.app-header-left,
+.app-header-right {
     display: flex;
     align-items: center;
 }
@@ -176,6 +192,57 @@ button, a {
     width: 100%;
 }
 
+.green {
+    background: linear-gradient(to right, #00b09b, #96c93d);
+}
+
+.orange {
+    background: linear-gradient(to right, #f59042, #f59942);
+}
+
+.red {
+    background: linear-gradient(to right, #cb356b, #bd3f32);
+}
+
+.yellow {
+    background: linear-gradient(to right, #f5d142, #f5d142);
+}
+
+.blue {
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
+}
+
+.pink {
+    background: linear-gradient(to right, #834d9b, #d04ed6);
+}
+
+.black {
+    background: linear-gradient(to right, #000428, #004e92);
+}
+
+.purple {
+    background: linear-gradient(to right, #7028e4, #e5b2ca);
+}
+
+.teal {
+    background: linear-gradient(to right, #00555a, #00b7c2);
+}
+
+.brown {
+    background: linear-gradient(to right, #7b4022, #d35d2b);
+}
+
+.gray {
+    background: linear-gradient(to right, #9c9c9c, #3d3d3d);
+}
+
+.cyan {
+    background: linear-gradient(to right, #00a4e8, #0085ad);
+}
+
+.lime {
+    background: linear-gradient(to right, #b4d53e, #73a942);
+}
 
 @media screen and (max-width: 520px) {
     .app-content {
