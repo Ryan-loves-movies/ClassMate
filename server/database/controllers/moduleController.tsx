@@ -278,33 +278,26 @@ async function getLessons(
             }
         ]
     })
-        .then(async (user) => {
-            return await user
-                ?.getUsers_Modules()
-                .then((user_modules) => {
-                    return res.status(200).json({
-                        userWithLessons: {
-                            username: user.username,
-                            modules: user_modules.map(async (user_module) => {
-                                return await user_module
-                                    .getModule()
-                                    .then((mod) => {
-                                        return {
-                                            code: mod.code,
-                                            name: mod.name,
-                                            lessons: user_module.getLessons()
-                                        };
-                                    });
-                            })
-                        }
-                    });
-                })
-                .catch((err) =>
-                    res.status(404).json({
-                        message: 'No modules associated with user!',
-                        error: err
+        .then((user) => {
+            return user?.getUsers_Modules().then(async (user_modules) => {
+                const mods = await Promise.all(
+                    user_modules.map(async (user_module) => {
+                        const mod = await user_module.getModule();
+                        const lesses = await user_module.getLessons();
+                        return {
+                            code: mod.code,
+                            name: mod.name,
+                            lessons: lesses.map((less) => less.toJSON())
+                        };
                     })
                 );
+                return res.status(200).json({
+                    userWithLessons: {
+                        username: user.username,
+                        modules: mods
+                    }
+                });
+            });
         })
         .catch((err) =>
             res.status(404).json({ message: 'User not found!', error: err })
@@ -343,9 +336,6 @@ async function addModule(req: Request, res: Response) {
                 return user?.addModule(module as Modules);
             });
         })
-        .catch((err) =>
-            res.status(404).json({ message: 'User not found!', error: err })
-        )
         .then(() => {
             Users.findByPk(username, {
                 include: [
@@ -355,90 +345,75 @@ async function addModule(req: Request, res: Response) {
                 ]
             }).then((user) => {
                 if (lessons.length === 0) {
-                    Modules.findByPk(moduleCode, {
+                    return Modules.findByPk(moduleCode, {
                         include: [
                             {
                                 model: Lessons
                             }
                         ]
-                    })
-                        .then(async (mod) => {
-                            const lessonTypes = [
-                                ...new Set(
-                                    await mod
-                                        ?.getLessons()
-                                        .then((lesses) =>
-                                            lesses.map(
-                                                (less) => less.lessonType
-                                            )
-                                        )
+                    }).then(async (mod) => {
+                        const lessonTypes = [
+                            ...new Set(
+                                await mod
+                                    ?.getLessons()
+                                    .then((lesses) =>
+                                        lesses.map((less) => less.lessonType)
+                                    )
+                            )
+                        ];
+                        lessonTypes.map(
+                            async (lessonType) =>
+                                await mod?.getLessons().then((lesses) =>
+                                    user
+                                        ?.getUsers_Modules()
+                                        .then((user_modules) => {
+                                            const user_module =
+                                                user_modules.find(
+                                                    (user_module) =>
+                                                        user_module.moduleCode ===
+                                                        moduleCode
+                                                );
+                                            const less = lesses.find(
+                                                (less) =>
+                                                    less.lessonType ===
+                                                    lessonType
+                                            );
+                                            return user_module?.addLesson(less);
+                                        })
                                 )
-                            ];
-                            lessonTypes.map(
-                                async (lessonType) =>
-                                    await mod?.getLessons().then((lesses) =>
-                                        user
-                                            ?.getUsers_Modules()
-                                            .then((user_modules) => {
-                                                const user_module =
-                                                    user_modules.find(
-                                                        (user_module) =>
-                                                            user_module.moduleCode ===
-                                                            moduleCode
-                                                    );
-                                                const less = lesses.find(
-                                                    (less) =>
-                                                        less.lessonType ===
-                                                        lessonType
-                                                );
-                                                return user_module?.addLesson(
-                                                    less
-                                                );
-                                            })
-                                    )
-                            );
-                            return res
-                                .status(200)
-                                .json({ message: 'Module added!' });
-                        })
-                        .catch((err) =>
-                            res.status(404).json({
-                                message: 'Module not found!',
-                                error: err
-                            })
                         );
+                        return res
+                            .status(200)
+                            .json({ message: 'Module added!' });
+                    });
                 }
-                return lessons
-                    .map((lesson: lesson) => {
-                        Lessons.findOne({
-                            where: {
-                                moduleCode: moduleCode,
-                                lessonType: lesson.lessonType,
-                                lessonId: lesson.lessonId
-                            }
-                        }).then((lesson) => {
-                            user?.getUsers_Modules().then((user_modules) => {
-                                return user_modules
-                                    .find(
-                                        (user_module) =>
-                                            user_module.moduleCode ===
-                                            moduleCode
-                                    )
-                                    ?.addLesson(lesson as Lessons);
-                            });
+                lessons.map((lesson: lesson) => {
+                    return Lessons.findOne({
+                        where: {
+                            moduleCode: moduleCode,
+                            lessonType: lesson.lessonType,
+                            lessonId: lesson.lessonId
+                        }
+                    }).then((lesson) => {
+                        user?.getUsers_Modules().then((user_modules) => {
+                            return user_modules
+                                .find(
+                                    (user_module) =>
+                                        user_module.moduleCode === moduleCode
+                                )
+                                ?.addLesson(lesson as Lessons);
                         });
-                    })
-                    .then(() =>
-                        res.status(200).json({ message: 'Module added!' })
-                    )
-                    .catch((err: Error) =>
-                        res.status(404).json({
-                            message: 'Lesson not found!',
-                            error: err
-                        })
-                    );
+                    });
+                });
+                return res.status(200).json({ message: 'Module added!' });
             });
-        });
+        })
+        .catch((err) =>
+            res.status(404).json({
+                message: 'User not found or module already exists!',
+                error: err
+            })
+        );
 }
 
 /**
@@ -454,7 +429,8 @@ async function addModule(req: Request, res: Response) {
 Remove specific module taken by user (and all related lessons)
 **/
 async function removeModule(req: Request, res: Response) {
-    const { username, moduleCode } = req.body;
+    const username = req.query.username as string;
+    const moduleCode = req.query.moduleCode as string;
     return await Users.findByPk(username, {
         include: [
             {
@@ -462,9 +438,9 @@ async function removeModule(req: Request, res: Response) {
             }
         ]
     })
-        .then((user) => {
-            Modules.findByPk(moduleCode).then((module) => {
-                user?.removeModule(module as Modules);
+        .then(async (user) => {
+            await Modules.findByPk(moduleCode).then(async (module) => {
+                await user?.removeModule(module as Modules);
             });
         })
         .then(() => res.status(200).json({ message: 'Module removed!' }))

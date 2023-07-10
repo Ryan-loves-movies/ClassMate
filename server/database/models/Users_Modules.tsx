@@ -57,7 +57,12 @@ Users_Modules.init(
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            references: {
+                model: 'Users_Modules_Lessons',
+                key: 'userId'
+            },
+            onDelete: 'CASCADE'
         },
         username: {
             type: DataTypes.STRING(30),

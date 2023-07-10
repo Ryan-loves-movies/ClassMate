@@ -141,6 +141,9 @@ async function sync() {
         Users.hasMany(Users_Modules, { foreignKey: 'username' });
         Modules.hasMany(Users_Modules, { foreignKey: 'moduleCode' }); */
 
+    Users_Modules.belongsTo(Users, { foreignKey: 'username' });
+    Users_Modules.belongsTo(Modules, { foreignKey: 'moduleCode' });
+
     Users.belongsToMany(Groups, {
         through: Users_Groups,
         foreignKey: 'username'
@@ -159,11 +162,13 @@ async function sync() {
 
     Users_Modules.belongsToMany(Lessons, {
         through: Users_Modules_Lessons,
-        foreignKey: 'id'
+        foreignKey: 'userId',
+        onDelete: 'CASCADE'
     });
     Lessons.belongsToMany(Users_Modules, {
         through: Users_Modules_Lessons,
-        foreignKey: 'id'
+        foreignKey: 'lessonId',
+        onDelete: 'CASCADE'
     });
 
     await sequelize.sync({ alter: true });

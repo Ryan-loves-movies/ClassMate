@@ -17,8 +17,8 @@ expressRouter.post("/allModules", populateModules);
 expressRouter.post("/allLessons", populateLessons);
 expressRouter.get("/search/modules", searchModules);
 expressRouter.get("/module", hasModule);
-expressRouter.put("/modules", addModule);
-expressRouter.delete("/modules", removeModule);
+expressRouter.put("/module", addModule);
+expressRouter.delete("/module", removeModule);
 expressRouter.put("/lessons", updateLesson);
 expressRouter.get("/lessons", getLessons);
 
