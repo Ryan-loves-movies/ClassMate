@@ -6,19 +6,7 @@ import colors from '@models/colors';
 import { moduleWithLessons } from '@models/module';
 
 // Component for the background
-const Col = ({
-    // showWidth,
-    gray = false
-}: {
-    // showWidth?: Dispatch<number>;
-    gray: boolean;
-}) => {
-    // const ref = useRef<HTMLDivElement>(null);
-    // useEffect(() => {
-    //     if (showWidth) {
-    //         showWidth(ref.current?.offsetWidth as number);
-    //     }
-    // })
+const Col = ({ gray = false }: { gray: boolean }) => {
     return (
         <div
             className={`${styles['s-hour-row']} ${
@@ -73,7 +61,7 @@ export default function Timetable({
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div
-                className={`${styles['s-act-tab']} ${styles[`${color}`]}`}
+                className={`${styles['s-act-tab']} ${color}`}
                 style={{
                     left: `${start}%`,
                     width: `${width}%`

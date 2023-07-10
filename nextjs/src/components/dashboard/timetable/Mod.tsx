@@ -31,7 +31,7 @@ export default function Mod({
     };
     return (
         <div className={styles['box']}>
-            <div className={`${styles['background']} ${styles[color]}`} />
+            <div className={`${styles['background']} ${color}`} />
             <div className={styles['trash']}>
                 <TrashIcon clickHandler={trashHandler} />
             </div>

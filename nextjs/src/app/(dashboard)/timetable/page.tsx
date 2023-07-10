@@ -20,17 +20,17 @@ export default function TimetableMain() {
     const [searchRes, setSearchRes] = useState<module[]>([]);
 
     useEffect(() => {
-        const updateAddedMod = (addedMod: string | undefined) => {
+        const updateAddedMod = async (addedMod: string | undefined) => {
             // Don't update to default timing if module already exists on timetable
             if (
                 addedMod === undefined ||
                 mods.find((indivMod) => indivMod.code === addedMod) !==
                     undefined
             ) {
-                return new Promise(() => '');
+                return;
             }
-            try {
-                return axios.put(
+            return await axios
+                .put(
                     `${expressHost}/authorized/module`,
                     {
                         username: sessionStorage.getItem('username'),
@@ -42,17 +42,19 @@ export default function TimetableMain() {
                             Authorization: sessionStorage.getItem('token')
                         }
                     }
-                );
-            } catch (err) {
-                alert(
-                    `Oops! Something went wrong when adding that mod! Error: ${err}`
-                );
-            }
+                )
+                .then(() => console.log('2'))
+                .catch((err) => {
+                    alert(
+                        `Oops! Something went wrong when adding that mod! Error: ${err}`
+                    );
+                });
         };
 
         // Get list of modules this user is studying from personal database
-        const getModules = () => {
-            return axios
+        const getModules = async () => {
+            console.log('1');
+            return await axios
                 .get(`${expressHost}/authorized/lessons`, {
                     headers: {
                         Authorization: window['sessionStorage'].getItem('token')
@@ -77,8 +79,8 @@ export default function TimetableMain() {
         };
 
         const updateAndGet = async () => {
-            updateAddedMod(addedMod);
-            getModules();
+            await updateAddedMod(addedMod);
+            await getModules();
         };
 
         updateAndGet();
@@ -89,14 +91,12 @@ export default function TimetableMain() {
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === 'ArrowUp' && focusedIndex > 0) {
             event.preventDefault();
-            // setFocusedIndex((prevInd) => prevInd - 1);
             setFocusedIndex(focusedIndex - 1);
         } else if (
             event.key === 'ArrowDown' &&
             focusedIndex < searchRes.length - 1
         ) {
             event.preventDefault();
-            // setFocusedIndex((prevInd) => prevInd + 1);
             setFocusedIndex(focusedIndex + 1);
         } else if (
             event.key === 'Enter' &&
