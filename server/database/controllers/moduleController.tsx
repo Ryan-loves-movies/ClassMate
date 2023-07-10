@@ -6,6 +6,7 @@ import Lessons from '@models/Lessons';
 import { EmptyResultError, Op } from 'sequelize';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
+import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
 
 interface Module {
     code: string;
@@ -439,6 +440,18 @@ async function removeModule(req: Request, res: Response) {
         ]
     })
         .then(async (user) => {
+            await Users_Modules.findOne({
+                where: {
+                    username: username,
+                    moduleCode: moduleCode
+                }
+            }).then(async (user_module) => {
+                await Users_Modules_Lessons.destroy({
+                    where: {
+                        userId: user_module?.id
+                    }
+                });
+            });
             await Modules.findByPk(moduleCode).then(async (module) => {
                 await user?.removeModule(module as Modules);
             });
