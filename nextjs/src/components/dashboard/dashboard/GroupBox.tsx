@@ -23,6 +23,10 @@ const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
     );
 };
 
+const SolveButton = () => {
+    return <></>;
+};
+
 export default function GroupBox({
     waiting,
     setWaiting,
@@ -74,6 +78,7 @@ export default function GroupBox({
             .catch(() => alert('failed to delete group!'));
         setGroupsUpdated(true);
     };
+
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
