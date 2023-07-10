@@ -1,7 +1,5 @@
 import {
     Association,
-    BelongsToCreateAssociationMixin,
-    BelongsToGetAssociationMixin,
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
     BelongsToManyCountAssociationsMixin,
@@ -11,7 +9,6 @@ import {
     BelongsToManyHasAssociationsMixin,
     BelongsToManyRemoveAssociationMixin,
     BelongsToManySetAssociationsMixin,
-    BelongsToSetAssociationMixin,
     DataTypes,
     HasManyCreateAssociationMixin,
     HasManyGetAssociationsMixin,
@@ -121,6 +118,7 @@ Users.init(
 async function sync() {
     await Users.sync();
 
+    // Users : Modules - M:N
     Users.belongsToMany(Modules, {
         through: Users_Modules,
         foreignKey: 'username'
@@ -130,20 +128,26 @@ async function sync() {
         foreignKey: 'moduleCode'
     });
 
+    // Users : Users_Modules : Modules - M:1:N
+    Users_Modules.belongsTo(Users, { foreignKey: 'username' });
+    Users.hasMany(Users_Modules, { foreignKey: 'username' });
+    Users_Modules.belongsTo(Modules, { foreignKey: 'moduleCode' });
+
+    // Modules : Lessons - 1:M
     Lessons.belongsTo(Modules, { foreignKey: 'moduleCode' });
     Modules.hasMany(Lessons, { foreignKey: 'moduleCode' });
 
-    Users_Modules.belongsTo(Users, { foreignKey: 'username' });
-    Users.hasMany(Users_Modules, { foreignKey: 'username' });
-    // Below are so that u can query the user_modules rows associated with a specific user or module
-    /* Users_Modules.belongsTo(Users, { foreignKey: 'userModuleId' });
-        Users_Modules.belongsTo(Modules, { foreignKey: 'userModuleId' });
-        Users.hasMany(Users_Modules, { foreignKey: 'username' });
-        Modules.hasMany(Users_Modules, { foreignKey: 'moduleCode' }); */
+    // Users_Modules : Lessons - M:N
+    Users_Modules.belongsToMany(Lessons, {
+        through: Users_Modules_Lessons,
+        foreignKey: 'userId'
+    });
+    Lessons.belongsToMany(Users_Modules, {
+        through: Users_Modules_Lessons,
+        foreignKey: 'lessonId'
+    });
 
-    Users_Modules.belongsTo(Users, { foreignKey: 'username' });
-    Users_Modules.belongsTo(Modules, { foreignKey: 'moduleCode' });
-
+    // Users : Groups - M:N
     Users.belongsToMany(Groups, {
         through: Users_Groups,
         foreignKey: 'username'
@@ -152,24 +156,10 @@ async function sync() {
         through: Users_Groups,
         foreignKey: 'groupId'
     });
-    // Below are so that u can query the user_groups rows associated with a specific user or module
-    // Users_Groups.belongsTo(Users, { foreignKey: 'userGroupId' });
-    // Users_Groups.belongsTo(Groups, { foreignKey: 'userGroupId' });
-    // Users.hasMany(Users_Groups, { foreignKey: 'username' });
-    // Modules.hasMany(Users_Groups, { foreignKey: 'groupId' });
+
+    // Groups : Modules - M:1
     Groups.belongsTo(Modules, { foreignKey: 'moduleCode' });
     Modules.hasMany(Groups, { foreignKey: 'moduleCode' });
-
-    Users_Modules.belongsToMany(Lessons, {
-        through: Users_Modules_Lessons,
-        foreignKey: 'userId',
-        onDelete: 'CASCADE'
-    });
-    Lessons.belongsToMany(Users_Modules, {
-        through: Users_Modules_Lessons,
-        foreignKey: 'lessonId',
-        onDelete: 'CASCADE'
-    });
 
     await sequelize.sync({ alter: true });
 }

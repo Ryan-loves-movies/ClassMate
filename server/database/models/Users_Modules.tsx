@@ -61,8 +61,7 @@ Users_Modules.init(
             references: {
                 model: 'Users_Modules_Lessons',
                 key: 'userId'
-            },
-            onDelete: 'CASCADE'
+            }
         },
         username: {
             type: DataTypes.STRING(30),
