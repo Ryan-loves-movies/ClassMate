@@ -1,48 +1,19 @@
-import React, { Dispatch, useState } from 'react';
+import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/timetable/modSearchBar.module.css';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
-
-interface respBody {
-    code: string;
-    name: string;
-}
+import module from '@models/module';
 
 export default function ModSearchBar({
-    setAddedActivity,
+    setSearchRes,
+    handleKeyDown,
     width
 }: {
-    setAddedActivity: Dispatch<string>;
+    setSearchRes: Dispatch<module[]>;
+    handleKeyDown: (event: React.KeyboardEvent) => void;
     width: string;
 }) {
-    // The sequelize model passed should have indexes based on the LIKE query for both `code` and `title` for efficiency
-    const [searchRes, setSearchRes] = useState<respBody[]>([]);
-    const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'ArrowUp' && focusedIndex > 0) {
-            event.preventDefault();
-            setFocusedIndex((prevInd) => prevInd - 1);
-        } else if (
-            event.key === 'ArrowDown' &&
-            focusedIndex < searchRes.length - 1
-        ) {
-            event.preventDefault();
-            setFocusedIndex((prevInd) => prevInd + 1);
-        } else if (
-            event.key === 'Enter' &&
-            focusedIndex >= 0 &&
-            focusedIndex < searchRes.length
-        ) {
-            event.preventDefault();
-            const selectedOption = searchRes[focusedIndex];
-            setAddedActivity(selectedOption.code);
-        }
-    };
-
-    const handleMouseEnter = (index: number) => setFocusedIndex(index);
-
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
 
@@ -67,20 +38,6 @@ export default function ModSearchBar({
                 });
         }
     };
-    const searchLi = (
-        <ul>
-            {searchRes.map((item, index: number) => (
-                <li
-                    key={item.code}
-                    className={index === focusedIndex ? styles['selected'] : ''}
-                    onMouseEnter={() => handleMouseEnter(index)}
-                >
-                    <span className={styles['module-code']}>{item.code}</span>
-                    <span className={styles['module-title']}>{item.name}</span>
-                </li>
-            ))}
-        </ul>
-    );
 
     return (
         <div className={styles['search-field']} style={{ maxWidth: width }}>
@@ -91,6 +48,8 @@ export default function ModSearchBar({
                     placeholder="Add module"
                     onChange={handleSearch}
                     onKeyDown={handleKeyDown}
+                    onFocus={handleSearch}
+                    onBlur={() => setSearchRes([])}
                 />
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +69,6 @@ export default function ModSearchBar({
                     <title>Search</title>
                 </svg>
             </div>
-            <div className={styles['search-results']}>{searchLi}</div>
         </div>
     );
 }

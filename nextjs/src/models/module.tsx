@@ -1,4 +1,4 @@
-import { lessonAPI, attributes } from "@models/lesson";
+import lesson,{ lessonAPI, attributes } from "@models/lesson";
 
 export interface moduleAPI {
     acadYear: string; // "2021/2022"
@@ -21,14 +21,15 @@ export interface moduleAPI {
 }
 
 // JSON structure returned from personal database
-interface respBody {
+export default interface module {
     code: string;
     name: string;
 }
 
-export default interface module {
-    code: string,
-    name: string
+export interface moduleWithLessons {
+    code: string;
+    name: string;
+    lessons: lesson[];
 }
 
 export interface modDet {

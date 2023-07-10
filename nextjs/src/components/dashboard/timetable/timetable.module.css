@@ -13,7 +13,7 @@
     position: relative;
 }
 
-/* For the time at the top */
+/* For the times at the top */
 .header {
     width: 100%;
     min-width: 1000px;
@@ -74,10 +74,11 @@
     display: flex;
     width: 100%;
     height: 20%;
+    align-items: center;
 }
 
 .s-act-tab {
-    height: 100%;
+    height: 95%;
     padding: 35px;
     border-radius: 16px;
     position: absolute;

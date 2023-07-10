@@ -1,36 +1,45 @@
 'use client';
-import React, { useRef } from 'react';
+import React from 'react';
 import styles from '@components/dashboard/timetable/timetable.module.css';
+import colors from '@models/colors';
 
-interface modDet {
-    code: string;
-    day: string;
-    startTime: string;
-    endTime: string;
-}
-interface modType {
-    code: string;
-    lecture: modDet;
-    tutorial: modDet;
-    lab: modDet;
-}
+import { moduleWithLessons } from '@models/module';
 
-export default function Timetable({ activities }: { activities: modType[] }) {
-    const twoHourBox = useRef<HTMLDivElement>(null);
-    const colors = [
-        'green',
-        'blue',
-        'pink',
-        'black',
-        'teal',
-        'cyan',
-        'brown',
-        'purple',
-        'gray',
-        'orange',
-        'red',
-        'yellow'
-    ];
+// Component for the background
+const Col = ({
+    // showWidth,
+    gray = false
+}: {
+    // showWidth?: Dispatch<number>;
+    gray: boolean;
+}) => {
+    // const ref = useRef<HTMLDivElement>(null);
+    // useEffect(() => {
+    //     if (showWidth) {
+    //         showWidth(ref.current?.offsetWidth as number);
+    //     }
+    // })
+    return (
+        <div
+            className={`${styles['s-hour-row']} ${
+                gray ? styles['gray-col'] : ''
+            }`}
+        >
+            <div className={`${styles['s-hour-wrapper']}`} />
+            <div className={`${styles['s-hour-wrapper']}`} />
+            <div className={`${styles['s-hour-wrapper']}`} />
+            <div className={`${styles['s-hour-wrapper']}`} />
+            <div className={`${styles['s-hour-wrapper']}`} />
+        </div>
+    );
+};
+
+export default function Timetable({
+    activities
+}: {
+    activities: moduleWithLessons[];
+}) {
+    // const twoHourBox = useRef<HTMLDivElement>(null);
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
     // Components for the module tabs
@@ -79,10 +88,10 @@ export default function Timetable({ activities }: { activities: modType[] }) {
     // Activities for the whole week
     const Activities = () => {
         const activitiesWithColors = activities.map(
-            (mod: modType, index: number) => {
+            (mod: moduleWithLessons, index: number) => {
                 return {
                     ...mod,
-                    color: colors[index]
+                    color: colors[index % 12]
                 };
             }
         );
@@ -91,72 +100,26 @@ export default function Timetable({ activities }: { activities: modType[] }) {
                 {days.map((day) => {
                     return (
                         <div className={styles['s-act-row']} key={day}>
-                            {activitiesWithColors
-                                .filter((mod) => mod.lecture.day === day)
-                                .map((mod) => {
-                                    return (
-                                        <Activity
-                                            key={mod.code}
-                                            code={mod.code}
-                                            color={mod.color}
-                                            startTime={mod.lecture.startTime}
-                                            endTime={mod.lecture.endTime}
-                                            lessonType={mod.lecture.code}
-                                        />
-                                    );
-                                })}
-                            {activitiesWithColors
-                                .filter((mod) => mod.lab.day === day)
-                                .map((mod) => {
-                                    return (
-                                        <Activity
-                                            key={mod.code}
-                                            code={mod.code}
-                                            color={mod.color}
-                                            startTime={mod.lab.startTime}
-                                            endTime={mod.lab.endTime}
-                                            lessonType={mod.lab.code}
-                                        />
-                                    );
-                                })}
-                            {activitiesWithColors
-                                .filter((mod) => mod.tutorial.day === day)
-                                .map((mod) => {
-                                    return (
-                                        <Activity
-                                            key={mod.code}
-                                            code={mod.code}
-                                            color={mod.color}
-                                            startTime={mod.tutorial.startTime}
-                                            endTime={mod.tutorial.endTime}
-                                            lessonType={mod.tutorial.code}
-                                        />
-                                    );
-                                })}
+                            {activitiesWithColors.map((mod) => {
+                                return mod.lessons
+                                    .filter((less) => less.day === day)
+                                    .map((less) => {
+                                        return (
+                                            <Activity
+                                                key={mod.code}
+                                                code={mod.code}
+                                                color={mod.color}
+                                                startTime={less.startTime}
+                                                endTime={less.endTime}
+                                                lessonType={less.lessonType}
+                                            />
+                                        );
+                                    });
+                            })}
                         </div>
                     );
                 })}
             </>
-        );
-    };
-
-    // Component for the background
-    const Col = ({ gray = false }) => {
-        return (
-            <div
-                className={`${styles['s-hour-row']} ${
-                    gray ? styles['gray-col'] : ''
-                }`}
-            >
-                <div
-                    className={`${styles['s-hour-wrapper']}`}
-                    ref={twoHourBox}
-                />
-                <div className={`${styles['s-hour-wrapper']}`} />
-                <div className={`${styles['s-hour-wrapper']}`} />
-                <div className={`${styles['s-hour-wrapper']}`} />
-                <div className={`${styles['s-hour-wrapper']}`} />
-            </div>
         );
     };
 

@@ -33,8 +33,26 @@
 /* Below css is for below the timetable */
 .module-field {
     display: flex;
+    position: relative;
     margin-top: 20px;
     width: 100%;
     height: 330px;
+    flex-direction: column;
+}
+
+.search-results {
+    max-height: 70%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: top;
     justify-content: center;
+}
+
+.user-modules {
+    position: absolute;
+    display: flex;
+    top: 60px;
+    left: 20px;
+    flex-wrap: wrap;
 }
