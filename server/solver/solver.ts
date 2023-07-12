@@ -1,10 +1,26 @@
 'use client';
-import lesson from '@models/lesson';
-import module, { moduleWithoutName } from '@models/module';
-import { userWithoutEmailPhoto } from '@models/user';
+interface lesson {
+    id: number;
+    lessonId: string;
+    moduleCode: string;
+    lessonType: string;
+    sem: number;
+    day: string;
+    startTime: string;
+    endTime: string;
+}
+interface module {
+    code: string;
+    name: string;
+}
 
-import { init } from '@components/z3-solver-private/browser'
-import type { Arith } from '@components/z3-solver-private/browser'
+interface moduleWithoutName {
+    code: string;
+}
+
+interface userWithoutEmailPhoto {
+    username: string;
+}
 
 interface fullModule extends module {
     lessons: lesson[];
@@ -14,6 +30,29 @@ interface fullUser extends userWithoutEmailPhoto {
     modules: fullModule[];
 }
 
+interface modifiedLesson extends lesson {
+    startTimeVar: Arith;
+    endTimeVar: Arith;
+    boolVar: Arith;
+}
+
+interface modifiedModule extends module {
+    lessons: modifiedLesson[][]; // To split into groups of lesson types so nested array
+}
+
+interface modifiedUser extends userWithoutEmailPhoto {
+    modules: modifiedModule[];
+    commonModule: modifiedModule;
+}
+
+interface modifiedUsers {
+    users: modifiedUser[];
+    commonModule: modifiedModule;
+}
+
+import { init } from 'z3-solver/build/node';
+import type { Arith } from 'z3-solver/build/node';
+
 /** @param users: fullUser[] - The lessons field should consist of all valid lessons that can be taken by each user
  * */
 export default async function timetableGenerator(
@@ -22,26 +61,6 @@ export default async function timetableGenerator(
 ) {
     const { Context } = await init();
     const { Solver, Int, If, Or } = Context('main');
-
-    interface modifiedLesson extends lesson {
-        startTimeVar: Arith;
-        endTimeVar: Arith;
-        boolVar: Arith;
-    }
-
-    interface modifiedModule extends module {
-        lessons: modifiedLesson[][]; // To split into groups of lesson types so nested array
-    }
-
-    interface modifiedUser extends userWithoutEmailPhoto {
-        modules: modifiedModule[];
-        commonModule: modifiedModule;
-    }
-
-    interface modifiedUsers {
-        users: modifiedUser[];
-        commonModule: modifiedModule;
-    }
 
     const solver = new Solver();
 
@@ -241,7 +260,16 @@ export default async function timetableGenerator(
 
     solver.check().then((result) => {
         if (result === 'sat') {
-            console.log(solver.model());
+            const model = solver.model();
+
+            modUsers.commonModule.lessons.map((lessType) => {
+                lessType.map((less) => {
+                    console.log(
+                        `${commonModule.code}_${less.id}_${less.startTime}_${less.endTime}`
+                    );
+                    console.log(model.eval(less.boolVar).toString());
+                });
+            });
         } else {
             console.log('No valid timetable exists for the group.');
         }

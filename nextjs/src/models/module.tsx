@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { lessonAPI, attributes } from "@models/lesson";
+=======
+import lesson, { lessonAPI, attributes } from '@models/lesson';
+>>>>>>> Stashed changes
 
 export interface moduleAPI {
     acadYear: string; // "2021/2022"
@@ -26,9 +30,20 @@ interface respBody {
     name: string;
 }
 
+<<<<<<< Updated upstream
 export default interface module {
     code: string,
     name: string
+=======
+export interface moduleWithoutName {
+    code: string;
+}
+
+export interface moduleWithLessons {
+    code: string;
+    name: string;
+    lessons: lesson[];
+>>>>>>> Stashed changes
 }
 
 export interface modDet {

@@ -151,9 +151,14 @@ export default function TimetableMain() {
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
+<<<<<<< Updated upstream
                         console.log(res.data);
                         const tempMods: modType[] = res.data.mods;
                         tempMods.filter((mod) => mod.code !== null);
+=======
+                        const tempMods: moduleWithLessons[] =
+                            res.data.modules;
+>>>>>>> Stashed changes
                         setMods(tempMods);
                     }
                 })

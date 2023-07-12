@@ -268,6 +268,7 @@ async function getLessons(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
 
+<<<<<<< Updated upstream
     const ans = await Modules.findAll({
         limit: limit,
         where: {
@@ -288,6 +289,72 @@ async function getLessons(req: Request, res: Response) {
 
     res.status(200).json({ modules: ans.map((model) => model.toJSON()) });
     return ans;
+=======
+    return await Users.findByPk(username, {
+        attributes: ['username'],
+        include: [
+            {
+                model: Users_Modules
+            }
+        ]
+    })
+        .then((user) => {
+            return user?.getUsers_Modules().then(async (user_modules) => {
+                const mods = await Promise.all(
+                    user_modules.map(async (user_module) => {
+                        const mod = await user_module.getModule();
+                        const lesses = await user_module.getLessons();
+                        return {
+                            code: mod.code,
+                            name: mod.name,
+                            lessons: lesses.map((less) => less.toJSON())
+                        };
+                    })
+                );
+                return res.status(200).json({
+                    username: user.username,
+                    modules: mods
+                });
+            });
+        })
+        .catch((err) =>
+            res.status(404).json({ message: 'User not found!', error: err })
+        );
+>>>>>>> Stashed changes
+}
+
+async function getAllPossibleLessons(req: Request, res: Response) {
+    const username = req.query.username as string;
+    Users.findByPk(username, {
+        attributes: ['username'],
+        include: [
+            {
+                model: Modules
+            }
+        ]
+    })
+        .then((user) => {
+            return user?.getModules().then(async (mods) => {
+                const modWithLessons = await Promise.all(
+                    mods.map(async (mod) => {
+                        return {
+                            code: mod.code,
+                            name: mod.name,
+                            lessons: await mod.getLessons()
+                        };
+                    })
+                );
+                return res.status(200).json({
+                    username: user.username,
+                    modules: modWithLessons
+                });
+            });
+        })
+        .catch((err) => {
+            return res
+                .status(404)
+                .json({ message: 'User not found!', error: err });
+        });
 }
 
 /**
@@ -432,6 +499,7 @@ export default {
     hasModule,
     searchModules,
     getLessons,
+    getAllPossibleLessons,
     addModule,
     removeModule,
     updateLesson
