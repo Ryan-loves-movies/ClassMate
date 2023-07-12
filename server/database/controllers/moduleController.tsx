@@ -293,10 +293,8 @@ async function getLessons(
                     })
                 );
                 return res.status(200).json({
-                    userWithLessons: {
-                        username: user.username,
-                        modules: mods
-                    }
+                    username: user.username,
+                    modules: mods
                 });
             });
         })

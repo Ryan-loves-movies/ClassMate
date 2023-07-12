@@ -14,16 +14,6 @@ const {
     updateLesson
 } = moduleController;
 
-<<<<<<< Updated upstream
-expressRouter.post("/allModules", populateModules);
-expressRouter.post("/allLessons", populateLessons);
-expressRouter.get("/search/modules", searchModules);
-expressRouter.get("/module", hasModule);
-expressRouter.put("/module", addModule);
-expressRouter.delete("/module", removeModule);
-expressRouter.put("/lessons", updateLesson);
-expressRouter.get("/lessons", getLessons);
-=======
 expressRouter.post('/allModules', populateModules);
 expressRouter.post('/allLessons', populateLessons);
 expressRouter.get('/search/modules', searchModules);
@@ -33,6 +23,5 @@ expressRouter.delete('/module', removeModule);
 expressRouter.put('/lessons', updateLesson);
 expressRouter.get('/lessons', getLessons);
 expressRouter.get('/all/lessons', getAllPossibleLessons);
->>>>>>> Stashed changes
 
 export default expressRouter;
