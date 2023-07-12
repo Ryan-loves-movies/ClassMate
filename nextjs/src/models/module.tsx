@@ -1,4 +1,4 @@
-import lesson,{ lessonAPI, attributes } from "@models/lesson";
+import lesson, { lessonAPI, attributes } from '@models/lesson';
 
 export interface moduleAPI {
     acadYear: string; // "2021/2022"
@@ -24,6 +24,10 @@ export interface moduleAPI {
 export default interface module {
     code: string;
     name: string;
+}
+
+export interface moduleWithoutName {
+    code: string;
 }
 
 export interface moduleWithLessons {

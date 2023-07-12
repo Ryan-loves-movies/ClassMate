@@ -305,6 +305,40 @@ async function getLessons(
         );
 }
 
+async function getAllPossibleLessons(req: Request, res: Response) {
+    const username = req.query.username as string;
+    Users.findByPk(username, {
+        attributes: ['username'],
+        include: [
+            {
+                model: Modules
+            }
+        ]
+    })
+        .then((user) => {
+            return user?.getModules().then(async (mods) => {
+                const modWithLessons = await Promise.all(
+                    mods.map(async (mod) => {
+                        return {
+                            code: mod.code,
+                            name: mod.name,
+                            lessons: await mod.getLessons()
+                        };
+                    })
+                );
+                return res.status(200).json({
+                    username: user.username,
+                    modules: modWithLessons
+                });
+            });
+        })
+        .catch((err) => {
+            return res
+                .status(404)
+                .json({ message: 'User not found!', error: err });
+        });
+}
+
 /**
     req: {
     headers: {
@@ -532,6 +566,7 @@ export default {
     hasModule,
     searchModules,
     getLessons,
+    getAllPossibleLessons,
     addModule,
     removeModule,
     updateLesson

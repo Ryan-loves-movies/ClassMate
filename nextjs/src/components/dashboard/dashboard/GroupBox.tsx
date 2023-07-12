@@ -1,13 +1,23 @@
 import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
 import { groupWithUsersNoEmail } from '@models/group';
-import { userWithoutEmail } from '@models/user';
+import { userWithoutEmail, userWithoutEmailPhoto } from '@models/user';
 import PhotoRenderer from '@components/dashboard/PhotoRenderer';
+import module, { moduleWithoutName } from '@models/module';
+import lesson from '@models/lesson';
+
+interface fullModule extends module {
+    lessons: lesson[];
+}
+
+interface fullUser extends userWithoutEmailPhoto {
+    modules: fullModule[];
+}
 
 const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
     return (
@@ -23,8 +33,39 @@ const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
     );
 };
 
-const SolveButton = () => {
-    return <></>;
+const optimizeHandler = async (
+    users: userWithoutEmail[],
+    commonModule: moduleWithoutName
+) => {
+    const userWithAllLessons: fullUser[] = await Promise.all(
+        users.map(async (user) => {
+            return await axios
+                .get(`${expressHost}/authorized/all/lessons`, {
+                    headers: {
+                        Authorization: sessionStorage.getItem('token')
+                    },
+                    params: {
+                        username: user.username
+                    }
+                })
+                .then((res: AxiosResponse) => res.data as fullUser);
+        })
+    );
+    console.log(userWithAllLessons);
+
+    axios.put(
+        `${expressHost}/authorized/group/optimize`,
+        {
+            users: userWithAllLessons,
+            commonModule: commonModule
+        },
+        {
+            headers: {
+                Authorization: sessionStorage.getItem('token')
+            }
+        }
+    );
+    // timetableGenerator(userWithAllLessons, commonModule);
 };
 
 export default function GroupBox({
@@ -79,12 +120,25 @@ export default function GroupBox({
         setGroupsUpdated(true);
     };
 
+    const SolveButton = () => {
+        return (
+            <button
+                onClick={() =>
+                    optimizeHandler(users, {
+                        code: header
+                    } as moduleWithoutName)
+                }
+            >
+                LOL
+            </button>
+        );
+    };
+
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
-                className={`${styles['project-box']} ${
-                    waiting ? styles['waiting'] : ''
-                }`}
+                className={`${styles['project-box']} ${waiting ? styles['waiting'] : ''
+                    }`}
                 style={{ backgroundColor: backgroundColor }}
             >
                 <div className={styles['project-box-header']}>
@@ -150,6 +204,7 @@ export default function GroupBox({
                     </div>
                 </div>
             </div>
+            <SolveButton />
         </div>
     );
 }
