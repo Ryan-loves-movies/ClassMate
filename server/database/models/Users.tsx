@@ -167,6 +167,7 @@ async function sync() {
     });
 
     await sequelize.sync({ alter: true });
+    // await sequelize.sync({ force: true });
 }
 
 sync();

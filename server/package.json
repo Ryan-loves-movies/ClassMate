@@ -71,6 +71,7 @@
     "_moduleAliases": {
         "@controllers": "dist/database/controllers",
         "@models": "dist/database/models",
+        "@interfaces": "dist/interfaces",
         "@server": "dist"
     }
 }

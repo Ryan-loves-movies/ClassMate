@@ -35,11 +35,12 @@ async function getGroupId(req: Request, res: Response) {
         ]
     })
         .then((group) => {
-            res.status(200).json({ groupId: group?.id });
+            return res.status(200).json({ groupId: group?.id });
         })
         .catch((error: AxiosError) => {
-            console.log(error);
-            res.status(500).json({ message: 'Group not found!', error: error });
+            return res
+                .status(500)
+                .json({ message: 'Group not found!', error: error });
         });
 }
 
@@ -64,18 +65,11 @@ async function getGroups(req: Request, res: Response) {
             }
         ]
     })
-        .then((user) => {
-            user?.getGroups()
-                .then((groups) => {
-                    return res.status(200).json({
-                        groups: groups.map((group) => group.toJSON())
-                    });
-                })
-                .catch((err) => {
-                    return res.status(404).json({
-                        message: `error occurred when trying to find groups associated with user: ${err}`
-                    });
-                });
+        .then(async (user) => {
+            const groups = await user?.getGroups();
+            return res.status(200).json({
+                groups: groups?.map((group) => group.toJSON())
+            });
         })
         .catch(() => {
             return res
@@ -106,18 +100,10 @@ async function getUsersInGroup(req: Request, res: Response) {
         ]
     })
         .then(async (group) => {
-            await group
-                ?.getUsers()
-                .then((users) => {
-                    res.status(200).json({
-                        users: users.map((user) => user.toJSON())
-                    });
-                })
-                .catch((err) => {
-                    res.status(404).json({
-                        message: `error occurred when trying to find groups associated with user: ${err}`
-                    });
-                });
+            const users = await group?.getUsers();
+            return res.status(200).json({
+                users: users?.map((user) => user.toJSON())
+            });
         })
         .catch(() => {
             res.status(404).json({ message: 'user could not be found!' });
@@ -146,39 +132,28 @@ async function createGroup(req: Request, res: Response) {
             }
         }
     })
-        .then((module) => {
+        .then(async (module) => {
             const moduleCode = module?.code as string;
-            Groups.create({
+            const group = await Groups.create({
                 name: groupName,
                 moduleCode: moduleCode,
                 color: color
-            })
-                .then((group) => {
-                    Users.findByPk(username, {
-                        include: [
-                            {
-                                model: Groups
-                            }
-                        ]
-                    })
-                        .then((user) => {
-                            group.addUser(user as Users);
-                            res.status(200).json({
-                                id: group.id,
-                                moduleCode: moduleCode,
-                                name: groupName,
-                                color: color
-                            });
-                        })
-                        .catch(() => {
-                            res.status(404).json({
-                                message: 'user could not be found!'
-                            });
-                        });
-                })
-                .catch((err) => {
-                    res.status(401).json({ message: err.message });
-                });
+            });
+            const user = await Users.findByPk(username, {
+                include: [
+                    {
+                        model: Groups
+                    }
+                ]
+            });
+            await group.addUser(user as Users);
+
+            return res.status(200).json({
+                id: group.id,
+                moduleCode: moduleCode,
+                name: groupName,
+                color: color
+            });
         })
         .catch(() => {
             return res.status(404).json({ message: 'Module does not exist!' });
@@ -202,14 +177,12 @@ async function deleteGroup(req: Request, res: Response) {
         where: {
             id: groupId
         }
+    });
+    await Users_Groups.destroy({
+        where: {
+            groupId: groupId
+        }
     })
-        .then(() => {
-            Users_Groups.destroy({
-                where: {
-                    groupId: groupId
-                }
-            });
-        })
         .then(() => {
             res.status(200).json({ message: 'Group successfully deleted' });
         })
@@ -239,17 +212,10 @@ async function addUserToGroup(req: Request, res: Response) {
             }
         ]
     })
-        .then((group) => {
-            return Users.findByPk(username)
-                .then((user) => {
-                    group?.addUser(user as Users);
-                    return res
-                        .status(200)
-                        .json({ message: 'User added to group!' });
-                })
-                .catch(() => {
-                    return res.status(404).json({ message: 'User not found!' });
-                });
+        .then(async (group) => {
+            const user = await Users.findByPk(username);
+            await group?.addUser(user as Users);
+            return res.status(200).json({ message: 'User added to group!' });
         })
         .catch(() => {
             return res.status(404).json({ message: 'Group not found!' });
@@ -278,42 +244,26 @@ async function removeUserFromGroup(req: Request, res: Response) {
             }
         ]
     })
-        .then((group) => {
-            if (group?.countUsers().then((userCount) => userCount === 1)) {
-                return Groups.destroy({
+        .then(async (group) => {
+            if (
+                await group?.countUsers().then((userCount) => userCount === 1)
+            ) {
+                await Groups.destroy({
                     where: {
                         id: groupId
                     }
-                })
-                    .then(() => {
-                        return Users_Groups.destroy({
-                            where: {
-                                groupId: groupId
-                            }
-                        })
-                            .then(() => {
-                                return res
-                                    .status(200)
-                                    .json({ message: 'Removed User!' });
-                            })
-                            .catch((err) => {
-                                return res.status(401).json({ message: err });
-                            });
-                    })
-                    .catch((err) => res.status(401).json({ message: err }));
+                });
+                await Users_Groups.destroy({
+                    where: {
+                        groupId: groupId
+                    }
+                });
+                return res.status(200).json({ message: 'Removed User!' });
             }
-            return Users.findByPk(username).then((user) => {
-                return group
-                    ?.removeUser(user as Users)
-                    .then(() => {
-                        return res
-                            .status(200)
-                            .json({ message: 'Removed User!' });
-                    })
-                    .catch((err) => {
-                        return res.status(401).json({ message: err });
-                    });
-            });
+
+            const user = await Users.findByPk(username);
+            await group?.removeUser(user as Users);
+            return res.status(200).json({ message: 'Removed User!' });
         })
         .catch(() => {
             return res.status(404).json({ message: 'Cannot find group!' });

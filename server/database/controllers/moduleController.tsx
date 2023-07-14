@@ -2,20 +2,14 @@ import { Request, Response } from 'express';
 import Users from '@models/Users';
 import Modules from '@models/Modules';
 import Users_Modules from '@models/Users_Modules';
+import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
 import Lessons from '@models/Lessons';
 import { EmptyResultError, Op } from 'sequelize';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
 
-interface Module {
-    code: string;
-    name: string;
-}
-
-interface lesson {
-    lessonId: string;
-    lessonType: string;
-}
+import module from '@interfaces/module';
+import lesson from '@interfaces/lesson';
 
 interface lessonResponse {
     classNo: string;
@@ -63,11 +57,11 @@ async function populateModules(req: Request, res: Response) {
                     code: module.moduleCode,
                     name: module.title
                 }))
-                .map((module: Module, index: number) => {
+                .map((mod: module, index: number) => {
                     if ((index + 1) % 1000 === 0) {
                         console.log('Another 1000 records updated');
                     }
-                    Modules.create(module, { ignoreDuplicates: true }).catch(
+                    Modules.create(mod, { ignoreDuplicates: true }).catch(
                         (err) => {
                             if (err instanceof EmptyResultError) {
                                 console.log('Entry already exists');
@@ -125,6 +119,7 @@ async function populateLessons(req: Request, res: Response) {
                                         lessonId: timetable.classNo,
                                         lessonType: timetable.lessonType,
                                         sem: semData.semester,
+                                        weeks: timetable.weeks,
                                         day: timetable.day,
                                         startTime: timetable.startTime,
                                         endTime: timetable.endTime
@@ -353,27 +348,25 @@ async function addModule(req: Request, res: Response) {
                         model: Users_Modules
                     }
                 ]
-            }).then((user) => {
+            }).then(async (user) => {
                 if (lessons.length === 0) {
-                    Modules.findByPk(moduleCode, {
+                    return await Modules.findByPk(moduleCode, {
                         include: [
                             {
                                 model: Lessons
                             }
                         ]
-                    })
-                        .then(async (mod) => {
-                            const lessonTypes = [
-                                ...new Set(
-                                    await mod
-                                        ?.getLessons()
-                                        .then((lesses) =>
-                                            lesses.map(
-                                                (less) => less.lessonType
-                                            )
-                                        )
-                                )
-                            ];
+                    }).then(async (mod) => {
+                        const lessonTypes = [
+                            ...new Set(
+                                await mod
+                                    ?.getLessons()
+                                    .then((lesses) =>
+                                        lesses.map((less) => less.lessonType)
+                                    )
+                            )
+                        ];
+                        await Promise.all(
                             lessonTypes.map(
                                 async (lessonType) =>
                                     await mod?.getLessons().then((lesses) =>
@@ -396,21 +389,15 @@ async function addModule(req: Request, res: Response) {
                                                 );
                                             })
                                     )
-                            );
-                            return res
-                                .status(200)
-                                .json({ message: 'Module added!' });
-                        })
-                        .catch((err) =>
-                            res.status(404).json({
-                                message: 'Module not found!',
-                                error: err
-                            })
-                        );
+                            ));
+                        return res
+                            .status(200)
+                            .json({ message: 'Module added!' });
+                    });
                 }
-                return lessons
-                    .map((lesson: lesson) => {
-                        Lessons.findOne({
+                await Promise.all(
+                    lessons.map(async (lesson: lesson) => {
+                        return await Lessons.findOne({
                             where: {
                                 moduleCode: moduleCode,
                                 lessonType: lesson.lessonType,
@@ -428,15 +415,8 @@ async function addModule(req: Request, res: Response) {
                             });
                         });
                     })
-                    .then(() =>
-                        res.status(200).json({ message: 'Module added!' })
-                    )
-                    .catch((err: Error) =>
-                        res.status(404).json({
-                            message: 'Lesson not found!',
-                            error: err
-                        })
-                    );
+                );
+                return res.status(200).json({ message: 'Module added!' });
             });
         });
 }
@@ -462,12 +442,27 @@ async function removeModule(req: Request, res: Response) {
             }
         ]
     })
-        .then((user) => {
-            Modules.findByPk(moduleCode).then((module) => {
-                user?.removeModule(module as Modules);
+        .then(async (user) => {
+            // First delete all lessons associated with the user_module entry
+            const user_module = await Users_Modules.findOne({
+                where: {
+                    username: username,
+                    moduleCode: moduleCode
+                }
             });
+            await Users_Modules_Lessons.destroy({
+                where: {
+                    userId: user_module?.id
+                }
+            });
+
+            // Finally delete the module
+            await Modules.findByPk(moduleCode).then(async (module) => {
+                await user?.removeModule(module as Modules);
+            });
+
+            return res.status(200).json({ message: 'Module removed!' });
         })
-        .then(() => res.status(200).json({ message: 'Module removed!' }))
         .catch((err) =>
             res.status(404).json({ message: 'User not found!', error: err })
         );
@@ -513,25 +508,27 @@ async function updateLesson(req: Request, res: Response) {
                     )
                 );
 
-            user_module?.getLessons().then((lessons) => {
-                const lessonToRemove = lessons.find(
-                    (lesson) =>
-                        lesson.moduleCode === moduleCode &&
-                        lesson.lessonType === lessonType
-                );
-                user_module.removeLesson(lessonToRemove);
-                Lessons.findOne({
-                    where: {
-                        lessonId: lessonId,
-                        lessonType: lessonType,
-                        moduleCode: moduleCode
-                    }
-                }).then((lessonToAdd) => {
-                    user_module.addLesson(lessonToAdd as Lessons);
-                });
+            // Delete all lessons related to the lesson type and module to be updated
+            const lessons = await user_module?.getLessons();
+            const lessonToRemove = lessons?.find(
+                (lesson) =>
+                    lesson.moduleCode === moduleCode &&
+                    lesson.lessonType === lessonType
+            );
+            await user_module?.removeLesson(lessonToRemove);
+
+            // Finally add the lesson passed as param
+            Lessons.findOne({
+                where: {
+                    lessonId: lessonId,
+                    lessonType: lessonType,
+                    moduleCode: moduleCode
+                }
+            }).then((lessonToAdd) => {
+                user_module?.addLesson(lessonToAdd as Lessons);
             });
+            return res.status(200).json({ message: 'Lesson updated!' });
         })
-        .then(() => res.status(200).json({ message: 'Lesson updated!' }))
         .catch((err) =>
             res.status(404).json({ message: 'User not found!', error: err })
         );
