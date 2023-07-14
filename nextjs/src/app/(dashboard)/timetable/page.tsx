@@ -66,8 +66,6 @@ export default function TimetableMain() {
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
                         const tempMods: moduleWithLessons[] = res.data.modules;
-                        console.log(res.data);
-                        console.log(res.data.modules);
                         setMods(tempMods);
                     }
                 })

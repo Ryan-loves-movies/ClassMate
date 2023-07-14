@@ -53,18 +53,25 @@ const optimizeHandler = async (
     );
     console.log(userWithAllLessons);
 
-    axios.put(
-        `${expressHost}/authorized/group/optimize`,
-        {
-            users: userWithAllLessons,
-            commonModule: commonModule
-        },
-        {
-            headers: {
-                Authorization: sessionStorage.getItem('token')
+    axios
+        .put(
+            `${expressHost}/authorized/group/optimize`,
+            {
+                users: userWithAllLessons,
+                commonModule: commonModule
+            },
+            {
+                headers: {
+                    Authorization: sessionStorage.getItem('token')
+                }
             }
-        }
-    );
+        )
+        .then(() => {
+            alert('Timetables updated!');
+        })
+        .catch(() => {
+            alert('Failed to find optimal timetable!');
+        });
     // timetableGenerator(userWithAllLessons, commonModule);
 };
 
@@ -137,8 +144,9 @@ export default function GroupBox({
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
-                className={`${styles['project-box']} ${waiting ? styles['waiting'] : ''
-                    }`}
+                className={`${styles['project-box']} ${
+                    waiting ? styles['waiting'] : ''
+                }`}
                 style={{ backgroundColor: backgroundColor }}
             >
                 <div className={styles['project-box-header']}>
