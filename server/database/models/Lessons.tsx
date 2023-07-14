@@ -27,6 +27,7 @@ class Lessons extends Model<
     declare moduleCode: string;
     declare lessonType: string;
     declare sem: number;
+    declare weeks: number[];
     declare day: string;
     declare startTime: string;
     declare endTime: string;
@@ -96,6 +97,12 @@ Lessons.init(
         },
         sem: {
             type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: false
+        },
+        // ONLY for PostgreSQL
+        weeks: {
+            type: DataTypes.ARRAY(DataTypes.INTEGER),
             allowNull: false,
             unique: false
         },

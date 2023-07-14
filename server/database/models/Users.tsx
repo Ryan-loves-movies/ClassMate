@@ -162,6 +162,7 @@ async function sync() {
     Modules.hasMany(Groups, { foreignKey: 'moduleCode' });
 
     await sequelize.sync({ alter: true });
+    // await sequelize.sync({ force: true });
 }
 
 sync();

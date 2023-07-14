@@ -6,30 +6,7 @@ import config from '@server/config';
 import Users from '@models/Users';
 import { Op } from 'sequelize';
 
-interface profile {
-    email: string;
-    username: string;
-    password: string;
-}
-
-interface minProfile {
-    username: string;
-    password: string;
-}
-
-interface modDet {
-    code: string;
-    day: string;
-    startTime: string;
-    endTime: string;
-}
-
-interface modType {
-    code: string;
-    lecture: modDet;
-    tutorial: modDet;
-    lab: modDet;
-}
+import { userCreator, userLogIn } from '@interfaces/user';
 
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
@@ -88,7 +65,7 @@ const searchUsers = async (req: Request, res: Response) => {
 @returns void
 **/
 const createUser = (req: Request, res: Response) => {
-    const { email, username, password }: profile = req.body;
+    const { email, username, password }: userCreator = req.body;
 
     try {
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
@@ -126,7 +103,7 @@ const createUser = (req: Request, res: Response) => {
 Verifies password of user, then returns a JSON web token with expiry in 24 hours.
     **/
 async function logIn(req: Request, res: Response) {
-    const { username, password }: minProfile = req.body;
+    const { username, password }: userLogIn = req.body;
     try {
         await Users.findByPk(username, {
             attributes: ['username', 'password']
@@ -177,7 +154,7 @@ async function logIn(req: Request, res: Response) {
 Verifies token of user, then return log out successful message. 
     Note: Deletion of JSON web token to be done on client side
 **/
-async function logOut(req: Request, res: Response) {
+async function logOut(res: Response) {
     // Clear JWT token on client-side AND invalidate token on server-side
     res.status(200).json({ message: 'Logout successful!' });
 }
@@ -216,66 +193,6 @@ async function getProfile(req: Request, res: Response) {
                 photo: user.get('photo')
             });
         });
-        /* } */
-        /* return await Users.findByPk(username, {
-                include: [
-                    {
-                        model: Users_Modules,
-                        include: [
-                            {
-                                model: Lessons
-                            },
-                            {
-                                model: Modules
-                            }]
-                    }]
-            })
-            .then((user) => {
-                if (!user) {
-                    return res.status(404).json({ message: 'No existing user found' });
-                }
-                console.log(user);
-                console.log(user.get('Users_Modules'));
-                console.log(user.get('Lessons'));
-                return res.status(200).json({
-                    username: user.get("username"),
-                    email: user.get("email"),
-        
-                    mods: user.get('Modules')
-                    // .map((module) => {
-                    //     return {
-                    //         code: module.get('code'),
-                    //         lessons: lessonTypes
-                    //             .map((lessonType) => user.get(`${lessonType.name}Id`))
-                    //             .filter((lesson) => lesson !== null)
-                    //     }
-        
-                    // })
-                    // [
-                    //     {
-                    //         code: user.get('mod1'),
-                    //         lecture: {
-                    //             code: user.get('mod1LecCode'),
-                    //             day: user.get('mod1LecDay'),
-                    //             startTime: user.get('mod1LecStartTime'),
-                    //             endTime: user.get('mod1LecEndTime')
-                    //         },
-                    //         tutorial: {
-                    //             code: user.get('mod1TutCode'),
-                    //             day: user.get('mod1TutDay'),
-                    //             startTime: user.get('mod1TutStartTime'),
-                    //             endTime: user.get('mod1TutEndTime'),
-                    //         },
-                    //         lab: {
-                    //             code: user.get('mod1LabCode'),
-                    //             day: user.get('mod1LabDay'),
-                    //             startTime: user.get('mod1LabStartTime'),
-                    //             endTime: user.get('mod1LabEndTime')
-                    //         }
-                    //     }
-                    // ]
-                });
-            }) */
     } catch (err) {
         console.log(
             'Error while getting profile details in getProfile() - userController.tsx - line 400?\n',
@@ -308,87 +225,6 @@ async function updateProfilePhoto(req: Request, res: Response) {
         .catch(() => {
             res.status(404).json({ message: 'user not found!' });
         });
-}
-
-/**
-    req: {
-    headers: {
-        Authorization: ~token~
-    },
-    body: {
-        username: string,
-        ~updatedRowKey~: ~updatedRowValue~
-    }
-}
-Updates the values of the user profile in the database and returns the number of values updated
-**/
-async function updateProfile(req: Request, res: Response) {
-    try {
-        const { username, ...updatedValsRaw } = req.body;
-        const updatedVals = updatedValsRaw as modType;
-        await Users.findOne({
-            where: {
-                username: username
-            }
-        }).then((details) => {
-            // Check if module in database already
-            //     If not yet, then get last empty mod number
-            //     Else, then get mod number of module
-            const allMods = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
-                (num) => details?.get(`mod${num}`) || null
-            );
-            console.log(details);
-            console.log(
-                allMods.find((modCode) => modCode === updatedVals.code)
-            );
-            console.log(allMods.filter((modCode) => modCode !== null));
-            const modNoToChange =
-                allMods.find((modCode) => modCode === updatedVals.code) ||
-                allMods.filter((modCode) => modCode !== null).length + 1;
-            const updatedDet = {
-                [`mod${modNoToChange}`]: updatedVals.code,
-                [`mod${modNoToChange}LecCode`]: updatedVals.lecture.code,
-                [`mod${modNoToChange}LecDay`]: updatedVals.lecture.day,
-                [`mod${modNoToChange}LecStartTime`]:
-                    updatedVals.lecture.startTime,
-                [`mod${modNoToChange}LecEndTime`]: updatedVals.lecture.endTime,
-                [`mod${modNoToChange}LabCode`]: updatedVals.lab.code,
-                [`mod${modNoToChange}LabDay`]: updatedVals.lab.day,
-                [`mod${modNoToChange}LabStartTime`]: updatedVals.lab.startTime,
-                [`mod${modNoToChange}LabEndTime`]: updatedVals.lab.endTime,
-                [`mod${modNoToChange}TutCode`]: updatedVals.tutorial.code,
-                [`mod${modNoToChange}TutDay`]: updatedVals.tutorial.day,
-                [`mod${modNoToChange}TutStartTime`]:
-                    updatedVals.tutorial.startTime,
-                [`mod${modNoToChange}TutEndTime`]: updatedVals.tutorial.endTime
-            };
-            Users.update(updatedDet, {
-                where: {
-                    username: username
-                }
-            })
-                .then((rowsUpdated: number[]) => {
-                    res.status(200).json({
-                        message: `Updated rows ${rowsUpdated}.`
-                    });
-                })
-                .catch((error: Error) => {
-                    res.status(500).json({
-                        message:
-                            'Error updating rows in database using updateProfile() in userController.tsx -- line 514:'
-                    });
-                    console.log(
-                        'Error updating rows in database using updateProfile() in userController.tsx -- line 514:',
-                        error
-                    );
-                });
-        });
-    } catch (err) {
-        console.log(
-            'Error when updating profile in updateProfile() - line 430 in userController.tsx\n',
-            err
-        );
-    }
 }
 
 /**
@@ -461,18 +297,16 @@ async function deleteUser(req: Request, res: Response) {
             where: {
                 username: req.body.username
             }
-        })
-            .then((rowsDeleted: number) => {
-                console.log(`Deleted ${rowsDeleted} rows.`);
-            })
-            .catch((error: Error) => {
-                console.error('Error deleting row:', error);
-            });
+        }).then((rowsDeleted: number) => {
+            console.log(`Deleted ${rowsDeleted} rows.`);
+            return res.status(200).json({ message: 'user deleted!' });
+        });
     } catch (err) {
         console.log(
             'Error when updating profile in deleteUser() - line 501 in userController.tsx\n',
             err
         );
+        return res.status(404).json({ message: 'user could not be found!' });
     }
 }
 
@@ -483,7 +317,6 @@ export default {
     logOut,
     getProfile,
     updateProfilePhoto,
-    updateProfile,
     resetPassword,
     verifyEmail,
     deleteUser

@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import config from "@server/config";
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import config from '@server/config';
 
 /** 
     req: {
@@ -14,14 +14,16 @@ function validateRequest(req: Request, res: Response) {
     const token = req.headers.authorization as string;
 
     if (!token) {
-        res.status(404).json({ message: "No token provided" });
+        return res.status(404).json({ message: 'No token provided' });
     }
 
     try {
         const decoded = jwt.verify(token, config.JWT_SECRET);
-        res.status(200).json({ message: "authorized", decoded: decoded });
+        return res
+            .status(200)
+            .json({ message: 'authorized', decoded: decoded });
     } catch {
-        res.status(401).json({ message: "Invalid token" });
+        return res.status(401).json({ message: 'Invalid token' });
     }
 }
 

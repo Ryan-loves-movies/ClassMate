@@ -32,6 +32,9 @@
             "@controllers/*": [
                 "./database/controllers/*"
             ],
+            "@interfaces/*": [
+                "./interfaces/*"
+            ],
             "@server/*": [
                 "./*"
             ]
