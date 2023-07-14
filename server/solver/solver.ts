@@ -171,11 +171,11 @@ export default async function timetableGenerator(
                                                 startTimeVar: startTimeVar,
                                                 endTimeVar: endTimeVar,
                                                 boolVar: boolVar
-                                            }I;
+                                            };
                                         })
                                     }) as modifiedLesson[][]
                             })
-                        })
+                        }})
             } as modifiedUser;
         }),
         commonModule: {
