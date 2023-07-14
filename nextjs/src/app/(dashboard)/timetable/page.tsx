@@ -14,7 +14,6 @@ import SearchResults from '@components/dashboard/timetable/SearchResults';
 import Mod from '@components/dashboard/timetable/Mod';
 
 export default function TimetableMain() {
-    const [isSem1, setIsSem1] = useState<boolean>(true);
     const [mods, setMods] = useState<moduleWithLessons[]>([]);
     const [addedMod, setAddedMod] = useState<string>();
     const [searchRes, setSearchRes] = useState<module[]>([]);
@@ -35,7 +34,8 @@ export default function TimetableMain() {
                     {
                         username: sessionStorage.getItem('username'),
                         moduleCode: addedMod,
-                        lessons: []
+                        lessons: [],
+                        semester: 1
                     },
                     {
                         headers: {
@@ -60,7 +60,8 @@ export default function TimetableMain() {
                         Authorization: window['sessionStorage'].getItem('token')
                     },
                     params: {
-                        username: window['sessionStorage'].getItem('username')
+                        username: window['sessionStorage'].getItem('username'),
+                        semester: window['sessionStorage'].getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => {
@@ -83,7 +84,10 @@ export default function TimetableMain() {
         };
 
         updateAndGet();
-    }, [isSem1, addedMod]);
+        if (addedMod !== '') {
+            setAddedMod('');
+        }
+    }, [addedMod]);
 
     const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
@@ -130,15 +134,18 @@ export default function TimetableMain() {
                     )}
                 </div>
                 <div className={styles['user-modules']}>
-                    {mods.map((mod, index: number) => (
-                        <Mod
-                            mod={mod}
-                            mods={mods}
-                            color={colors[index % 12]}
-                            setMods={setMods}
-                            key={mod.code}
-                        />
-                    ))}
+                    {mods
+                        .filter((mod) => mod.lessons.length > 0)
+                        .map((mod, index: number) => (
+                            <Mod
+                                mod={mod}
+                                mods={mods}
+                                setMods={setMods}
+                                setAddedMod={setAddedMod}
+                                color={colors[index % 12]}
+                                key={mod.code}
+                            />
+                        ))}
                 </div>
             </div>
         </div>

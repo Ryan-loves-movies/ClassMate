@@ -264,6 +264,7 @@ async function getLessons(
     res: Response
 ): Promise<Response<any, Record<string, any>> | undefined> {
     const username = req.query.username as string;
+    const semester = parseInt(req.query.semester as string);
 
     return await Users.findByPk(username, {
         attributes: ['username'],
@@ -278,7 +279,11 @@ async function getLessons(
                 const mods = await Promise.all(
                     user_modules.map(async (user_module) => {
                         const mod = await user_module.getModule();
-                        const lesses = await user_module.getLessons();
+                        const lesses = await user_module
+                            .getLessons()
+                            .then((lessons) =>
+                                lessons.filter((less) => less.sem == semester)
+                            );
                         return {
                             code: mod.code,
                             name: mod.name,
@@ -299,6 +304,8 @@ async function getLessons(
 
 async function getAllPossibleLessons(req: Request, res: Response) {
     const username = req.query.username as string;
+    const semester = parseInt(req.query.semester as string);
+
     Users.findByPk(username, {
         attributes: ['username'],
         include: [
@@ -314,7 +321,13 @@ async function getAllPossibleLessons(req: Request, res: Response) {
                         return {
                             code: mod.code,
                             name: mod.name,
-                            lessons: await mod.getLessons()
+                            lessons: await mod
+                                .getLessons()
+                                .then((lesses) =>
+                                    lesses.filter(
+                                        (less) => less.sem === semester
+                                    )
+                                )
                         };
                     })
                 );
@@ -350,7 +363,7 @@ Adds the module to the user and the lessons associated with it
 If lessons === [], handler will add the default lessons associated with the module
 **/
 async function addModule(req: Request, res: Response) {
-    const { username, moduleCode, lessons } = req.body;
+    const { username, moduleCode, lessons, semester } = req.body;
     return await Users.findByPk(username, {
         include: [
             {
@@ -372,59 +385,61 @@ async function addModule(req: Request, res: Response) {
                 ]
             }).then(async (user) => {
                 if (lessons.length === 0) {
-                    return await Modules.findByPk(moduleCode, {
+                    const mod = await Modules.findByPk(moduleCode, {
                         include: [
                             {
                                 model: Lessons
                             }
                         ]
-                    }).then(async (mod) => {
-                        const lessonTypes = [
-                            ...new Set(
-                                await mod
-                                    ?.getLessons()
-                                    .then((lesses) =>
-                                        lesses.map((less) => less.lessonType)
-                                    )
-                            )
-                        ];
-                        await Promise.all(
-                            lessonTypes.map(
-                                async (lessonType) =>
-                                    await mod?.getLessons().then((lesses) =>
-                                        user
-                                            ?.getUsers_Modules()
-                                            .then((user_modules) => {
-                                                const user_module =
-                                                    user_modules.find(
-                                                        (user_module) =>
-                                                            user_module.moduleCode ===
-                                                            moduleCode
-                                                    );
-                                                const less = lesses.find(
-                                                    (less) =>
-                                                        less.lessonType ===
-                                                        lessonType
-                                                );
-                                                return user_module?.addLesson(
-                                                    less
-                                                );
-                                            })
-                                    )
-                            )
-                        );
-                        return res
-                            .status(200)
-                            .json({ message: 'Module added!' });
                     });
+                    const lessonTypes = [
+                        ...new Set(
+                            await mod
+                                ?.getLessons()
+                                .then((lesses) =>
+                                    lesses
+                                        .filter((less) => less.sem === semester)
+                                        .map((less) => less.lessonType)
+                                )
+                        )
+                    ];
+                    await Promise.all(
+                        lessonTypes.map(async (lessonType) => {
+                            const lesses = await mod
+                                ?.getLessons()
+                                .then((lessons) =>
+                                    lessons.filter(
+                                        (less) => less.sem === semester
+                                    )
+                                );
+                            const user_modules = await user?.getUsers_Modules();
+                            const user_module = user_modules?.find(
+                                (user_module) =>
+                                    user_module.moduleCode === moduleCode
+                            );
+                            const less = lesses?.find(
+                                (less) => less.lessonType === lessonType
+                            );
+                            await user_module?.addLessons(
+                                lesses?.filter(
+                                    (lesson) =>
+                                        less?.lessonId === lesson.lessonId
+                                )
+                            );
+                        })
+                    );
+                    return res.status(200).json({ message: 'Module added!' });
                 }
+
                 await Promise.all(
                     lessons.map(async (lesson: lesson) => {
                         return await Lessons.findOne({
                             where: {
                                 moduleCode: moduleCode,
                                 lessonType: lesson.lessonType,
-                                lessonId: lesson.lessonId
+                                lessonId: lesson.lessonId,
+                                sem: lesson.sem,
+                                startTime: lesson.startTime
                             }
                         }).then((lesson) => {
                             user?.getUsers_Modules().then((user_modules) => {
@@ -513,7 +528,7 @@ async function removeModule(req: Request, res: Response) {
 Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function updateLesson(req: Request, res: Response) {
-    const { username, moduleCode, lessonId, lessonType } = req.body;
+    const { username, moduleCode, lessonId, lessonType, semester } = req.body;
     return await Users.findByPk(username, {
         include: [
             {
@@ -548,14 +563,15 @@ async function updateLesson(req: Request, res: Response) {
             await user_module?.removeLesson(lessonToRemove);
 
             // Finally add the lesson passed as param
-            Lessons.findOne({
+            Lessons.findAll({
                 where: {
                     lessonId: lessonId,
                     lessonType: lessonType,
-                    moduleCode: moduleCode
+                    moduleCode: moduleCode,
+                    sem: semester
                 }
             }).then((lessonToAdd) => {
-                user_module?.addLesson(lessonToAdd as Lessons);
+                user_module?.addLessons(lessonToAdd);
             });
             return res.status(200).json({ message: 'Lesson updated!' });
         })

@@ -55,7 +55,19 @@ export default function Timetable({
         startTime = '0800',
         endTime = '2200',
         color = 'blue',
-        lessonType = 'Tutorial[C1]'
+        lessonType = 'Tutorial[C1]',
+        lessonId = '1',
+        venue = 'LOL',
+        weeks = []
+    }: {
+        code: string;
+        startTime: string;
+        endTime: string;
+        color: string;
+        lessonType: string;
+        lessonId: string;
+        venue: string;
+        weeks: number[];
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
@@ -68,7 +80,11 @@ export default function Timetable({
                 }}
             >
                 <div className={styles['s-act-name']}>{code}</div>
-                <div className={styles['s-act-lesson']}>{lessonType}</div>
+                <div
+                    className={styles['s-act-lesson']}
+                >{`${lessonType} [${lessonId}]`}</div>
+                <div className={styles['s-act-lesson']}>{'LOL'}</div>
+                <div className={styles['s-act-lesson']}>{weeks}</div>
             </div>
         );
     };
@@ -94,12 +110,15 @@ export default function Timetable({
                                     .map((less) => {
                                         return (
                                             <Activity
-                                                key={mod.code}
+                                                key={`${mod.code}_${less.id}_${less.startTime}`}
                                                 code={mod.code}
                                                 color={mod.color}
                                                 startTime={less.startTime}
                                                 endTime={less.endTime}
                                                 lessonType={less.lessonType}
+                                                lessonId={less.lessonId}
+                                                venue={'LOL'}
+                                                weeks={less.weeks}
                                             />
                                         );
                                     });

@@ -98,7 +98,7 @@ Lessons.init(
         sem: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: false
+            unique: 'fakeCompositePrimaryKey'
         },
         // ONLY for PostgreSQL
         weeks: {
@@ -112,7 +112,8 @@ Lessons.init(
         },
         startTime: {
             type: DataTypes.STRING(4),
-            allowNull: false
+            allowNull: false,
+            unique: 'fakeCompositePrimaryKey'
         },
         endTime: {
             type: DataTypes.STRING(4),

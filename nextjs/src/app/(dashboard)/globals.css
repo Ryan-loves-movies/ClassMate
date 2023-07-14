@@ -165,13 +165,25 @@ a {
 }
 
 .app-header-left,
-.app-header-right {
+.app-header-right,
+.app-header-center {
     display: flex;
     align-items: center;
 }
 
 .app-header-left {
-    flex-grow: 1;
+    /* flex-grow: 1; */
+    width: 33.3%;
+}
+
+.app-header-center {
+    width: 33.3%;
+    justify-content: center;
+}
+
+.app-header-right {
+    width: 33.3%;
+    justify-content: end;
 }
 
 .app-header-right button {

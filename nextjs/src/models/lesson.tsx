@@ -15,15 +15,15 @@ export interface lessonAPI {
     covidZone: string; // "B"
 }
 
-
 // JSON structure returned from personal database
 export default interface lesson {
-    id: number,
-    lessonId: string,
-    moduleCode: string,
-    lessonType: string,
-    sem: number,
-    day: string,
-    startTime: string,
-    endTime: string
+    id: number;
+    lessonId: string;
+    moduleCode: string;
+    lessonType: string;
+    sem: number;
+    day: string;
+    startTime: string;
+    endTime: string;
+    weeks: number[];
 }

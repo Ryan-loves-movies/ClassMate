@@ -14,7 +14,7 @@ export default function Mod({
 }: {
     mod: module;
     color: string;
-    mods: moduleWithLessons[],
+    mods: moduleWithLessons[];
     setMods: Dispatch<moduleWithLessons[]>;
 }) {
     const trashHandler = async () => {
@@ -27,7 +27,7 @@ export default function Mod({
                 moduleCode: mod.code
             }
         });
-        setMods(mods.filter((previousMod) => previousMod.code !== mod.code))
+        setMods(mods.filter((previousMod) => previousMod.code !== mod.code));
     };
     return (
         <div className={styles['box']}>

@@ -1,7 +1,8 @@
 import React from 'react';
-import Logo from '@components/dashboard/layout/Logo';
-import AuthorizationComponent from '@components/dashboard/Authorization';
 import ThemeProviderLocal from '@components/dashboard/ThemeProviderLocal';
+import AuthorizationComponent from '@components/dashboard/Authorization';
+import Logo from '@components/dashboard/layout/Logo';
+import ChooseSemester from '@components/dashboard/layout/ChooseSemester';
 import SwitchModeButton from '@components/dashboard/layout/SwitchModeButton';
 import NotificationButton from '@components/dashboard/layout/NotificationButton';
 import ProfileMenuButton from '@components/dashboard/layout/ProfileMenuButton';
@@ -34,6 +35,9 @@ export default function RootLayout({
                                     >
                                         ClassMate
                                     </Link>
+                                </div>
+                                <div className="app-header-center">
+                                    <ChooseSemester />
                                 </div>
                                 <div className="app-header-right">
                                     <SwitchModeButton />
