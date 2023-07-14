@@ -20,7 +20,11 @@ interface modifiedLesson extends lesson {
 }
 
 interface modifiedModule extends module {
-    lessons: modifiedLesson[][]; // To split into groups of lesson types so nested array
+    lessons: modifiedLesson[][][]; // To split into groups of lesson types so nested array + each lesson id is grouped into an array
+}
+
+interface modiifiedModuleWithoutName extends moduleWithoutName {
+    lessons: modifiedLesson[][][];
 }
 
 interface modifiedUser extends userWithoutEmailPhoto {
@@ -29,7 +33,7 @@ interface modifiedUser extends userWithoutEmailPhoto {
 
 interface modifiedUsers {
     users: modifiedUser[];
-    commonModule: modifiedModule;
+    commonModule: modiifiedModuleWithoutName;
 }
 
 interface resultMod {
@@ -111,119 +115,198 @@ export default async function timetableGenerator(
                             code: user_mod.code,
                             name: user_mod.name,
                             lessons: lessonTypes.map((lessonType) => {
-                                return user_mod.lessons
+                                const lessons = user_mod.lessons
                                     .filter(
-                                        (less) => less.lessonType === lessonType
+                                        (lesson) => lesson.lessonType === lessonType
                                     )
-                                    .map((less) => {
-                                        const weeksVar = BitVec.val(
-                                            // `${user.username}_${user_mod.code}_${less.id}_weeks`,
-                                            convertArrToNumber(less.weeks),
-                                            13
-                                        );
-                                        const dayVar = Int.const(
-                                            `${user.username}_${user_mod.code}_${less.id}_day`
-                                        );
-                                        const boolVar = Int.const(
-                                            `${user.username}_${user_mod.code}_${less.id}_bool`
-                                        );
-                                        const startTimeVar = Int.const(
-                                            `${user.username}_${user_mod.code}_${less.id}_startTime`
-                                        );
-                                        const endTimeVar = Int.const(
-                                            `${user.username}_${user_mod.code}_${less.id}_endTime`
-                                        );
-                                        solver.add(
-                                            Or(boolVar.eq(0), boolVar.eq(1)),
-                                            If(
-                                                boolVar.eq(0),
-                                                dayVar.eq(0),
-                                                dayVar.eq(
-                                                    convertDayToNumber(less.day)
+                                const lessIds = [...new Set(lessons.map((less) => less.lessonId))]
+                                return lessIds
+                                    .map((lessId) => {
+                                        return lessons.filter((less) => less.lessonId === lessId).map((less) => {
+                                            const weeksVar = BitVec.val(
+                                                // `${user.username}_${user_mod.code}_${less.id}_weeks`,
+                                                convertArrToNumber(less.weeks),
+                                                13
+                                            );
+                                            const dayVar = Int.const(
+                                                `${user.username}_${user_mod.code}_${less.id}_day`
+                                            );
+                                            const boolVar = Int.const(
+                                                `${user.username}_${user_mod.code}_${less.id}_bool`
+                                            );
+                                            const startTimeVar = Int.const(
+                                                `${user.username}_${user_mod.code}_${less.id}_startTime`
+                                            );
+                                            const endTimeVar = Int.const(
+                                                `${user.username}_${user_mod.code}_${less.id}_endTime`
+                                            );
+                                            solver.add(
+                                                Or(boolVar.eq(0), boolVar.eq(1)),
+                                                If(
+                                                    boolVar.eq(0),
+                                                    dayVar.eq(0),
+                                                    dayVar.eq(
+                                                        convertDayToNumber(less.day)
+                                                    )
+                                                ),
+                                                If(
+                                                    boolVar.eq(0),
+                                                    startTimeVar.eq(0),
+                                                    startTimeVar.eq(
+                                                        parseInt(less.startTime)
+                                                    )
+                                                ),
+                                                If(
+                                                    boolVar.eq(0),
+                                                    endTimeVar.eq(0),
+                                                    endTimeVar.eq(
+                                                        parseInt(less.endTime)
+                                                    )
                                                 )
-                                            ),
-                                            If(
-                                                boolVar.eq(0),
-                                                startTimeVar.eq(0),
-                                                startTimeVar.eq(
-                                                    parseInt(less.startTime)
-                                                )
-                                            ),
-                                            If(
-                                                boolVar.eq(0),
-                                                endTimeVar.eq(0),
-                                                endTimeVar.eq(
-                                                    parseInt(less.endTime)
-                                                )
-                                            )
-                                        );
-                                        return {
-                                            ...less,
-                                            weeksVar: weeksVar,
-                                            dayVar: dayVar,
-                                            startTimeVar: startTimeVar,
-                                            endTimeVar: endTimeVar,
-                                            boolVar: boolVar
-                                        };
-                                    });
-                            }) as modifiedLesson[][]
-                        };
-                    })
+                                            );
+                                            return {
+                                                ...less,
+                                                weeksVar: weeksVar,
+                                                dayVar: dayVar,
+                                                startTimeVar: startTimeVar,
+                                                endTimeVar: endTimeVar,
+                                                boolVar: boolVar
+                                            }I;
+                                        })
+                                    }) as modifiedLesson[][]
+                            })
+                        })
             } as modifiedUser;
         }),
         commonModule: {
             code: commonModule.code,
             lessons: commonLessonTypes.map((lessType) => {
-                return commonModuleLessons.lessons
-                    .filter((less) => less.lessonType === lessType)
-                    .map((less) => {
-                        const weeksVar = BitVec.val(
-                            // `${commonModule.code}_${less.id}_weeks`,
-                            convertArrToNumber(less.weeks),
-                            13
-                        );
-                        const dayVar = Int.const(
-                            `${commonModule.code}_${less.id}_day`
-                        );
-                        const boolVar = Int.const(
-                            `${commonModule.code}_${less.id}_bool`
-                        );
-                        const startTimeVar = Int.const(
-                            `${commonModule.code}_${less.id}_startTime`
-                        );
-                        const endTimeVar = Int.const(
-                            `${commonModule.code}_${less.id}_endTime`
-                        );
-                        solver.add(
-                            Or(boolVar.eq(0), boolVar.eq(1)),
-                            If(
-                                boolVar.eq(0),
-                                dayVar.eq(0),
-                                dayVar.eq(convertDayToNumber(less.day))
-                            ),
-                            If(
-                                boolVar.eq(0),
-                                startTimeVar.eq(0),
-                                startTimeVar.eq(parseInt(less.startTime))
-                            ),
-                            If(
-                                boolVar.eq(0),
-                                endTimeVar.eq(0),
-                                endTimeVar.eq(parseInt(less.startTime))
-                            )
-                        );
-                        return {
-                            ...less,
-                            weeksVar: weeksVar,
-                            dayVar: dayVar,
-                            startTimeVar: startTimeVar,
-                            endTimeVar: endTimeVar,
-                            boolVar: boolVar
-                        };
+                const lessons = commonModuleLessons.lessons.filter((lesson) => lesson.lessonType === lessType)
+                const lessIds = [...new Set(lessons.map((less) => less.lessonId))]
+                return lessIds
+                    .map((lessId) => {
+                        return lessons.filter((less) => less.lessonId === lessId).map((less) => {
+                            const weeksVar = BitVec.val(
+                                // `${commonModule.code}_${less.id}_weeks`,
+                                convertArrToNumber(less.weeks),
+                                13
+                            );
+                            const dayVar = Int.const(
+                                `${commonModule.code}_${less.id}_day`
+                            );
+                            const boolVar = Int.const(
+                                `${commonModule.code}_${less.id}_bool`
+                            );
+                            const startTimeVar = Int.const(
+                                `${commonModule.code}_${less.id}_startTime`
+                            );
+                            const endTimeVar = Int.const(
+                                `${commonModule.code}_${less.id}_endTime`
+                            );
+                            solver.add(
+                                Or(boolVar.eq(0), boolVar.eq(1)),
+                                If(
+                                    boolVar.eq(0),
+                                    dayVar.eq(0),
+                                    dayVar.eq(convertDayToNumber(less.day))
+                                ),
+                                If(
+                                    boolVar.eq(0),
+                                    startTimeVar.eq(0),
+                                    startTimeVar.eq(parseInt(less.startTime))
+                                ),
+                                If(
+                                    boolVar.eq(0),
+                                    endTimeVar.eq(0),
+                                    endTimeVar.eq(parseInt(less.startTime))
+                                )
+                            );
+                            return {
+                                ...less,
+                                weeksVar: weeksVar,
+                                dayVar: dayVar,
+                                startTimeVar: startTimeVar,
+                                endTimeVar: endTimeVar,
+                                boolVar: boolVar
+                            };
+                        })
                     });
             })
-        }
+        } as modiifiedModuleWithoutName
     } as modifiedUsers;
+    //     const modUsers: modifiedUsers = {
+    //         users: users.map((user) => ({
+    //           username: user.username,
+    //           modules: user.modules
+    //             .filter((user_mod) => user_mod.code !== commonModule.code)
+    //             .map((user_mod) => ({
+    //               code: user_mod.code,
+    //               name: user_mod.name,
+    //               lessons: user_mod.lessons.reduce<modifiedLesson[][][]>((acc, lesson) => {
+    //                 const lessonIndex = acc.findIndex(
+    //                   (lessons) => lessons[0].lessonType === lesson.lessonType
+    //                 );
+    //                 if (lessonIndex !== -1) {
+    //                   acc[lessonIndex].push({
+    //                     ...lesson,
+    //                     weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
+    //                     dayVar: Int.const(
+    //                       `${user.username}_${user_mod.code}_${lesson.id}_day`
+    //                     ),
+    //                     boolVar: Int.const(
+    //                       `${user.username}_${user_mod.code}_${lesson.id}_bool`
+    //                     ),
+    //                     startTimeVar: Int.const(
+    //                       `${user.username}_${user_mod.code}_${lesson.id}_startTime`
+    //                     ),
+    //                     endTimeVar: Int.const(
+    //                       `${user.username}_${user_mod.code}_${lesson.id}_endTime`
+    //                     )
+    //                   });
+    //                 } else {
+    //                   acc.push([
+    //                     {
+    //                       ...lesson,
+    //                       weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
+    //                       dayVar: Int.const(
+    //                         `${user.username}_${user_mod.code}_${lesson.id}_day`
+    //                       ),
+    //                       boolVar: Int.const(
+    //                         `${user.username}_${user_mod.code}_${lesson.id}_bool`
+    //                       ),
+    //                       startTimeVar: Int.const(
+    //                         `${user.username}_${user_mod.code}_${lesson.id}_startTime`
+    //                       ),
+    //                       endTimeVar: Int.const(
+    //                         `${user.username}_${user_mod.code}_${lesson.id}_endTime`
+    //                       )
+    //                     }
+    //                   ]);
+    //                 }
+    //                 return acc;
+    //               }, [])
+    //             }))
+    //         })),
+
+    //         commonModule: {
+    //       code: commonModule.code,
+    //       name: '', // Add the name property here
+    //       lessons: commonLessonTypes.map((lessonType) =>
+    //         commonModuleLessons.lessons
+    //           .filter((lesson) => lesson.lessonType === lessonType)
+    //           .map((lesson) => ({
+    //             ...lesson,
+    //             weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
+    //             dayVar: Int.const(`${commonModule.code}_${lesson.id}_day`),
+    //             boolVar: Int.const(`${commonModule.code}_${lesson.id}_bool`),
+    //             startTimeVar: Int.const(`${commonModule.code}_${lesson.id}_startTime`),
+    //             endTimeVar: Int.const(`${commonModule.code}_${lesson.id}_endTime`)
+    //           }))
+    //       )
+    //     }
+    //   };
+
+
 
     // Constraint 1: Must have only 1 lesson for each lesson type
     modUsers.users.forEach((modUser) => {
