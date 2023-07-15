@@ -35,7 +35,8 @@ export default function TimetableMain() {
                         username: sessionStorage.getItem('username'),
                         moduleCode: addedMod,
                         lessons: [],
-                        semester: 1
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     },
                     {
                         headers: {
@@ -57,11 +58,12 @@ export default function TimetableMain() {
             return await axios
                 .get(`${expressHost}/authorized/lessons`, {
                     headers: {
-                        Authorization: window['sessionStorage'].getItem('token')
+                        Authorization: sessionStorage.getItem('token')
                     },
                     params: {
-                        username: window['sessionStorage'].getItem('username'),
-                        semester: window['sessionStorage'].getItem('sem')
+                        username: sessionStorage.getItem('username'),
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => {
@@ -141,7 +143,6 @@ export default function TimetableMain() {
                                 mod={mod}
                                 mods={mods}
                                 setMods={setMods}
-                                setAddedMod={setAddedMod}
                                 color={colors[index % 12]}
                                 key={mod.code}
                             />

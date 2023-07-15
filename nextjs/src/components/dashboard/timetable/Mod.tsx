@@ -24,7 +24,9 @@ export default function Mod({
             },
             params: {
                 username: sessionStorage.getItem('username'),
-                moduleCode: mod.code
+                moduleCode: mod.code,
+                ay: sessionStorage.getItem('ay'),
+                semester: sessionStorage.getItem('sem')
             }
         });
         setMods(mods.filter((previousMod) => previousMod.code !== mod.code));

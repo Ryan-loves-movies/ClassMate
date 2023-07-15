@@ -52,8 +52,8 @@
 
 .act-left-arrow {
     display: flex;
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     border-left: 3px solid;
     border-top: 3px solid;
     transform: rotate(-45deg);
@@ -62,8 +62,8 @@
 
 .act-right-arrow {
     display: flex;
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     border-top: 3px solid;
     border-right: 3px solid;
     transform: rotate(45deg);
@@ -73,7 +73,6 @@
 a.act-left-arrow,
 a.act-right-arrow {
     border-color: #5b86e5;
-    /* border-color: #fff; */
 }
 
 a.act-left-arrow:hover {

@@ -76,7 +76,9 @@ export default function GroupForm({
                     Authorization: sessionStorage.getItem('token')
                 },
                 params: {
-                    moduleCode: input
+                    moduleCode: input,
+                    ay: sessionStorage.getItem('ay'),
+                    semester: sessionStorage.getItem('sem')
                 }
             })
             .catch(() => {
