@@ -15,6 +15,7 @@ export interface lessonAPI {
     covidZone: string; // "B"
 }
 
+
 // JSON structure returned from personal database
 export default interface lesson {
     id: number;
@@ -22,8 +23,10 @@ export default interface lesson {
     moduleCode: string;
     lessonType: string;
     sem: number;
+    weeks: number[];
+    venue: string;
     day: string;
     startTime: string;
     endTime: string;
-    weeks: number[];
+    size: number;
 }

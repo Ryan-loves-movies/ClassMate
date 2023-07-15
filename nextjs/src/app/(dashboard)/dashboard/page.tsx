@@ -218,7 +218,10 @@ export default function Dashboard() {
                     .then(() => setNewGroup(groupChosen))
                     .catch(() =>
                         alert('Error occurred when adding user to group!')
-                    );
+                    )
+                    .then(() => {
+                        setUserChosen(undefined);
+                    });
             }
         }
         console.log('4');

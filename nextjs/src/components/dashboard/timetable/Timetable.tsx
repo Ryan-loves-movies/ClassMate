@@ -83,7 +83,7 @@ export default function Timetable({
                 <div
                     className={styles['s-act-lesson']}
                 >{`${lessonType} [${lessonId}]`}</div>
-                <div className={styles['s-act-lesson']}>{'LOL'}</div>
+                <div className={styles['s-act-lesson']}>{venue}</div>
                 <div className={styles['s-act-lesson']}>{weeks}</div>
             </div>
         );
@@ -117,7 +117,7 @@ export default function Timetable({
                                                 endTime={less.endTime}
                                                 lessonType={less.lessonType}
                                                 lessonId={less.lessonId}
-                                                venue={'LOL'}
+                                                venue={less.venue}
                                                 weeks={less.weeks}
                                             />
                                         );

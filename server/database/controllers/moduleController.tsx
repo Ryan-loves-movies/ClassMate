@@ -45,10 +45,13 @@ Adds the module to the user and the lessons associated with it
 **/
 async function populateModules(req: Request, res: Response) {
     await Modules.sync();
+    const ay = parseInt(req.body.ay as string);
+    const ayReq = `${ay}-${ay + 1}`;
+
     // Fetch module list data from NUSMods API
     await axios
         .get<ModuleResponse[]>(
-            `https://api.nusmods.com/v2/${req.body.ay}/moduleList.json`
+            `https://api.nusmods.com/v2/${ayReq}/moduleList.json`
         )
         .then((axiosRes: AxiosResponse) => {
             const modules = axiosRes.data
@@ -99,58 +102,80 @@ Adds the module to the user and the lessons associated with it
 async function populateLessons(req: Request, res: Response) {
     await Modules.sync();
     let counter = 0;
-    const axiosPromises: Promise<Response | void>[] = [];
+    const ay = parseInt(req.body.ay as string);
+    const ayReq = `${ay}-${ay + 1}`;
     const axiosRateLimited = axiosRateLimit(axios.create(), { maxRPS: 50 });
     const fakeModules: string[] = [];
-    await Modules.findAll().then((modules) => {
-        modules.forEach((module) => {
-            const axiosPromise = axiosRateLimited
-                .get<ModuleResponse[]>(
-                    `https://api.nusmods.com/v2/${req.body.ay}/modules/${module.code}.json`
-                )
-                .then((axiosRes: AxiosResponse) => {
-                    const modData = axiosRes.data;
-                    modData.semesterData.forEach(
-                        (semData: semesterDataResponse) => {
-                            semData.timetable.forEach(async (timetable) => {
-                                await Lessons.create(
-                                    {
-                                        moduleCode: modData.moduleCode,
-                                        lessonId: timetable.classNo,
-                                        lessonType: timetable.lessonType,
-                                        sem: semData.semester,
-                                        weeks: timetable.weeks,
-                                        day: timetable.day,
-                                        startTime: timetable.startTime,
-                                        endTime: timetable.endTime
-                                    },
-                                    { ignoreDuplicates: true }
-                                ).catch((err) => {
-                                    if (err instanceof EmptyResultError) {
-                                        console.log('Entry already exists!');
-                                    }
-                                });
-                                counter++;
-                                console.log(counter);
-                            });
-                        }
-                    );
+    await Modules.findAll()
+        .then(async (modules) => {
+            await Promise.all(
+                modules.map(async (module) => {
+                    return await axiosRateLimited
+                        .get<ModuleResponse[]>(
+                            `https://api.nusmods.com/v2/${ayReq}/modules/${module.code}.json`
+                        )
+                        .then((axiosRes: AxiosResponse) => {
+                            const modData = axiosRes.data;
+                            modData.semesterData.map(
+                                async (semData: semesterDataResponse) => {
+                                    await Promise.all(
+                                        semData.timetable.map(
+                                            async (timetable) => {
+                                                await Lessons.create(
+                                                    {
+                                                        ay: ay,
+                                                        moduleCode:
+                                                            modData.moduleCode,
+                                                        lessonId:
+                                                            timetable.classNo,
+                                                        lessonType:
+                                                            timetable.lessonType,
+                                                        sem: semData.semester,
+                                                        weeks: timetable.weeks,
+                                                        venue: timetable.venue,
+                                                        day: timetable.day,
+                                                        startTime:
+                                                            timetable.startTime,
+                                                        endTime:
+                                                            timetable.endTime,
+                                                        size: timetable.size
+                                                    },
+                                                    { ignoreDuplicates: true }
+                                                ).catch((err) => {
+                                                    if (
+                                                        err instanceof
+                                                        EmptyResultError
+                                                    ) {
+                                                        console.log(
+                                                            'Entry already exists!'
+                                                        );
+                                                    }
+                                                });
+                                                counter++;
+                                                console.log(counter);
+                                            }
+                                        )
+                                    );
+                                }
+                            );
+                        })
+                        .catch((err: AxiosError) => {
+                            console.log(
+                                "Axios Error: Module doesn't exist",
+                                err
+                            );
+                            fakeModules.push(module.code);
+                        });
                 })
-                .catch((err: AxiosError) => {
-                    console.log("Axios Error: Module doesn't exist", err);
-                    fakeModules.push(module.code);
-                });
-            axiosPromises.push(axiosPromise);
-        });
-    });
-    await Promise.all(axiosPromises)
+            );
+        })
         .then(() => {
-            console.log('lessons updated!');
+            console.log('All lessons updated!');
             return res
                 .status(200)
                 .json({ message: 'database updated!', fakeModules });
         })
-        .catch((err: Error) => {
+        .catch((err) => {
             console.log('Error populating database:', err);
             return res.status(500).json({ message: err });
         });
@@ -158,6 +183,9 @@ async function populateLessons(req: Request, res: Response) {
 
 async function hasModule(req: Request, res: Response) {
     const moduleCode = req.query.moduleCode as string;
+    const ay = parseInt(req.query.ay as string);
+    const semester = parseInt(req.query.semester as string);
+
     return await Modules.findOne({
         where: {
             code: {
@@ -165,8 +193,15 @@ async function hasModule(req: Request, res: Response) {
             }
         }
     })
-        .then((module) => {
-            if (module) {
+        .then(async (module) => {
+            const lessons = await module
+                ?.getLessons()
+                .then((lesses) =>
+                    lesses.filter(
+                        (less) => less.sem === semester && less.ay === ay
+                    )
+                );
+            if (module && (lessons?.length as number) > 0) {
                 return res.status(200).json({ message: 'Module exists!' });
             } else {
                 throw Error;
@@ -180,6 +215,8 @@ async function hasModule(req: Request, res: Response) {
 async function searchModules(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
+    const ay = parseInt(req.query.ay as string);
+    const semester = parseInt(req.query.semester as string);
 
     if (limit === 0) {
         return await Modules.findAll({
@@ -199,9 +236,23 @@ async function searchModules(req: Request, res: Response) {
             }
         })
             .then((modules) => {
-                return res
-                    .status(200)
-                    .json({ modules: modules.map((model) => model.toJSON()) });
+                const possibleMods = modules
+                    .filter(
+                        async (mod) =>
+                            (
+                                await mod
+                                    .getLessons()
+                                    .then((lessons) =>
+                                        lessons.filter(
+                                            (less) =>
+                                                less.sem === semester &&
+                                                less.ay === ay
+                                        )
+                                    )
+                            ).length > 0
+                    )
+                    .map((mod) => mod.toJSON());
+                return res.status(200).json({ modules: possibleMods });
             })
             .catch((err) => {
                 return res.status(401).json({ message: err });
@@ -225,9 +276,23 @@ async function searchModules(req: Request, res: Response) {
         }
     })
         .then((modules) => {
-            res.status(200).json({
-                modules: modules.map((model) => model.toJSON())
-            });
+            const possibleMods = modules
+                .filter(
+                    async (mod) =>
+                        (
+                            await mod
+                                .getLessons()
+                                .then((lessons) =>
+                                    lessons.filter(
+                                        (less) =>
+                                            less.sem === semester &&
+                                            less.ay === ay
+                                    )
+                                )
+                        ).length > 0
+                )
+                .map((mod) => mod.toJSON());
+            return res.status(200).json({ modules: possibleMods });
         })
         .catch((err) => {
             res.status(401).json({ message: err });
@@ -264,6 +329,7 @@ async function getLessons(
     res: Response
 ): Promise<Response<any, Record<string, any>> | undefined> {
     const username = req.query.username as string;
+    const ay = parseInt(req.query.ay as string);
     const semester = parseInt(req.query.semester as string);
 
     return await Users.findByPk(username, {
@@ -282,7 +348,10 @@ async function getLessons(
                         const lesses = await user_module
                             .getLessons()
                             .then((lessons) =>
-                                lessons.filter((less) => less.sem == semester)
+                                lessons.filter(
+                                    (less) =>
+                                        less.sem == semester && less.ay === ay
+                                )
                             );
                         return {
                             code: mod.code,
@@ -304,6 +373,7 @@ async function getLessons(
 
 async function getAllPossibleLessons(req: Request, res: Response) {
     const username = req.query.username as string;
+    const ay = parseInt(req.query.ay as string);
     const semester = parseInt(req.query.semester as string);
 
     Users.findByPk(username, {
@@ -325,7 +395,9 @@ async function getAllPossibleLessons(req: Request, res: Response) {
                                 .getLessons()
                                 .then((lesses) =>
                                     lesses.filter(
-                                        (less) => less.sem === semester
+                                        (less) =>
+                                            less.sem === semester &&
+                                            less.ay === ay
                                     )
                                 )
                         };
@@ -363,7 +435,21 @@ Adds the module to the user and the lessons associated with it
 If lessons === [], handler will add the default lessons associated with the module
 **/
 async function addModule(req: Request, res: Response) {
-    const { username, moduleCode, lessons, semester } = req.body;
+    const {
+        username,
+        moduleCode,
+        lessons,
+        ay,
+        semester
+    }: {
+        username: string;
+        moduleCode: string;
+        lessons: lesson[];
+        ay: string;
+        semester: string;
+    } = req.body;
+    const actAy = parseInt(ay);
+    const actSemester = parseInt(semester);
     return await Users.findByPk(username, {
         include: [
             {
@@ -398,32 +484,40 @@ async function addModule(req: Request, res: Response) {
                                 ?.getLessons()
                                 .then((lesses) =>
                                     lesses
-                                        .filter((less) => less.sem === semester)
+                                        .filter(
+                                            (less) =>
+                                                less.sem === actSemester &&
+                                                less.ay === actAy
+                                        )
                                         .map((less) => less.lessonType)
                                 )
                         )
                     ];
+                    const user_modules = await user?.getUsers_Modules();
+                    const user_module = user_modules?.find(
+                        (user_module) => user_module.moduleCode === moduleCode
+                    );
+                    const unfilteredLesses = await mod
+                        ?.getLessons()
+                        .then((lessons) =>
+                            lessons.filter(
+                                (less) =>
+                                    less.sem === actSemester &&
+                                    less.ay === actAy
+                            )
+                        );
+                    // Add the lessons
                     await Promise.all(
                         lessonTypes.map(async (lessonType) => {
-                            const lesses = await mod
-                                ?.getLessons()
-                                .then((lessons) =>
-                                    lessons.filter(
-                                        (less) => less.sem === semester
-                                    )
-                                );
-                            const user_modules = await user?.getUsers_Modules();
-                            const user_module = user_modules?.find(
-                                (user_module) =>
-                                    user_module.moduleCode === moduleCode
-                            );
-                            const less = lesses?.find(
+                            const less = unfilteredLesses?.find(
                                 (less) => less.lessonType === lessonType
                             );
-                            await user_module?.addLessons(
-                                lesses?.filter(
+                            return await user_module?.addLessons(
+                                // Filter through 4 variables in total: Only can vary by startTime - i.e. Different slots for same lesson id
+                                unfilteredLesses?.filter(
                                     (lesson) =>
-                                        less?.lessonId === lesson.lessonId
+                                        less?.lessonId === lesson.lessonId &&
+                                        less.lessonType === lesson.lessonType
                                 )
                             );
                         })
@@ -438,6 +532,7 @@ async function addModule(req: Request, res: Response) {
                                 moduleCode: moduleCode,
                                 lessonType: lesson.lessonType,
                                 lessonId: lesson.lessonId,
+                                ay: lesson.ay,
                                 sem: lesson.sem,
                                 startTime: lesson.startTime
                             }
@@ -480,6 +575,9 @@ Remove specific module taken by user (and all related lessons)
 async function removeModule(req: Request, res: Response) {
     const username = req.query.username as string;
     const moduleCode = req.query.moduleCode as string;
+    const ay = parseInt(req.query.ay as string);
+    const semester = parseInt(req.query.semester as string);
+
     return await Users.findByPk(username, {
         include: [
             {
@@ -495,15 +593,22 @@ async function removeModule(req: Request, res: Response) {
                     moduleCode: moduleCode
                 }
             });
-            await Users_Modules_Lessons.destroy({
-                where: {
-                    userId: user_module?.id
-                }
+            await user_module?.getLessons().then(async (lesses) => {
+                await user_module.removeLessons(
+                    await Promise.all(
+                        lesses.filter(
+                            (less) => less.ay === ay && less.sem === semester
+                        )
+                    )
+                );
             });
 
             // Finally delete the module
             await Modules.findByPk(moduleCode).then(async (module) => {
-                await user?.removeModule(module as Modules);
+                const survivingLessons = await user_module?.getLessons();
+                if (survivingLessons?.length === 0) {
+                    await user?.removeModule(module as Modules);
+                }
             });
 
             return res.status(200).json({ message: 'Module removed!' });
@@ -528,7 +633,21 @@ async function removeModule(req: Request, res: Response) {
 Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
     **/
 async function updateLesson(req: Request, res: Response) {
-    const { username, moduleCode, lessonId, lessonType, semester } = req.body;
+    const {
+        username,
+        moduleCode,
+        lessonId,
+        lessonType,
+        ay,
+        semester
+    }: {
+        username: string;
+        moduleCode: string;
+        lessonId: string;
+        lessonType: string;
+        ay: number;
+        semester: number;
+    } = req.body;
     return await Users.findByPk(username, {
         include: [
             {
@@ -558,7 +677,9 @@ async function updateLesson(req: Request, res: Response) {
             const lessonToRemove = lessons?.find(
                 (lesson) =>
                     lesson.moduleCode === moduleCode &&
-                    lesson.lessonType === lessonType
+                    lesson.lessonType === lessonType &&
+                    lesson.ay === ay &&
+                    lesson.sem === semester
             );
             await user_module?.removeLesson(lessonToRemove);
 
@@ -568,6 +689,7 @@ async function updateLesson(req: Request, res: Response) {
                     lessonId: lessonId,
                     lessonType: lessonType,
                     moduleCode: moduleCode,
+                    ay: ay,
                     sem: semester
                 }
             }).then((lessonToAdd) => {

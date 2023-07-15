@@ -19,12 +19,12 @@ interface fullUser extends userWithoutEmailPhoto {
 interface resultMod {
     code: string;
     name: string;
-    lessons: lesson[];
+    lessons: lesson[][];
 }
 
 interface resultModNoName {
     code: string;
-    lessons: lesson[];
+    lessons: lesson[][];
 }
 
 interface result {
@@ -44,6 +44,8 @@ export default async function generateTimetable(req: Request, res: Response) {
         users,
         commonModule
     )) as result;
+    const ay = usersOptimalTimetables.commonModule.lessons[0][0].ay;
+    const semester = usersOptimalTimetables.commonModule.lessons[0][0].sem;
 
     return await Promise.all(
         users.map(async (usr) => {
@@ -63,20 +65,31 @@ export default async function generateTimetable(req: Request, res: Response) {
             // Replace the lessons
             await Promise.all(
                 user_mods?.forEach(async (user_mod) => {
+                    if (user_mod.moduleCode === commonModule.code) {
+                        return;
+                    }
                     const optMod = optUser?.modules.find(
                         (mod) => mod.code === user_mod.moduleCode
                     );
 
                     // Remove the original lessons first
                     const origLess = await user_mod.getLessons();
-                    await user_mod.removeLessons(origLess);
+                    await user_mod.removeLessons(
+                        origLess.filter(
+                            (less) => less.ay === ay && less.sem === semester
+                        )
+                    );
 
                     // Add the new lessons
-                    await Promise.all(
-                        optMod?.lessons.map(async (less) => {
-                            const actLess = await Lessons.findByPk(less.id);
-                            return await user_mod.addLesson(actLess as Lessons);
-                        }) || []
+                    await Lessons.findAll({
+                        where: {
+                            id: optMod?.lessons.flatMap(
+                                (lessType) =>
+                                    lessType.flatMap((less) => less.id) || []
+                            )
+                        }
+                    }).then(
+                        async (lesses) => await user_mod.addLessons(lesses)
                     );
                 }) || []
             );
@@ -86,17 +99,18 @@ export default async function generateTimetable(req: Request, res: Response) {
                 (user_mod) => user_mod.moduleCode === commonModule.code
             );
             const origCommonUser_ModLess = await commonUser_Mod?.getLessons();
-            await commonUser_Mod?.removeLessons(origCommonUser_ModLess);
-            await Promise.all(
-                optUser?.modules
-                    .find((mod) => mod.code === commonModule.code)
-                    ?.lessons.map(async (less) => {
-                        const actLess = await Lessons.findByPk(less.id);
-                        return await commonUser_Mod?.addLesson(
-                            actLess as Lessons
-                        );
-                    }) || []
+            await commonUser_Mod?.removeLessons(
+                origCommonUser_ModLess?.filter(
+                    (less) => less.ay === ay && less.sem === semester
+                )
             );
+            await Lessons.findAll({
+                where: {
+                    id: usersOptimalTimetables.commonModule.lessons.flatMap(
+                        (lessType) => lessType.flatMap((less) => less.id)
+                    )
+                }
+            }).then(async (lesses) => await commonUser_Mod?.addLessons(lesses));
         })
     )
         .then(() => res.status(200).json({ message: 'Timetables Updated!' }))

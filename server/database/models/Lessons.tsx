@@ -26,11 +26,14 @@ class Lessons extends Model<
     declare lessonId: string;
     declare moduleCode: string;
     declare lessonType: string;
+    declare ay: number;
     declare sem: number;
     declare weeks: number[];
+    declare venue: string;
     declare day: string;
     declare startTime: string;
     declare endTime: string;
+    declare size: number;
 
     declare getUsers_Modules: BelongsToManyGetAssociationsMixin<Users_Modules>;
     declare addUser_Module: BelongsToManyAddAssociationMixin<
@@ -95,6 +98,11 @@ Lessons.init(
             allowNull: false,
             unique: 'fakeCompositePrimaryKey'
         },
+        ay: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: 'fakeCompositePrimaryKey'
+        },
         sem: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -105,6 +113,10 @@ Lessons.init(
             type: DataTypes.ARRAY(DataTypes.INTEGER),
             allowNull: false,
             unique: false
+        },
+        venue: {
+            type: DataTypes.STRING(30),
+            allowNull: false
         },
         day: {
             type: DataTypes.STRING(10),
@@ -117,6 +129,10 @@ Lessons.init(
         },
         endTime: {
             type: DataTypes.STRING(4),
+            allowNull: false
+        },
+        size: {
+            type: DataTypes.INTEGER,
             allowNull: false
         }
     },

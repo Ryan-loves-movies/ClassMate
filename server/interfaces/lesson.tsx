@@ -21,9 +21,12 @@ export default interface lesson {
     lessonId: string;
     moduleCode: string;
     lessonType: string;
+    ay: number;
     sem: number;
     weeks: number[];
+    venue: string;
     day: string;
     startTime: string;
     endTime: string;
+    size: number;
 }

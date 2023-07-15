@@ -39,12 +39,12 @@ interface modifiedUsers {
 interface resultMod {
     code: string;
     name: string;
-    lessons: lesson[];
+    lessons: lesson[][];
 }
 
 interface resultModNoName {
     code: string;
-    lessons: lesson[];
+    lessons: lesson[][];
 }
 
 interface result {
@@ -56,7 +56,12 @@ interface result {
 }
 
 import { init } from 'z3-solver/build/node';
-import type { Arith, BitVecNum } from 'z3-solver/build/node';
+import type {
+    Arith,
+    BitVec,
+    BitVecNum,
+    Bool as BoolType
+} from 'z3-solver/build/node';
 
 const dayMapper: Map<string, number> = new Map<string, number>();
 dayMapper.set('Monday', 1);
@@ -88,7 +93,7 @@ export default async function timetableGenerator(
     commonModule: moduleWithoutName
 ) {
     const { Context } = await init();
-    const { Solver, Int, BitVec, If, Or } = Context('main');
+    const { Solver, Int, BitVec, Or, And } = Context('main');
 
     const solver = new Solver();
 
@@ -115,14 +120,20 @@ export default async function timetableGenerator(
                             code: user_mod.code,
                             name: user_mod.name,
                             lessons: lessonTypes.map((lessonType) => {
-                                const lessons = user_mod.lessons
-                                    .filter(
-                                        (lesson) => lesson.lessonType === lessonType
+                                const lessons = user_mod.lessons.filter(
+                                    (lesson) => lesson.lessonType === lessonType
+                                );
+                                const lessIds = [
+                                    ...new Set(
+                                        lessons.map((less) => less.lessonId)
                                     )
-                                const lessIds = [...new Set(lessons.map((less) => less.lessonId))]
-                                return lessIds
-                                    .map((lessId) => {
-                                        return lessons.filter((less) => less.lessonId === lessId).map((less) => {
+                                ];
+                                return lessIds.map((lessId) => {
+                                    return lessons
+                                        .filter(
+                                            (less) => less.lessonId === lessId
+                                        )
+                                        .map((less) => {
                                             const weeksVar = BitVec.val(
                                                 // `${user.username}_${user_mod.code}_${less.id}_weeks`,
                                                 convertArrToNumber(less.weeks),
@@ -141,27 +152,30 @@ export default async function timetableGenerator(
                                                 `${user.username}_${user_mod.code}_${less.id}_endTime`
                                             );
                                             solver.add(
-                                                Or(boolVar.eq(0), boolVar.eq(1)),
-                                                If(
+                                                Or(
                                                     boolVar.eq(0),
-                                                    dayVar.eq(0),
-                                                    dayVar.eq(
-                                                        convertDayToNumber(less.day)
-                                                    )
+                                                    boolVar.eq(1)
                                                 ),
-                                                If(
-                                                    boolVar.eq(0),
-                                                    startTimeVar.eq(0),
-                                                    startTimeVar.eq(
-                                                        parseInt(less.startTime)
-                                                    )
+                                                // If(
+                                                //     boolVar.eq(0),
+                                                //     dayVar.eq(0),
+                                                dayVar.eq(
+                                                    convertDayToNumber(less.day)
+                                                    // )
                                                 ),
-                                                If(
-                                                    boolVar.eq(0),
-                                                    endTimeVar.eq(0),
-                                                    endTimeVar.eq(
-                                                        parseInt(less.endTime)
-                                                    )
+                                                // If(
+                                                //     boolVar.eq(0),
+                                                //     startTimeVar.eq(0),
+                                                startTimeVar.eq(
+                                                    parseInt(less.startTime)
+                                                    // )
+                                                ),
+                                                // If(
+                                                //     boolVar.eq(0),
+                                                //     endTimeVar.eq(0),
+                                                endTimeVar.eq(
+                                                    parseInt(less.endTime)
+                                                    // )
                                                 )
                                             );
                                             return {
@@ -171,21 +185,27 @@ export default async function timetableGenerator(
                                                 startTimeVar: startTimeVar,
                                                 endTimeVar: endTimeVar,
                                                 boolVar: boolVar
-                                            }I;
-                                        })
-                                    }) as modifiedLesson[][]
+                                            };
+                                        });
+                                }) as modifiedLesson[][];
                             })
-                        })
+                        };
+                    })
             } as modifiedUser;
         }),
         commonModule: {
             code: commonModule.code,
             lessons: commonLessonTypes.map((lessType) => {
-                const lessons = commonModuleLessons.lessons.filter((lesson) => lesson.lessonType === lessType)
-                const lessIds = [...new Set(lessons.map((less) => less.lessonId))]
-                return lessIds
-                    .map((lessId) => {
-                        return lessons.filter((less) => less.lessonId === lessId).map((less) => {
+                const lessons = commonModuleLessons.lessons.filter(
+                    (lesson) => lesson.lessonType === lessType
+                );
+                const lessIds = [
+                    ...new Set(lessons.map((less) => less.lessonId))
+                ];
+                return lessIds.map((lessId) => {
+                    return lessons
+                        .filter((less) => less.lessonId === lessId)
+                        .map((less) => {
                             const weeksVar = BitVec.val(
                                 // `${commonModule.code}_${less.id}_weeks`,
                                 convertArrToNumber(less.weeks),
@@ -205,21 +225,18 @@ export default async function timetableGenerator(
                             );
                             solver.add(
                                 Or(boolVar.eq(0), boolVar.eq(1)),
-                                If(
-                                    boolVar.eq(0),
-                                    dayVar.eq(0),
-                                    dayVar.eq(convertDayToNumber(less.day))
-                                ),
-                                If(
-                                    boolVar.eq(0),
-                                    startTimeVar.eq(0),
-                                    startTimeVar.eq(parseInt(less.startTime))
-                                ),
-                                If(
-                                    boolVar.eq(0),
-                                    endTimeVar.eq(0),
-                                    endTimeVar.eq(parseInt(less.startTime))
-                                )
+                                // If(
+                                //     boolVar.eq(0),
+                                //     dayVar.eq(0),
+                                dayVar.eq(convertDayToNumber(less.day)),
+                                // If(
+                                //     boolVar.eq(0),
+                                //     startTimeVar.eq(0),
+                                startTimeVar.eq(parseInt(less.startTime)),
+                                // If(
+                                //     boolVar.eq(0),
+                                //     endTimeVar.eq(0),
+                                endTimeVar.eq(parseInt(less.startTime))
                             );
                             return {
                                 ...less,
@@ -229,94 +246,22 @@ export default async function timetableGenerator(
                                 endTimeVar: endTimeVar,
                                 boolVar: boolVar
                             };
-                        })
-                    });
+                        });
+                });
             })
         } as modiifiedModuleWithoutName
     } as modifiedUsers;
-    //     const modUsers: modifiedUsers = {
-    //         users: users.map((user) => ({
-    //           username: user.username,
-    //           modules: user.modules
-    //             .filter((user_mod) => user_mod.code !== commonModule.code)
-    //             .map((user_mod) => ({
-    //               code: user_mod.code,
-    //               name: user_mod.name,
-    //               lessons: user_mod.lessons.reduce<modifiedLesson[][][]>((acc, lesson) => {
-    //                 const lessonIndex = acc.findIndex(
-    //                   (lessons) => lessons[0].lessonType === lesson.lessonType
-    //                 );
-    //                 if (lessonIndex !== -1) {
-    //                   acc[lessonIndex].push({
-    //                     ...lesson,
-    //                     weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
-    //                     dayVar: Int.const(
-    //                       `${user.username}_${user_mod.code}_${lesson.id}_day`
-    //                     ),
-    //                     boolVar: Int.const(
-    //                       `${user.username}_${user_mod.code}_${lesson.id}_bool`
-    //                     ),
-    //                     startTimeVar: Int.const(
-    //                       `${user.username}_${user_mod.code}_${lesson.id}_startTime`
-    //                     ),
-    //                     endTimeVar: Int.const(
-    //                       `${user.username}_${user_mod.code}_${lesson.id}_endTime`
-    //                     )
-    //                   });
-    //                 } else {
-    //                   acc.push([
-    //                     {
-    //                       ...lesson,
-    //                       weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
-    //                       dayVar: Int.const(
-    //                         `${user.username}_${user_mod.code}_${lesson.id}_day`
-    //                       ),
-    //                       boolVar: Int.const(
-    //                         `${user.username}_${user_mod.code}_${lesson.id}_bool`
-    //                       ),
-    //                       startTimeVar: Int.const(
-    //                         `${user.username}_${user_mod.code}_${lesson.id}_startTime`
-    //                       ),
-    //                       endTimeVar: Int.const(
-    //                         `${user.username}_${user_mod.code}_${lesson.id}_endTime`
-    //                       )
-    //                     }
-    //                   ]);
-    //                 }
-    //                 return acc;
-    //               }, [])
-    //             }))
-    //         })),
-
-    //         commonModule: {
-    //       code: commonModule.code,
-    //       name: '', // Add the name property here
-    //       lessons: commonLessonTypes.map((lessonType) =>
-    //         commonModuleLessons.lessons
-    //           .filter((lesson) => lesson.lessonType === lessonType)
-    //           .map((lesson) => ({
-    //             ...lesson,
-    //             weeksVar: BitVec.val(convertArrToNumber(lesson.weeks), 13),
-    //             dayVar: Int.const(`${commonModule.code}_${lesson.id}_day`),
-    //             boolVar: Int.const(`${commonModule.code}_${lesson.id}_bool`),
-    //             startTimeVar: Int.const(`${commonModule.code}_${lesson.id}_startTime`),
-    //             endTimeVar: Int.const(`${commonModule.code}_${lesson.id}_endTime`)
-    //           }))
-    //       )
-    //     }
-    //   };
-
-
 
     // Constraint 1: Must have only 1 lesson for each lesson type
     modUsers.users.forEach((modUser) => {
         modUser.modules.forEach((specificMod) => {
             specificMod.lessons.forEach((lessType) => {
-                const initial = lessType[0].boolVar;
+                const initial = lessType[0][0].boolVar;
                 const lessTypeSum = lessType
                     .slice(1)
                     .reduce(
-                        (firstLess, secLess) => firstLess.add(secLess.boolVar),
+                        (firstLess, secLess) =>
+                            firstLess.add(secLess[0].boolVar),
                         initial
                     );
                 solver.add(lessTypeSum.eq(1));
@@ -324,16 +269,34 @@ export default async function timetableGenerator(
         });
     });
     modUsers.commonModule.lessons.forEach((lessType) => {
-        const initial = lessType[0].boolVar;
+        const initial = lessType[0][0].boolVar;
         const lessTypeSum = lessType
             .slice(1)
             .reduce(
-                (firstLess, secLess) => firstLess.add(secLess.boolVar),
+                (firstLess, secLess) => firstLess.add(secLess[0].boolVar),
                 initial
             );
         solver.add(lessTypeSum.eq(1));
     });
 
+    const reduceInterferenceConstraint = (
+        operator: (
+            prevLessMini: modifiedLesson,
+            nextLessMini: modifiedLesson
+        ) => BoolType,
+        less: modifiedLesson[],
+        nextLess: modifiedLesson[]
+    ) => {
+        return And(
+            ...less.map((lessId) => {
+                return And(
+                    ...nextLess.map((nextLessId) =>
+                        operator(lessId, nextLessId)
+                    )
+                );
+            })
+        );
+    };
     // Constraint 2: No overlap in time slots for the modules not shared by the group
     modUsers.users.forEach((modUser) => {
         for (let modInd = 0; modInd < modUser.modules.length; modInd++) {
@@ -360,25 +323,51 @@ export default async function timetableGenerator(
                                 solver.add(
                                     Or(
                                         Or(
-                                            less.boolVar.eq(0),
-                                            nextLess.boolVar.eq(0)
+                                            less[0].boolVar.eq(0),
+                                            nextLess[0].boolVar.eq(0)
                                         ),
                                         Or(
-                                            less.weeksVar
-                                                .xor(nextLess.weeksVar)
+                                            less
+                                                .reduce(
+                                                    (lessId, nextLessId) =>
+                                                        lessId.or(
+                                                            nextLessId.weeksVar
+                                                        ),
+                                                    less[0].weeksVar as BitVec
+                                                )
+                                                .xor(
+                                                    nextLess.reduce(
+                                                        (lessId, nextLessId) =>
+                                                            lessId.or(
+                                                                nextLessId.weeksVar
+                                                            ),
+                                                        nextLess[0]
+                                                            .weeksVar as BitVec
+                                                    )
+                                                )
                                                 .redAnd()
                                                 .ule(1),
                                             Or(
-                                                less.dayVar.neq(
-                                                    nextLess.dayVar
+                                                reduceInterferenceConstraint(
+                                                    (lessId, nextLessId) =>
+                                                        lessId.dayVar.neq(
+                                                            nextLessId.dayVar
+                                                        ),
+                                                    less,
+                                                    nextLess
                                                 ),
-                                                Or(
-                                                    less.endTimeVar.le(
-                                                        nextLess.startTimeVar
-                                                    ),
-                                                    less.startTimeVar.ge(
-                                                        nextLess.endTimeVar
-                                                    )
+                                                reduceInterferenceConstraint(
+                                                    (lessId, nextLessId) =>
+                                                        Or(
+                                                            lessId.endTimeVar.le(
+                                                                nextLessId.startTimeVar
+                                                            ),
+                                                            lessId.startTimeVar.ge(
+                                                                nextLessId.endTimeVar
+                                                            )
+                                                        ),
+                                                    less,
+                                                    nextLess
                                                 )
                                             )
                                         )
@@ -393,23 +382,51 @@ export default async function timetableGenerator(
                             solver.add(
                                 Or(
                                     Or(
-                                        less.boolVar.eq(0),
-                                        nextLess.boolVar.eq(0)
+                                        less[0].boolVar.eq(0),
+                                        nextLess[0].boolVar.eq(0)
                                     ),
                                     Or(
-                                        less.weeksVar
-                                            .xor(nextLess.weeksVar)
+                                        less
+                                            .reduce(
+                                                (lessId, nextLessId) =>
+                                                    lessId.or(
+                                                        nextLessId.weeksVar
+                                                    ),
+                                                less[0].weeksVar as BitVec
+                                            )
+                                            .xor(
+                                                nextLess.reduce(
+                                                    (lessId, nextLessId) =>
+                                                        lessId.or(
+                                                            nextLessId.weeksVar
+                                                        ),
+                                                    nextLess[0]
+                                                        .weeksVar as BitVec
+                                                )
+                                            )
                                             .redAnd()
                                             .ule(1),
                                         Or(
-                                            less.dayVar.neq(nextLess.dayVar),
-                                            Or(
-                                                less.endTimeVar.le(
-                                                    nextLess.startTimeVar
-                                                ),
-                                                less.startTimeVar.ge(
-                                                    nextLess.endTimeVar
-                                                )
+                                            reduceInterferenceConstraint(
+                                                (lessId, nextLessId) =>
+                                                    lessId.dayVar.neq(
+                                                        nextLessId.dayVar
+                                                    ),
+                                                less,
+                                                nextLess
+                                            ),
+                                            reduceInterferenceConstraint(
+                                                (lessId, nextLessId) =>
+                                                    Or(
+                                                        lessId.endTimeVar.le(
+                                                            nextLessId.startTimeVar
+                                                        ),
+                                                        lessId.startTimeVar.ge(
+                                                            nextLessId.endTimeVar
+                                                        )
+                                                    ),
+                                                less,
+                                                nextLess
                                             )
                                         )
                                     )
@@ -439,20 +456,26 @@ export default async function timetableGenerator(
                                 const less = lessType.find(
                                     (less) =>
                                         parseInt(
-                                            model.eval(less.boolVar).toString()
+                                            model
+                                                .eval(less[0].boolVar)
+                                                .toString()
                                         ) === 1
-                                ) as lesson;
-                                return {
-                                    id: less.id,
-                                    lessonId: less.lessonId,
-                                    moduleCode: less.moduleCode,
-                                    lessonType: less.lessonType,
-                                    sem: less.sem,
-                                    weeks: less.weeks,
-                                    day: less.day,
-                                    startTime: less.startTime,
-                                    endTime: less.endTime
-                                } as lesson;
+                                ) as lesson[];
+                                return less.map((actLess) => {
+                                    return {
+                                        id: actLess.id,
+                                        lessonId: actLess.lessonId,
+                                        moduleCode: actLess.moduleCode,
+                                        lessonType: actLess.lessonType,
+                                        ay: actLess.ay,
+                                        sem: actLess.sem,
+                                        weeks: actLess.weeks,
+                                        day: actLess.day,
+                                        startTime: actLess.startTime,
+                                        endTime: actLess.endTime,
+                                        venue: actLess.venue
+                                    } as lesson;
+                                });
                             })
                         } as resultMod;
                     })
@@ -463,19 +486,24 @@ export default async function timetableGenerator(
                 lessons: modUsers.commonModule.lessons.map((lessType) => {
                     const less = lessType.find(
                         (less) =>
-                            parseInt(model.eval(less.boolVar).toString()) === 1
-                    ) as lesson;
-                    return {
-                        id: less.id,
-                        lessonId: less.lessonId,
-                        moduleCode: less.moduleCode,
-                        lessonType: less.lessonType,
-                        sem: less.sem,
-                        weeks: less.weeks,
-                        day: less.day,
-                        startTime: less.startTime,
-                        endTime: less.endTime
-                    } as lesson;
+                            parseInt(model.eval(less[0].boolVar).toString()) ===
+                            1
+                    ) as lesson[];
+                    return less.map((actLess) => {
+                        return {
+                            id: actLess.id,
+                            lessonId: actLess.lessonId,
+                            moduleCode: actLess.moduleCode,
+                            lessonType: actLess.lessonType,
+                            ay: actLess.ay,
+                            sem: actLess.sem,
+                            weeks: actLess.weeks,
+                            day: actLess.day,
+                            startTime: actLess.startTime,
+                            endTime: actLess.endTime,
+                            venue: actLess.venue
+                        } as lesson;
+                    });
                 })
             }
         };
