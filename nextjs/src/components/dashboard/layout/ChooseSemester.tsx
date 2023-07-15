@@ -1,10 +1,10 @@
 'use client';
 import styles from '@components/dashboard/layout/chooseSemester.module.css';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useState } from 'react';
 
 export default function ChooseSemester() {
-    const availableAy = [2023, 2024];
+    const availableAy = [2023];
 
     const [ay, setAyRaw] = useState(2023);
     const [sem, setSemRaw] = useState(1);
@@ -25,13 +25,11 @@ export default function ChooseSemester() {
     });
 
     const pathname = usePathname();
-    const router = useRouter();
     const refresher = () => {
         console.log('oskdmk');
         if (pathname.includes('/timetable')) {
+            // Sadly, router.refresh() doesn't work
             window.location.href = pathname
-            // router.refresh();
-            // router.push(pathname);
             console.log('ok');
         }
     };

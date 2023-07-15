@@ -27,7 +27,9 @@ export default function ModSearchBar({
                     },
                     params: {
                         query: query,
-                        limit: 0
+                        limit: 30,
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => {

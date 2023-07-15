@@ -45,7 +45,9 @@ const optimizeHandler = async (
                         Authorization: sessionStorage.getItem('token')
                     },
                     params: {
-                        username: user.username
+                        username: user.username,
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => res.data as fullUser);

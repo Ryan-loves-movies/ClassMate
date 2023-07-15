@@ -4,12 +4,13 @@ import config from '@/config';
 const { expressHost } = config;
 
 export default function DevButtons() {
-    const updateModules = async () => {
+    const availableYears = [2023];
+    const updateModules = async (ay: number) => {
         await axios
             .post(
                 `${expressHost}/authorized/allModules`,
                 {
-                    ay: '2023-2024'
+                    ay: ay
                 },
                 {
                     headers: {
@@ -22,12 +23,12 @@ export default function DevButtons() {
                 alert(`Error occurred when updating modules! ${err}`)
             );
     };
-    const updateLessons = async () => {
+    const updateLessons = async (ay: number) => {
         await axios
             .post(
                 `${expressHost}/authorized/allLessons`,
                 {
-                    ay: '2023-2024'
+                    ay: ay
                 },
                 {
                     headers: {
@@ -41,8 +42,12 @@ export default function DevButtons() {
             );
     };
     const clickHandler = async () => {
-        await updateModules();
-        await updateLessons();
+        await Promise.all(
+            availableYears.map(async (ay) => {
+                await updateModules(ay);
+                await updateLessons(ay);
+            })
+        );
     };
     return (
         <button onClick={clickHandler} type="button">
