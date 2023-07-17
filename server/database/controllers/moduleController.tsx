@@ -224,7 +224,7 @@ async function searchModules(req: Request, res: Response) {
                 [Op.or]: [
                     {
                         code: {
-                            [Op.iLike]: `%${query}%`
+                            [Op.iLike]: `${query}%`
                         }
                     },
                     {
@@ -233,7 +233,10 @@ async function searchModules(req: Request, res: Response) {
                         }
                     }
                 ]
-            }
+            },
+            order: [
+                ['code', 'ASC'] // Replace "en_US" with a case-insensitive collation of your choice
+            ]
         })
             .then((modules) => {
                 const possibleMods = modules
@@ -264,7 +267,7 @@ async function searchModules(req: Request, res: Response) {
             [Op.or]: [
                 {
                     code: {
-                        [Op.iLike]: `%${query}%`
+                        [Op.iLike]: `${query}%`
                     }
                 },
                 {
@@ -273,7 +276,10 @@ async function searchModules(req: Request, res: Response) {
                     }
                 }
             ]
-        }
+        },
+        order: [
+            ['code', 'ASC'] // Replace "en_US" with a case-insensitive collation of your choice
+        ]
     })
         .then((modules) => {
             const possibleMods = modules

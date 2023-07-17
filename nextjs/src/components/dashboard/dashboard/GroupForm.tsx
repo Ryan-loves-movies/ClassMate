@@ -26,11 +26,16 @@ export default function GroupForm({
     } = useForm();
 
     const groupBoxColors = [
-        '#fee4cb',
-        '#e9e7fd',
-        '#ffd3e2',
-        '#c8f7dc',
-        '#d5deff'
+        'rgb(254, 228, 203, 0.9)',
+        'rgb(233, 231, 253, 0.9)',
+        'rgb(255, 211, 226, 0.9)',
+        'rgb(200, 247, 220, 0.9)',
+        'rgb(213, 222, 255, 0.9)',
+        'rgb(253, 226, 226, 0.9)',
+        'rgb(226, 247, 246, 0.9)',
+        'rgb(253, 219, 216, 0.9)',
+        'rgb(234, 231, 255, 0.9)',
+        'rgb(255, 241, 208, 0.9)'
     ];
     const randomIndex = () => Math.floor(Math.random() * groupBoxColors.length);
 
@@ -174,13 +179,13 @@ export default function GroupForm({
                             </div>
                         </div>
                     </fieldset>
-                    <div className={styles['forms_buttons']}>
-                        <input
-                            type="submit"
-                            value="Create Group"
-                            className={styles['forms_buttons-action']}
-                        />
-                    </div>
+                    <button
+                        type="submit"
+                        value="Create Group"
+                        className={styles['forms_buttons-action']}
+                    >
+                        Create Group
+                    </button>
                 </form>
             </div>
         </div>

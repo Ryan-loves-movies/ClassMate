@@ -73,12 +73,15 @@ export default function Timetable({
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div
-                className={`${styles['s-act-tab']} ${color}`}
+                className={`${styles['s-act-tab']}`}
                 style={{
                     left: `${start}%`,
                     width: `${width}%`
                 }}
             >
+                <div
+                    className={`${color} ${styles['s-act-tab-background']}`}
+                />
                 <div className={styles['s-act-name']}>{code}</div>
                 <div
                     className={styles['s-act-lesson']}

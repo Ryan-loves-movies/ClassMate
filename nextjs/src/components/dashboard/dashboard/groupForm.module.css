@@ -22,7 +22,7 @@
     overflow-x: hidden;
     border: none;
     position: relative;
-    width: 30%;
+    width: 28%;
     height: 40%;
     text-align: center;
     background-color: var(--projects-section);
@@ -76,7 +76,7 @@
 
 .forms_buttons-action {
     outline: none;
-    width: 100%;
+    width: 40%;
     background-color: #e8716d;
     border-radius: 4em 4em 4em 4em;
     border: 0px;
@@ -88,6 +88,19 @@
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
+}
+
+.forms_buttons-action:hover {
+    animation: pulse 1.0s ease-in infinite;
+}
+
+@keyframes pulse{
+    50% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .error {

@@ -128,7 +128,7 @@ async function createGroup(req: Request, res: Response) {
     await Modules.findOne({
         where: {
             code: {
-                [Op.iLike]: `%${moduleCode}%`
+                [Op.iLike]: `${moduleCode}`
             }
         }
     })
