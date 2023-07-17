@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
@@ -8,7 +8,6 @@ import Timetable from '@components/dashboard/timetable/Timetable';
 import ModSearchBar from '@components/dashboard/timetable/ModSearchBar';
 import colors from '@models/colors';
 
-// JSON structure returned from personal database
 import module, { moduleWithLessons } from '@models/module';
 import SearchResults from '@components/dashboard/timetable/SearchResults';
 import Mod from '@components/dashboard/timetable/Mod';
@@ -17,6 +16,7 @@ export default function TimetableMain() {
     const [mods, setMods] = useState<moduleWithLessons[]>([]);
     const [addedMod, setAddedMod] = useState<string>();
     const [searchRes, setSearchRes] = useState<module[]>([]);
+    const [retainFocus, setRetainFocus] = useState<boolean>(false);
 
     useEffect(() => {
         const updateAddedMod = async (addedMod: string | undefined) => {
@@ -115,14 +115,32 @@ export default function TimetableMain() {
 
     const handleMouseEnter = (index: number) => setFocusedIndex(index);
 
+    // To ensure that input is focused on when module is clicked on
+    const modSearchBarRef = useRef<HTMLInputElement>(null);
+    const handleMouseDown = (event: React.MouseEvent<HTMLLIElement>) => {
+        event.preventDefault();
+        setRetainFocus(true);
+        {
+            modSearchBarRef.current && modSearchBarRef.current?.focus();
+        }
+        setAddedMod(searchRes[focusedIndex].code);
+    };
+
+
+
     return (
         <div className={styles['projects-section']} onKeyDown={handleKeyDown}>
             <Timetable activities={mods} />
-            <div className={styles['module-field']}>
+            <div
+                className={styles['module-field']}
+                onBlur={() => setSearchRes([])}
+            >
                 <ModSearchBar
+                    setFocusedIndex={setFocusedIndex}
                     setSearchRes={setSearchRes}
                     handleKeyDown={handleKeyDown}
                     width="100%"
+                    ref={modSearchBarRef}
                 />
                 <div className={styles['search-results']}>
                     {searchRes.length === 0 ? (
@@ -131,6 +149,7 @@ export default function TimetableMain() {
                         <SearchResults
                             searchRes={searchRes || []}
                             handleMouseEnter={handleMouseEnter}
+                            handleMouseDown={handleMouseDown}
                             focusedIndex={focusedIndex}
                         />
                     )}

@@ -7,7 +7,7 @@
     display: inline-flexbox;
     overflow-y: scroll;
     box-shadow: 0 1px 0px 1px rgba(0, 0, 0, 0.15);
-    background: #fff;
+    background: var(--projects-section);
     z-index: 999;
 }
 
