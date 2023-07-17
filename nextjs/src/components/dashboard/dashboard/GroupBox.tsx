@@ -1,6 +1,7 @@
 import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
+import OptimizeButton from '@components/dashboard/dashboard/OptimizeButton';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
@@ -22,7 +23,7 @@ interface fullUser extends userWithoutEmailPhoto {
 const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
     return (
         <>
-            {users.map((user: userWithoutEmail) => (
+            {users?.map((user: userWithoutEmail) => (
                 <PhotoRenderer
                     arrBuffer={user.photo.data}
                     alt={user.username}
@@ -31,50 +32,6 @@ const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
             ))}
         </>
     );
-};
-
-const optimizeHandler = async (
-    users: userWithoutEmail[],
-    commonModule: moduleWithoutName
-) => {
-    const userWithAllLessons: fullUser[] = await Promise.all(
-        users.map(async (user) => {
-            return await axios
-                .get(`${expressHost}/authorized/all/lessons`, {
-                    headers: {
-                        Authorization: sessionStorage.getItem('token')
-                    },
-                    params: {
-                        username: user.username,
-                        ay: sessionStorage.getItem('ay'),
-                        semester: sessionStorage.getItem('sem')
-                    }
-                })
-                .then((res: AxiosResponse) => res.data as fullUser);
-        })
-    );
-    console.log(userWithAllLessons);
-
-    axios
-        .put(
-            `${expressHost}/authorized/group/optimize`,
-            {
-                users: userWithAllLessons,
-                commonModule: commonModule
-            },
-            {
-                headers: {
-                    Authorization: sessionStorage.getItem('token')
-                }
-            }
-        )
-        .then(() => {
-            alert('Timetables updated!');
-        })
-        .catch(() => {
-            alert('Failed to find optimal timetable!');
-        });
-    // timetableGenerator(userWithAllLessons, commonModule);
 };
 
 export default function GroupBox({
@@ -129,20 +86,6 @@ export default function GroupBox({
         setGroupsUpdated(true);
     };
 
-    const SolveButton = () => {
-        return (
-            <button
-                onClick={() =>
-                    optimizeHandler(users, {
-                        code: header
-                    } as moduleWithoutName)
-                }
-            >
-                LOL
-            </button>
-        );
-    };
-
     return (
         <div className={styles['project-box-wrapper']} style={{ width: width }}>
             <div
@@ -153,31 +96,13 @@ export default function GroupBox({
             >
                 <div className={styles['project-box-header']}>
                     <div className={styles['trash']}>
-                        <TrashIcon clickHandler={deleteGroupHandler} />
+                        <TrashIcon
+                            clickHandler={deleteGroupHandler}
+                            description="Leave Group"
+                        />
                     </div>
-                    <div className={styles['more-wrapper']}>
-                        <button
-                            className={styles['project-btn-more']}
-                            type="button"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="feather feather-more-vertical"
-                            >
-                                <circle cx="12" cy="12" r="1" />
-                                <circle cx="12" cy="5" r="1" />
-                                <circle cx="12" cy="19" r="1" />
-                                <title>More</title>
-                            </svg>
-                        </button>
+                    <div className={styles['project-box-optimize']}>
+                        <OptimizeButton users={users} moduleCode={header} />
                     </div>
                 </div>
                 <div className={styles['project-box-content-header']}>
@@ -214,7 +139,6 @@ export default function GroupBox({
                     </div>
                 </div>
             </div>
-            <SolveButton />
         </div>
     );
 }

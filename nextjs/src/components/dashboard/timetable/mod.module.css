@@ -6,22 +6,42 @@
     position: relative;
 }
 
+.box:hover {
+    top: -5px;
+    animation: jump 0.5s ease;
+}
+
+@keyframes jump {
+    0% {
+        top: 0px;
+    }
+    50% {
+        top: -10px;
+    }
+    100% {
+        top: -5px;
+    }
+}
+
 .background {
     display: flex;
     position: absolute;
+    z-index: 1;
     width: 98%;
     height: 95%;
-    opacity: 0.5;
+    opacity: 0.8;
     border-radius: 16px;
 }
 
 .trash {
+    z-index: 3;
     position: absolute;
     right: 20px;
     top: 10px;
 }
 
 .code {
+    z-index: 2;
     margin-top: 10px;
     margin-left: 10px;
     font-weight: bold;
@@ -29,5 +49,6 @@
 }
 
 .name {
+    z-index: 2;
     margin-left: 10px;
 }

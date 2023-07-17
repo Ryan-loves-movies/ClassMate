@@ -26,17 +26,25 @@
 
 .app-cover {
     position: relative;
+    display: flex;
     width: var(--app-cover-size);
     height: var(--app-cover-size);
-    background-color: #fff;
+    /* background-color: #fff; */
+    /* background-color: #fc8b77; */
+    background-color: #ff6e77;
+    opacity: 0.8;
     background-blend-mode: screen;
     border-radius: 50%;
     overflow: hidden;
     outline: none;
+    align-items: center;
 }
 
 .app-cover:hover {
-    background-color: #969ab0;
+    width: 150px;
+    border-radius: 40px;
+    /* background-color: #969ab0; */
+    transition: all 0.5s ease;
 }
 
 .checkbox {
@@ -55,13 +63,19 @@
 .bin-icon {
     position: absolute;
     top: 50%;
-    right: 0;
-    left: 0;
+    left: 11.5px;
+    /* left: 10px; */
+    /* left: 50%; */
+    /* transform: translate(-50%, 0%); */
     width: var(--btn-icon-width);
     height: var(--btn-icon-height);
     margin: var(--btn-icon-margin) auto 0 auto;
     border-radius: 50%;
     z-index: 2;
+}
+
+.app-cover:hover .bin-icon {
+    visibility: visible;
 }
 
 .lid {
@@ -176,4 +190,26 @@
     100% {
         top: var(--lid-end-height);
     }
+}
+
+.app-cover .description {
+    visibility: hidden;
+    display: flex;
+    position: absolute;
+    width: 100px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bolder;
+    font-size: 1em;
+    margin-left: 10px;
+}
+
+.app-cover:hover .description {
+    visibility: visible;
+    display: flex;
+    width: 100px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bolder;
+    font-size: 1em;
+    margin-left: 30px;
+    transition: all 0.5s ease;
 }

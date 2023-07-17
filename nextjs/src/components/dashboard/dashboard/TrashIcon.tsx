@@ -1,14 +1,15 @@
 import styles from '@components/dashboard/dashboard/trashIcon.module.css';
 
 export default function TrashIcon({
+    description,
     clickHandler
 }: {
+    description: string,
     clickHandler: () => void;
 }) {
     return (
         <div className={styles['app-cover']}>
-            <input
-                type="button"
+            <button
                 className={styles['checkbox']}
                 onClick={clickHandler}
             />
@@ -20,7 +21,7 @@ export default function TrashIcon({
                     </div>
                 </div>
             </div>
-            <div className={styles['layer']} />
+            <div className={styles['description']}>{description}</div>
         </div>
     );
 }

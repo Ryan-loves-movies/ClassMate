@@ -35,7 +35,10 @@ export default function Mod({
         <div className={styles['box']}>
             <div className={`${styles['background']} ${color}`} />
             <div className={styles['trash']}>
-                <TrashIcon clickHandler={trashHandler} />
+                <TrashIcon
+                    clickHandler={trashHandler}
+                    description="Drop Module"
+                />
             </div>
             <div className={styles['code']}>{mod.code}</div>
             <div className={styles['name']}>{mod.name}</div>
