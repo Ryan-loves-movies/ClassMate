@@ -460,103 +460,68 @@ async function addModule(req: Request, res: Response) {
         include: [
             {
                 model: Modules
+            },
+            {
+                model: Users_Modules
             }
         ]
     })
         .then(async (user) => {
-            return await Modules.findByPk(moduleCode).then((module) => {
-                return user?.addModule(module as Modules);
-            });
-        })
-        .then(() => {
-            Users.findByPk(username, {
+            // Find module
+            const modToAdd = await Modules.findByPk(moduleCode, {
                 include: [
                     {
-                        model: Users_Modules
+                        model: Lessons
                     }
                 ]
-            }).then(async (user) => {
-                if (lessons.length === 0) {
-                    const mod = await Modules.findByPk(moduleCode, {
-                        include: [
-                            {
-                                model: Lessons
-                            }
-                        ]
-                    });
-                    const lessonTypes = [
-                        ...new Set(
-                            await mod
-                                ?.getLessons()
-                                .then((lesses) =>
-                                    lesses
-                                        .filter(
-                                            (less) =>
-                                                less.sem === actSemester &&
-                                                less.ay === actAy
-                                        )
-                                        .map((less) => less.lessonType)
-                                )
-                        )
-                    ];
-                    const user_modules = await user?.getUsers_Modules();
-                    const user_module = user_modules?.find(
-                        (user_module) => user_module.moduleCode === moduleCode
-                    );
-                    const unfilteredLesses = await mod
-                        ?.getLessons()
-                        .then((lessons) =>
-                            lessons.filter(
-                                (less) =>
-                                    less.sem === actSemester &&
-                                    less.ay === actAy
-                            )
-                        );
-                    // Add the lessons
-                    await Promise.all(
-                        lessonTypes.map(async (lessonType) => {
-                            const less = unfilteredLesses?.find(
-                                (less) => less.lessonType === lessonType
-                            );
-                            return await user_module?.addLessons(
-                                // Filter through 4 variables in total: Only can vary by startTime - i.e. Different slots for same lesson id
-                                unfilteredLesses?.filter(
-                                    (lesson) =>
-                                        less?.lessonId === lesson.lessonId &&
-                                        less.lessonType === lesson.lessonType
-                                )
-                            );
-                        })
-                    );
-                    return res.status(200).json({ message: 'Module added!' });
-                }
-
-                await Promise.all(
-                    lessons.map(async (lesson: lesson) => {
-                        return await Lessons.findOne({
-                            where: {
-                                moduleCode: moduleCode,
-                                lessonType: lesson.lessonType,
-                                lessonId: lesson.lessonId,
-                                ay: lesson.ay,
-                                sem: lesson.sem,
-                                startTime: lesson.startTime
-                            }
-                        }).then((lesson) => {
-                            user?.getUsers_Modules().then((user_modules) => {
-                                return user_modules
-                                    .find(
-                                        (user_module) =>
-                                            user_module.moduleCode ===
-                                            moduleCode
-                                    )
-                                    ?.addLesson(lesson as Lessons);
-                            });
-                        });
-                    })
-                );
-                return res.status(200).json({ message: 'Module added!' });
             });
+
+            const lessonsToAdd = (await Promise.all(
+                lessons.map(async (less) => await Lessons.findByPk(less.id))
+            )) as Lessons[];
+
+            // If lessons === [], then add find default lessons
+            if (lessonsToAdd.length === 0) {
+                const unfilteredLessons = (
+                    await modToAdd?.getLessons()
+                )?.filter(
+                    (less) => less.sem === actSemester && less.ay === actAy
+                );
+                const lessonTypes = [
+                    ...new Set(
+                        unfilteredLessons?.map((less) => less.lessonType)
+                    )
+                ];
+
+                // Map over to the lessons to actually add
+                lessonsToAdd.push(
+                    ...(lessonTypes.flatMap((lessonType) => {
+                        // Find first matching lesson type
+                        const less = unfilteredLessons?.find(
+                            (less) => less.lessonType === lessonType
+                        );
+                        // Filter through 4 variables in total: Only can vary by startTime - i.e. Different slots for same lesson id
+                        return unfilteredLessons?.filter(
+                            (lesson) =>
+                                less?.lessonId === lesson.lessonId &&
+                                less?.lessonType === lesson.lessonType
+                        );
+                    }) as Lessons[])
+                );
+            }
+
+            // If lessonsToAdd === [] still, then module is useless -> Don't have to add in the first place.
+            if (lessonsToAdd.length === 0) {
+                return res
+                    .status(404)
+                    .json({ message: 'No lessons for module passed!' });
+            }
+            await (await user?.getUsers_Modules())
+                ?.find((user_mod) => user_mod.moduleCode === moduleCode)
+                ?.addLessons(lessonsToAdd);
+            return res
+                .status(200)
+                .json({ message: 'Module added with default lessons!' });
         })
         .catch((err) =>
             res.status(404).json({
