@@ -1,5 +1,5 @@
 import styles from '@components/dashboard/timetable/mod.module.css';
-import module, { moduleWithLessons } from '@models/module';
+import module, { moduleWithLessonsFixedChosen } from '@models/module';
 import TrashIcon from '../dashboard/TrashIcon';
 import config from '@/config';
 import axios from 'axios';
@@ -14,8 +14,8 @@ export default function Mod({
 }: {
     mod: module;
     color: string;
-    mods: moduleWithLessons[];
-    setMods: Dispatch<moduleWithLessons[]>;
+    mods: moduleWithLessonsFixedChosen[];
+    setMods: Dispatch<moduleWithLessonsFixedChosen[]>;
 }) {
     const trashHandler = async () => {
         await axios.delete(`${expressHost}/authorized/module`, {

@@ -8,6 +8,7 @@ const {
     hasModule,
     searchModules,
     getLessons,
+    getPossibleLessonsForModule,
     getAllPossibleLessons,
     addModule,
     removeModule,
@@ -22,6 +23,7 @@ expressRouter.put('/module', addModule);
 expressRouter.delete('/module', removeModule);
 expressRouter.put('/lessons', updateLesson);
 expressRouter.get('/lessons', getLessons);
+expressRouter.get('/module/lessons', getPossibleLessonsForModule);
 expressRouter.get('/all/lessons', getAllPossibleLessons);
 
 export default expressRouter;

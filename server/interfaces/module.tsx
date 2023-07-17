@@ -1,4 +1,4 @@
-import lesson, { lessonAPI, attributes } from '@interfaces/lesson';
+import lesson, { lessonAPI, attributes, lessonFixed } from '@interfaces/lesson';
 
 export interface moduleAPI {
     acadYear: string; // "2021/2022"
@@ -48,4 +48,10 @@ export interface modType {
     lecture: modDet;
     tutorial: modDet;
     lab: modDet;
+}
+
+export interface moduleWithLessonsFixed {
+    code: string;
+    name: string;
+    lessons: lessonFixed[];
 }

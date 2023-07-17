@@ -124,7 +124,9 @@ Checks if module code exists and is correct, if not in correct format -> Correct
 Create a new group with the list of users, return groupId
 **/
 async function createGroup(req: Request, res: Response) {
-    const { groupName, moduleCode, color, username } = req.body;
+    const { groupName, moduleCode, color, username, ay, sem } = req.body;
+    const actAy = parseInt(ay);
+    const actSem = parseInt(sem);
     await Modules.findOne({
         where: {
             code: {
@@ -137,7 +139,9 @@ async function createGroup(req: Request, res: Response) {
             const group = await Groups.create({
                 name: groupName,
                 moduleCode: moduleCode,
-                color: color
+                color: color,
+                ay: actAy,
+                sem: actSem
             });
             const user = await Users.findByPk(username, {
                 include: [

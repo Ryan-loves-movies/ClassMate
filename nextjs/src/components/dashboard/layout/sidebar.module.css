@@ -31,7 +31,7 @@
 
 .app-sidebar-container span {
     visibility: hidden;
-    margin-left: 35px;
+    margin-left: 15px;
     transition: margin 0.4s ease;
 }
 
@@ -47,6 +47,17 @@
     justify-content: flex-start;
     padding: 8px;
 }
+
+/* .app-sidebar:hover .item-1 span { */
+/*     transition: all 0.4s ease; */
+/* } */
+/**/
+/* .app-sidebar:hover .item-2 span { */
+/*     transition: all 0.8s ease; */
+/* } */
+/* .app-sidebar:hover .item-3 span { */
+/*     transition: all 1.2s ease; */
+/* } */
 
 .app-sidebar:hover .app-sidebar-container span {
     display: flex;
