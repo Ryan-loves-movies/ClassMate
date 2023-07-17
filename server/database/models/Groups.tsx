@@ -73,7 +73,7 @@ Groups.init(
             },
         },
         color: {
-            type: DataTypes.STRING(10),
+            type: DataTypes.STRING(30),
             allowNull: false
         }
     },

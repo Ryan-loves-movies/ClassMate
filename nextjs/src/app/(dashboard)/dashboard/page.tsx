@@ -227,12 +227,13 @@ export default function Dashboard() {
         console.log('4');
     }, [groups, userChosen, groupChosen]);
 
+    // Formatted Date if you ever want it again!
+    // <p className={styles['time']}>{formattedDate.toString()}</p>
     return (
         <>
             <div className={styles['projects-section']}>
                 <div className={styles['projects-section-header']}>
                     <p>Groups</p>
-                    <p className={styles['time']}>{formattedDate.toString()}</p>
                     <AddProjectButton clickHandler={addGroup} />
                 </div>
                 <div className={styles['project-boxes']}>

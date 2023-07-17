@@ -61,7 +61,7 @@ Users_Modules.init(
             references: {
                 model: 'Users_Modules_Lessons',
                 key: 'userId'
-            }
+            },
         },
         username: {
             type: DataTypes.STRING(30),
