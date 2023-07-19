@@ -1,5 +1,5 @@
 'use client';
-import React, { Dispatch } from 'react';
+import React, { Dispatch, useEffect } from 'react';
 import styles from '@components/dashboard/timetable/timetable.module.css';
 import colors from '@models/colors';
 
@@ -303,9 +303,11 @@ function Timetable({
         (firstNo, secNo) => firstNo + secNo.overlaps,
         0
     );
+    useEffect(() => {
+        setOverflowY(totalOverlaps > 6);
+    }, [totalOverlaps]);
     // Activities for the whole week
     const Activities = () => {
-        setOverflowY(totalOverlaps > 6);
         return (
             <>
                 {orderedActivities.map((overlapNActivities, index: number) => {
