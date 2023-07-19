@@ -2,23 +2,13 @@ import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
 import OptimizeButton from '@components/dashboard/dashboard/OptimizeButton';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
 import { groupWithUsersNoEmail } from '@models/group';
-import { userWithoutEmail, userWithoutEmailPhoto } from '@models/user';
+import { userWithoutEmail } from '@models/user';
 import PhotoRenderer from '@components/dashboard/PhotoRenderer';
-import module, { moduleWithoutName } from '@models/module';
-import lesson from '@models/lesson';
-
-interface fullModule extends module {
-    lessons: lesson[];
-}
-
-interface fullUser extends userWithoutEmailPhoto {
-    modules: fullModule[];
-}
 
 const ProfilePhotos = ({ users }: { users: userWithoutEmail[] }) => {
     return (

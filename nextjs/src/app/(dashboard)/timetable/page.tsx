@@ -13,18 +13,19 @@ import SearchResults from '@components/dashboard/timetable/SearchResults';
 import Mod from '@components/dashboard/timetable/Mod';
 
 export default function TimetableMain() {
-    const [mods, setMods] = useState<moduleWithLessons[]>([]);
+    const [mods, setMods] = useState<moduleWithLessonsFixedChosen[]>([]);
     const [addedMod, setAddedMod] = useState<string>();
     const [searchRes, setSearchRes] = useState<module[]>([]);
-    const [retainFocus, setRetainFocus] = useState<boolean>(false);
+    const [overflowY, setOverflowY] = useState<boolean>(false);
 
     useEffect(() => {
         const updateAddedMod = async (addedMod: string | undefined) => {
             // Don't update to default timing if module already exists on timetable
             if (
                 addedMod === undefined ||
+                addedMod === '' ||
                 mods.find((indivMod) => indivMod.code === addedMod) !==
-                    undefined
+                undefined
             ) {
                 return;
             }
@@ -68,7 +69,8 @@ export default function TimetableMain() {
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status === 200) {
-                        const tempMods: moduleWithLessons[] = res.data.modules;
+                        const tempMods: moduleWithLessonsFixedChosen[] =
+                            res.data.modules;
                         setMods(tempMods);
                     }
                 })
@@ -119,18 +121,25 @@ export default function TimetableMain() {
     const modSearchBarRef = useRef<HTMLInputElement>(null);
     const handleMouseDown = (event: React.MouseEvent<HTMLLIElement>) => {
         event.preventDefault();
-        setRetainFocus(true);
         {
             modSearchBarRef.current && modSearchBarRef.current?.focus();
         }
         setAddedMod(searchRes[focusedIndex].code);
     };
 
-
-
     return (
-        <div className={styles['projects-section']} onKeyDown={handleKeyDown}>
-            <Timetable activities={mods} />
+        <div
+            className={styles['projects-section']}
+            onKeyDown={handleKeyDown}
+            style={{
+                overflowY: `${overflowY ? 'scroll' : 'hidden'}`
+            }}
+        >
+            <Timetable
+                activities={mods}
+                setMods={setMods}
+                setOverflowY={setOverflowY}
+            />
             <div
                 className={styles['module-field']}
                 onBlur={() => setSearchRes([])}

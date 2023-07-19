@@ -1,4 +1,4 @@
-import sequelize from "@server/database/connection";
+import sequelize from '@server/database/connection';
 import {
     Association,
     BelongsToCreateAssociationMixin,
@@ -17,10 +17,10 @@ import {
     DataTypes,
     InferAttributes,
     InferCreationAttributes,
-    Model,
-} from "sequelize";
-import Modules from "@models/Modules";
-import Users from "@models/Users";
+    Model
+} from 'sequelize';
+import Modules from '@models/Modules';
+import Users from '@models/Users';
 
 class Groups extends Model<
     InferAttributes<Groups>,
@@ -29,6 +29,8 @@ class Groups extends Model<
     declare id: number | null;
     declare name: string;
     declare moduleCode: string;
+    declare ay: number;
+    declare sem: number;
     declare color: string;
 
     declare getUsers: BelongsToManyGetAssociationsMixin<Users>;
@@ -58,19 +60,27 @@ Groups.init(
             allowNull: false,
             unique: true,
             autoIncrement: true,
-            primaryKey: true,
+            primaryKey: true
         },
         name: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
         moduleCode: {
             type: DataTypes.STRING(30),
             allowNull: false,
             references: {
-                model: "Modules",
-                key: "code",
-            },
+                model: 'Modules',
+                key: 'code'
+            }
+        },
+        ay: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        sem: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
         color: {
             type: DataTypes.STRING(30),
@@ -79,8 +89,8 @@ Groups.init(
     },
     {
         sequelize,
-        tableName: "Groups",
-        timestamps: false,
+        tableName: 'Groups',
+        timestamps: false
     }
 );
 

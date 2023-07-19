@@ -1,35 +1,43 @@
 'use client';
-import React from 'react';
+import React, { Dispatch } from 'react';
 import styles from '@components/dashboard/timetable/timetable.module.css';
 import colors from '@models/colors';
 
-import { moduleWithLessons } from '@models/module';
+import { moduleWithLessonsFixedChosen } from '@models/module';
+import overlapCounter from '@components/dashboard/timetable/overlapCounter';
+import axios, { AxiosResponse } from 'axios';
+import config from '@/config';
+import { lessonChosen, lessonFixedChosen } from '@models/lesson';
+const { expressHost } = config;
 
-// Component for the background
-const Col = ({ gray = false }: { gray: boolean }) => {
-    return (
-        <div
-            className={`${styles['s-hour-row']} ${
-                gray ? styles['gray-col'] : ''
-            }`}
-        >
-            <div className={`${styles['s-hour-wrapper']}`} />
-            <div className={`${styles['s-hour-wrapper']}`} />
-            <div className={`${styles['s-hour-wrapper']}`} />
-            <div className={`${styles['s-hour-wrapper']}`} />
-            <div className={`${styles['s-hour-wrapper']}`} />
-        </div>
-    );
+const readableWeeks = (weeks: number[]) => {
+    const readableStr: string[] = [];
+
+    for (let week of weeks) {
+        if (readableStr.length === 0) {
+            readableStr.push(week.toString());
+            continue;
+        }
+        if (weeks.find((no) => no === week - 1) !== undefined) {
+            const lastStr = readableStr.pop() || '0';
+            readableStr.push(`${lastStr[0]}-${week}`);
+            continue;
+        }
+        readableStr.push(week.toString());
+    }
+    return readableStr.join();
 };
 
-export default function Timetable({
-    activities
+function Timetable({
+    activities,
+    setMods,
+    setOverflowY
 }: {
-    activities: moduleWithLessons[];
+    activities: moduleWithLessonsFixedChosen[];
+    setMods: Dispatch<moduleWithLessonsFixedChosen[]>;
+    setOverflowY: Dispatch<boolean>;
 }) {
-    // const twoHourBox = useRef<HTMLDivElement>(null);
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     // Components for the module tabs
     const toMin = (hours: number, minutes: number, time = ''): number => {
         if (time === null || time.length === 0) {
@@ -56,23 +64,6 @@ export default function Timetable({
         moduleCode: string,
         lessonType: string
     ) => {
-        const unChosen = activities
-            .flatMap((activity) => activity.lessons)
-            .filter((less) => !less.chosen);
-        const activitiesRemoved = activities.map((activity) => {
-            return {
-                code: activity.code,
-                name: activity.name,
-                lessons: activity.lessons.filter((less) => less.chosen)
-            };
-        });
-        if (
-            unChosen.find(() => true)?.moduleCode === moduleCode &&
-            unChosen.find(() => true)?.lessonType === lessonType
-        ) {
-            setMods(activitiesRemoved);
-            return;
-        }
         const possibleLessons = await axios
             .get(`${expressHost}/authorized/module/lessons`, {
                 headers: {
@@ -96,7 +87,7 @@ export default function Timetable({
                 });
             });
         setMods(
-            activitiesRemoved.map((activity) => {
+            activities.map((activity) => {
                 if (activity.code === moduleCode) {
                     const currLessWithoutLessonType = activity.lessons.filter(
                         (less) => less.lessonType !== lessonType
@@ -114,7 +105,7 @@ export default function Timetable({
     };
 
     /** NOTE: ay and sem is implied by the function being limited by the activities variable already
-        * */
+     * */
     const actClickHandlerUnchosen = async (
         lessonId: string,
         lessonType: string,
@@ -191,6 +182,8 @@ export default function Timetable({
 
     // One Activitiy Tab
     const Activity = ({
+        top = 0,
+        height = 100,
         code = 'BT1101',
         startTime = '0800',
         endTime = '2200',
@@ -203,6 +196,8 @@ export default function Timetable({
         chosen,
         haveOthersChosen
     }: {
+        top: number;
+        height: number;
         code: string;
         startTime: string;
         endTime: string;
@@ -219,12 +214,14 @@ export default function Timetable({
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div
-                className={`${styles['s-act-tab']} ${
-                    haveOthersChosen && chosen ? styles['s-act-tab-chosen'] : ''
-                }`}
+                className={`${styles['s-act-tab']} ${haveOthersChosen && chosen ? styles['s-act-tab-chosen'] : ''
+                    }`}
                 style={{
+                    top: `${top}%`,
                     left: `${start}%`,
-                    width: `${width}%`
+                    width: `${width}%`,
+                    height: `${height}%`,
+                    opacity: `${chosen ? 0.8 : 0.5}`
                 }}
             >
                 {fixed ? (
@@ -235,27 +232,27 @@ export default function Timetable({
                         onClick={() =>
                             chosen
                                 ? actClickHandlerChosen(
-                                      parseInt(
-                                          sessionStorage.getItem('ay') as string
-                                      ),
-                                      parseInt(
-                                          sessionStorage.getItem(
-                                              'sem'
-                                          ) as string
-                                      ),
-                                      sessionStorage.getItem(
-                                          'username'
-                                      ) as string,
-                                      code,
-                                      lessonType
-                                  )
+                                    parseInt(
+                                        sessionStorage.getItem('ay') as string
+                                    ),
+                                    parseInt(
+                                        sessionStorage.getItem(
+                                            'sem'
+                                        ) as string
+                                    ),
+                                    sessionStorage.getItem(
+                                        'username'
+                                    ) as string,
+                                    code,
+                                    lessonType
+                                )
                                 : actClickHandlerUnchosen(
-                                      lessonId,
-                                      lessonType,
-                                      code,
-                                      activities,
-                                      setMods
-                                  )
+                                    lessonId,
+                                    lessonType,
+                                    code,
+                                    activities,
+                                    setMods
+                                )
                         }
                     />
                 )}
@@ -270,24 +267,34 @@ export default function Timetable({
                     className={styles['s-act-lesson']}
                 >{`${lessonType} [${lessonId}]`}</div>
                 <div className={styles['s-act-lesson']}>{venue}</div>
-                <div className={styles['s-act-lesson']}>{weeks}</div>
+                <div className={styles['s-act-lesson']}>
+                    {`Weeks ${readableWeeks(weeks)}`}
+                </div>
             </div>
         );
     };
 
+    const activitiesWithColors = activities.map(
+        (mod: moduleWithLessonsFixedChosen, index: number) => {
+            return {
+                ...mod,
+                color: colors[index % 12]
+            };
+        }
+    );
+    const orderedActivities = overlapCounter(activitiesWithColors);
+    const totalOverlaps = orderedActivities.reduce(
+        (firstNo, secNo) => firstNo + secNo.overlaps,
+        0
+    );
     // Activities for the whole week
     const Activities = () => {
-        const activitiesWithColors = activities.map(
-            (mod: moduleWithLessons, index: number) => {
-                return {
-                    ...mod,
-                    color: colors[index % 12]
-                };
-            }
-        );
+        setOverflowY(totalOverlaps > 6);
         return (
             <>
-                {days.map((day) => {
+                {orderedActivities.map((overlapNActivities, index: number) => {
+                    const height =
+                        (100 / totalOverlaps) * overlapNActivities.overlaps;
                     return (
                         <div
                             className={styles['s-act-row']}
@@ -302,9 +309,9 @@ export default function Timetable({
                                         .filter(
                                             (specificLess) =>
                                                 less.lessonType ===
-                                                    specificLess.lessonType &&
+                                                specificLess.lessonType &&
                                                 less.moduleCode ===
-                                                    specificLess.moduleCode
+                                                specificLess.moduleCode
                                         )
                                         .map(
                                             (specificLess) =>
@@ -346,6 +353,30 @@ export default function Timetable({
         );
     };
 
+    // Component for the background
+    const Col = ({ gray = false }: { gray: boolean }) => {
+        return (
+            <div
+                className={`${styles['s-hour-row']} ${gray ? styles['gray-col'] : ''
+                    }`}
+            >
+                {orderedActivities.map((overlapNActivities, index: number) => {
+                    const height =
+                        (100 / totalOverlaps) * overlapNActivities.overlaps;
+                    return (
+                        <div
+                            className={`${styles['s-hour-wrapper']}`}
+                            style={{
+                                height: `${height}%`
+                            }}
+                            key={`background-${index}`}
+                        />
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div className={styles['DM_Sans']}>
             <div className={styles['header']}>
@@ -358,13 +389,32 @@ export default function Timetable({
                 <div className={styles['s-head-hour']}>2000</div>
                 <div className={styles['s-head-hour']}>2200</div>
             </div>
-            <div className={styles['schedule']}>
+            <div
+                className={styles['schedule']}
+                style={{
+                    height: `${(500 / 5) * totalOverlaps}px`,
+                    maxHeight: '700px'
+                }}
+            >
                 <div className={styles['s-legend']}>
-                    <div className={styles['s-week-day']}>Mon</div>
-                    <div className={styles['s-week-day']}>Tue</div>
-                    <div className={styles['s-week-day']}>Wed</div>
-                    <div className={styles['s-week-day']}>Thu</div>
-                    <div className={styles['s-week-day']}>Fri</div>
+                    {orderedActivities.map(
+                        (overlapNActivities, index: number) => {
+                            const height =
+                                (100 / totalOverlaps) *
+                                overlapNActivities.overlaps;
+                            return (
+                                <div
+                                    className={styles['s-week-day']}
+                                    style={{
+                                        height: `${height}%`
+                                    }}
+                                    key={`days-legend-${index}`}
+                                >
+                                    {days[index]}
+                                </div>
+                            );
+                        }
+                    )}
                 </div>
                 <div className={styles['s-container']}>
                     <div className={styles['s-activities']}>
@@ -384,3 +434,5 @@ export default function Timetable({
         </div>
     );
 }
+
+export default React.memo(Timetable);

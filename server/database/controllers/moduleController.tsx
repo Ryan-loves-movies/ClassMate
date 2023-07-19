@@ -2,14 +2,13 @@ import { Request, Response } from 'express';
 import Users from '@models/Users';
 import Modules from '@models/Modules';
 import Users_Modules from '@models/Users_Modules';
-import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
 import Lessons from '@models/Lessons';
 import { EmptyResultError, Op } from 'sequelize';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
 
 import module from '@interfaces/module';
-import lesson from '@interfaces/lesson';
+import lesson, { lessonChosen, lessonFixedChosen } from '@interfaces/lesson';
 
 interface lessonResponse {
     classNo: string;
@@ -359,10 +358,33 @@ async function getLessons(
                                         less.sem == semester && less.ay === ay
                                 )
                             );
+                        const possibleLessons = (await mod.getLessons()).filter(
+                            (less) => less.ay === ay && less.sem === semester
+                        );
                         return {
                             code: mod.code,
                             name: mod.name,
-                            lessons: lesses.map((less) => less.toJSON())
+                            lessons: lesses.map((less) => {
+                                return {
+                                    ...less.toJSON(),
+                                    chosen: true,
+                                    fixed:
+                                        [
+                                            ...new Set(
+                                                possibleLessons
+                                                    .filter(
+                                                        (lesson) =>
+                                                            lesson.lessonType ===
+                                                            less.lessonType
+                                                    )
+                                                    .map(
+                                                        (lesson) =>
+                                                            lesson.lessonId
+                                                    )
+                                            )
+                                        ].length === 1
+                                };
+                            }) as lessonFixedChosen[]
                         };
                     })
                 );
@@ -372,8 +394,61 @@ async function getLessons(
                 });
             });
         })
+        .catch((err) => {
+            console.log(err);
+            return res
+                .status(404)
+                .json({ message: 'User not found!', error: err });
+        });
+}
+
+async function getPossibleLessonsForModule(req: Request, res: Response) {
+    const ay = parseInt(req.query.ay as string);
+    const semester = parseInt(req.query.semester as string);
+    const username = req.query.username as string;
+    const moduleCode = req.query.moduleCode as string;
+    const lessonType = req.query.lessonType as string;
+
+    return await Users.findByPk(username, {
+        include: [
+            {
+                model: Modules
+            },
+            {
+                model: Users_Modules
+            }
+        ]
+    })
+        .then(async (user) => {
+            const mod = (await user?.getModules())?.find(
+                (mod) => mod.code === moduleCode
+            );
+            const user_mod = (await user?.getUsers_Modules())?.find(
+                (user_mod) => user_mod.moduleCode === moduleCode
+            );
+            const currLessons = await user_mod?.getLessons();
+            const possibleLessons = await mod?.getLessons();
+            return res.status(200).json({
+                lessons: possibleLessons
+                    ?.filter(
+                        (less) =>
+                            less.ay === ay &&
+                            less.sem === semester &&
+                            less.lessonType === lessonType
+                    )
+                    .map((less) => {
+                        return {
+                            ...less.toJSON(),
+                            chosen:
+                                currLessons?.find(
+                                    (currLess) => currLess.id === less.id
+                                ) !== undefined
+                        } as lessonChosen;
+                    })
+            });
+        })
         .catch((err) =>
-            res.status(404).json({ message: 'User not found!', error: err })
+            res.status(404).json({ message: 'Module not found!', error: err })
         );
 }
 
@@ -690,6 +765,7 @@ export default {
     hasModule,
     searchModules,
     getLessons,
+    getPossibleLessonsForModule,
     getAllPossibleLessons,
     addModule,
     removeModule,

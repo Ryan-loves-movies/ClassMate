@@ -13,7 +13,7 @@ export default function Sidebar() {
                 href="/dashboard"
                 className={`${styles['app-sidebar-container']} ${
                     pathName === '/dashboard' ? styles['active'] : ''
-                }`}
+                } ${styles['item-1']}`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@ export default function Sidebar() {
                 href="/timetable"
                 className={`${styles['app-sidebar-container']} ${
                     pathName === '/timetable' ? styles['active'] : ''
-                }`}
+                } ${styles['item-2']}`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +63,7 @@ export default function Sidebar() {
                 href="/settings"
                 className={`${styles['app-sidebar-container']} ${
                     pathName === '/settings' ? styles['active'] : ''
-                }`}
+                } ${styles['item-3']}`}
             >
                 <svg
                     className="link-icon feather feather-settings "

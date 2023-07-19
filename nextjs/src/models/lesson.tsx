@@ -15,6 +15,18 @@ export interface lessonAPI {
     covidZone: string; // "B"
 }
 
+export interface lessonFixed extends lesson {
+    fixed: boolean;
+}
+
+export interface lessonChosen extends lesson {
+    chosen: boolean;
+}
+
+export interface lessonFixedChosen extends lesson {
+    fixed: boolean;
+    chosen: boolean;
+}
 
 // JSON structure returned from personal database
 export default interface lesson {
