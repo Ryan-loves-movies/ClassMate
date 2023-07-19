@@ -303,9 +303,6 @@ function Timetable({
         (firstNo, secNo) => firstNo + secNo.overlaps,
         0
     );
-    useEffect(() => {
-        setOverflowY(totalOverlaps > 6);
-    }, [totalOverlaps]);
     // Activities for the whole week
     const Activities = () => {
         return (
@@ -394,6 +391,10 @@ function Timetable({
             </div>
         );
     };
+
+    useEffect(() => {
+        setOverflowY(totalOverlaps > 6);
+    }, [totalOverlaps]);
 
     return (
         <div className={styles['DM_Sans']}>

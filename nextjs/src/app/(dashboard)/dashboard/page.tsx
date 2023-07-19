@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import '@app/(dashboard)/globals.css';
 import styles from '@app/(dashboard)/dashboard/dashboard.module.css';
 import GroupBox from '@components/dashboard/dashboard/GroupBox';

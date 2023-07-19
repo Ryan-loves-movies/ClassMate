@@ -51,39 +51,47 @@
 }
 
 .act-left-arrow {
-    border-radius: 4px;
+    border-radius: 4px 4px 0px 4px;
+    padding: 0px;
+    background: transparent;
     display: flex;
     width: 15px;
     height: 15px;
     border-left: 3px solid;
     border-top: 3px solid;
+    border-right: 0px;
+    border-bottom: 0px;
     transform: rotate(-45deg);
     transform-origin: top right;
 }
 
 .act-right-arrow {
-    border-radius: 4px;
+    padding: 0px;
+    background: transparent;
+    border-radius: 4px 4px 4px 0px;
     display: flex;
     width: 15px;
     height: 15px;
     border-top: 3px solid;
     border-right: 3px solid;
+    border-left: 0px;
+    border-bottom: 0px;
     transform: rotate(45deg);
     transform-origin: top left;
 }
 
-a.act-left-arrow,
-a.act-right-arrow {
+button.act-left-arrow,
+button.act-right-arrow {
     border-color: #5b86e5;
 }
 
-a.act-left-arrow:hover {
+button.act-left-arrow:hover {
     border-top: 5px solid;
     border-left: 5px solid;
     border-color: #5b86e5;
 }
 
-a.act-right-arrow:hover {
+button.act-right-arrow:hover {
     border-top: 5px solid;
     border-right: 5px solid;
     border-color: #5b86e5;
