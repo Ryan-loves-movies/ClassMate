@@ -94,11 +94,11 @@ const FoundUsers = ({
 };
 
 export default function Dashboard() {
-    // Determining date for section
-    const currentDate = new Date();
-    const month = currentDate.toLocaleString('default', { month: 'long' });
-    const day = currentDate.getDate();
-    const formattedDate = `${month}, ${day}`;
+    // // Determining date for section
+    // const currentDate = new Date();
+    // const month = currentDate.toLocaleString('default', { month: 'long' });
+    // const day = currentDate.getDate();
+    // const formattedDate = `${month}, ${day}`;
 
     // setNewGroup will be set by groupForm when form is submitted => Then re-rendering of group boxes
     // setGroups will be set by the rendering of the groupBoxes
@@ -173,7 +173,9 @@ export default function Dashboard() {
                         Authorization: sessionStorage.getItem('token')
                     },
                     params: {
-                        username: sessionStorage.getItem('username')
+                        username: sessionStorage.getItem('username'),
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => {

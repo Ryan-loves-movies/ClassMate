@@ -11,6 +11,10 @@ export interface userCreator {
     username: string;
     email: string;
     password: string;
+    photo: {
+        type: string;
+        data: string[];
+    };
 }
 
 export interface userLogIn {

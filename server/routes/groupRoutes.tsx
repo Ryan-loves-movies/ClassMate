@@ -4,7 +4,6 @@ import groupController from '@controllers/groupController';
 import generateTimetable from '@server/solver/solverController';
 
 const {
-    getGroupId,
     getGroups,
     getUsersInGroup,
     createGroup,

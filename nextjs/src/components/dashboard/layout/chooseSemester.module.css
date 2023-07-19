@@ -51,6 +51,7 @@
 }
 
 .act-left-arrow {
+    border-radius: 4px;
     display: flex;
     width: 15px;
     height: 15px;
@@ -61,6 +62,7 @@
 }
 
 .act-right-arrow {
+    border-radius: 4px;
     display: flex;
     width: 15px;
     height: 15px;

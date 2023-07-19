@@ -51,6 +51,8 @@ export default function GroupForm({
                     groupName,
                     moduleCode,
                     color: color,
+                    ay: sessionStorage.getItem('ay'),
+                    semester: sessionStorage.getItem('sem'),
                     username: sessionStorage.getItem('username')
                 },
                 {

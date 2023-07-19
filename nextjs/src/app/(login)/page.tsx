@@ -7,6 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { regPassword, regUsername, regEmail } from '@app/(login)/validation';
 import LocalError from '@components/login/LocalError';
 import config from '@/config';
+import defaultPhoto from './bbook.json';
 
 export default function Home() {
     const router = useRouter();
@@ -67,7 +68,8 @@ export default function Home() {
             .post(`${config.expressHost}/register`, {
                 email: email,
                 username: username,
-                password: password
+                password: password,
+                photo: defaultPhoto
             })
             .then((res: AxiosResponse) => {
                 if (res.status === 201) {

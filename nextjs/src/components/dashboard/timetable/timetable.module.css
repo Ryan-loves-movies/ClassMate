@@ -78,14 +78,31 @@
 }
 
 .s-act-tab {
-    height: 95%;
+    position: absolute;
+}
+
+.s-act-tab-chosen {
+    animation: pulse 1.2s ease-in infinite;
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(1.04);
+    }
+}
+
+.act-btn {
+    opacity: 0;
+    width: 98%;
+    height: 98%;
     border-radius: 16px;
     position: absolute;
 }
 
 .s-act-tab-background {
-    height: 100%;
-    width: 100%;
+    top: 1%;
+    height: 98%;
+    width: 98%;
     border-radius: 16px;
     position: absolute;
     opacity: 0.8;

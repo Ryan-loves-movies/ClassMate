@@ -3,7 +3,7 @@ import styles from '@components/peopleBar.module.css';
 import StatusBar from '@components/dashboard/dashboard/StatusBar';
 import PhotoRenderer from '@components/dashboard/PhotoRenderer';
 import config from '@/config';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 const { expressHost } = config;
 
 import group from '@models/group';
@@ -14,7 +14,7 @@ let starIdCounter = 0;
 export default function PeopleBar({
     user,
     bio,
-    setUserChosen,
+    setUserChosen
 }: {
     user: userWithoutEmail;
     bio: string;
@@ -52,7 +52,9 @@ export default function PeopleBar({
                         Authorization: sessionStorage.getItem('token')
                     },
                     params: {
-                        username: username
+                        username: username,
+                        ay: sessionStorage.getItem('ay'),
+                        semester: sessionStorage.getItem('sem')
                     }
                 })
                 .then((res: AxiosResponse) => {

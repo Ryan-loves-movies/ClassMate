@@ -6,7 +6,7 @@ import config from '@server/config';
 import Users from '@models/Users';
 import { Op } from 'sequelize';
 
-import { userCreator, userLogIn } from '@interfaces/user';
+import { userLogIn } from '@interfaces/user';
 
 // Number of iterative hashing for password encryption
 const saltRounds = 10;
@@ -58,14 +58,15 @@ const searchUsers = async (req: Request, res: Response) => {
     body: {
         username: string,
         password: string (encoded),
-        email: string
+        email: string,
+        photo: blob
     }
 }
 @param res {express.Response}
 @returns void
 **/
 const createUser = (req: Request, res: Response) => {
-    const { email, username, password }: userCreator = req.body;
+    const { email, username, password, photo } = req.body;
 
     try {
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
@@ -77,7 +78,8 @@ const createUser = (req: Request, res: Response) => {
                     {
                         username: username,
                         email: email,
-                        password: hashedPassword
+                        password: hashedPassword,
+                        photo: photo.data
                     },
                     { ignoreDuplicates: true }
                 );

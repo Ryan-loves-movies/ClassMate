@@ -27,9 +27,12 @@ export default function ChooseSemester() {
     const pathname = usePathname();
     const refresher = () => {
         console.log('oskdmk');
-        if (pathname.includes('/timetable')) {
+        if (
+            pathname.includes('/timetable') ||
+            pathname.includes('/dashboard')
+        ) {
             // Sadly, router.refresh() doesn't work
-            window.location.href = pathname
+            window.location.href = pathname;
             console.log('ok');
         }
     };

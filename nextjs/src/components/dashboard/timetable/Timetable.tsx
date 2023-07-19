@@ -49,6 +49,149 @@ export default function Timetable({
         return (min / (120 * 7)) * 100;
     };
 
+<<<<<<< Updated upstream
+=======
+    const actClickHandlerChosen = async (
+        ay: number,
+        semester: number,
+        username: string,
+        moduleCode: string,
+        lessonType: string
+    ) => {
+        const unChosen = activities
+            .flatMap((activity) => activity.lessons)
+            .filter((less) => !less.chosen);
+        const activitiesRemoved = activities.map((activity) => {
+            return {
+                code: activity.code,
+                name: activity.name,
+                lessons: activity.lessons.filter((less) => less.chosen)
+            };
+        });
+        if (
+            unChosen.find(() => true)?.moduleCode === moduleCode &&
+            unChosen.find(() => true)?.lessonType === lessonType
+        ) {
+            setMods(activitiesRemoved);
+            return;
+        }
+        const possibleLessons = await axios
+            .get(`${expressHost}/authorized/module/lessons`, {
+                headers: {
+                    Authorization: sessionStorage.getItem('token')
+                },
+                params: {
+                    ay: ay,
+                    semester: semester,
+                    username: username,
+                    moduleCode: moduleCode,
+                    lessonType: lessonType
+                }
+            })
+            .then((res: AxiosResponse) => {
+                const lesses = res.data.lessons as lessonChosen[];
+                return lesses.map((less) => {
+                    return {
+                        ...less,
+                        fixed: false
+                    } as lessonFixedChosen;
+                });
+            });
+        setMods(
+            activitiesRemoved.map((activity) => {
+                if (activity.code === moduleCode) {
+                    const currLessWithoutLessonType = activity.lessons.filter(
+                        (less) => less.lessonType !== lessonType
+                    );
+                    currLessWithoutLessonType.push(...possibleLessons);
+                    return {
+                        code: activity.code,
+                        name: activity.name,
+                        lessons: currLessWithoutLessonType
+                    };
+                }
+                return activity;
+            })
+        );
+    };
+
+    /** NOTE: ay and sem is implied by the function being limited by the activities variable already
+        * */
+    const actClickHandlerUnchosen = async (
+        lessonId: string,
+        lessonType: string,
+        moduleCode: string,
+        activities: moduleWithLessonsFixedChosen[],
+        setMods: Dispatch<moduleWithLessonsFixedChosen[]>
+    ) => {
+        const lessonIds = activities.flatMap((mod) =>
+            mod.lessons
+                .filter(
+                    (less) =>
+                        less.moduleCode === moduleCode &&
+                        less.lessonType === lessonType &&
+                        less.lessonId === lessonId
+                )
+                .map((less) => less.id)
+        );
+        await axios
+            .put(
+                `${expressHost}/authorized/lessons`,
+                {
+                    username: sessionStorage.getItem('username'),
+                    lessonIds: lessonIds
+                },
+                {
+                    headers: {
+                        Authorization: sessionStorage.getItem('token')
+                    }
+                }
+            )
+            .then(() => {
+                setMods(
+                    activities.map((mod) => {
+                        if (mod.code !== moduleCode) {
+                            return mod;
+                        }
+
+                        const chosenLessons = mod.lessons
+                            .filter(
+                                (less) =>
+                                    less.lessonType === lessonType &&
+                                    less.lessonId === lessonId
+                            )
+                            .map((less) => {
+                                return {
+                                    id: less.id,
+                                    lessonId: less.lessonId,
+                                    moduleCode: less.moduleCode,
+                                    lessonType: less.lessonType,
+                                    sem: less.sem,
+                                    weeks: less.weeks,
+                                    venue: less.venue,
+                                    day: less.day,
+                                    startTime: less.startTime,
+                                    endTime: less.endTime,
+                                    size: less.size,
+                                    fixed: less.fixed,
+                                    chosen: true
+                                } as lessonFixedChosen;
+                            });
+                        const lessonsRemoveLessonType = mod.lessons.filter(
+                            (less) => less.lessonType !== lessonType
+                        );
+                        lessonsRemoveLessonType.push(...chosenLessons);
+                        return {
+                            code: mod.code,
+                            name: mod.name,
+                            lessons: lessonsRemoveLessonType
+                        };
+                    })
+                );
+            });
+    };
+
+>>>>>>> Stashed changes
     // One Activitiy Tab
     const Activity = ({
         code = 'BT1101',
@@ -58,7 +201,14 @@ export default function Timetable({
         lessonType = 'Tutorial[C1]',
         lessonId = '1',
         venue = 'LOL',
+<<<<<<< Updated upstream
         weeks = []
+=======
+        weeks = [],
+        fixed,
+        chosen,
+        haveOthersChosen
+>>>>>>> Stashed changes
     }: {
         code: string;
         startTime: string;
@@ -68,19 +218,67 @@ export default function Timetable({
         lessonId: string;
         venue: string;
         weeks: number[];
+<<<<<<< Updated upstream
+=======
+        fixed: boolean;
+        chosen: boolean;
+        haveOthersChosen: boolean;
+>>>>>>> Stashed changes
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div
-                className={`${styles['s-act-tab']}`}
+                className={`${styles['s-act-tab']} ${
+                    haveOthersChosen && chosen ? styles['s-act-tab-chosen'] : ''
+                }`}
                 style={{
                     left: `${start}%`,
                     width: `${width}%`
                 }}
             >
+<<<<<<< Updated upstream
                 <div
                     className={`${color} ${styles['s-act-tab-background']}`}
+=======
+                {fixed ? (
+                    <></>
+                ) : (
+                    <button
+                        className={styles['act-btn']}
+                        onClick={() =>
+                            chosen
+                                ? actClickHandlerChosen(
+                                      parseInt(
+                                          sessionStorage.getItem('ay') as string
+                                      ),
+                                      parseInt(
+                                          sessionStorage.getItem(
+                                              'sem'
+                                          ) as string
+                                      ),
+                                      sessionStorage.getItem(
+                                          'username'
+                                      ) as string,
+                                      code,
+                                      lessonType
+                                  )
+                                : actClickHandlerUnchosen(
+                                      lessonId,
+                                      lessonType,
+                                      code,
+                                      activities,
+                                      setMods
+                                  )
+                        }
+                    />
+                )}
+                <div
+                    className={`${color} ${styles['s-act-tab-background']}`}
+                    style={{
+                        borderRadius: `${fixed ? 5 : 16}px`
+                    }}
+>>>>>>> Stashed changes
                 />
                 <div className={styles['s-act-name']}>{code}</div>
                 <div
@@ -106,6 +304,7 @@ export default function Timetable({
             <>
                 {days.map((day) => {
                     return (
+<<<<<<< Updated upstream
                         <div className={styles['s-act-row']} key={day}>
                             {activitiesWithColors.map((mod) => {
                                 return mod.lessons
@@ -125,6 +324,57 @@ export default function Timetable({
                                             />
                                         );
                                     });
+=======
+                        <div
+                            className={styles['s-act-row']}
+                            style={{
+                                height: `${height}%`
+                            }}
+                            key={`day-${index}`}
+                        >
+                            {overlapNActivities.lessons.map((less) => {
+                                const haveOthersChosen =
+                                    !overlapNActivities.lessons
+                                        .filter(
+                                            (specificLess) =>
+                                                less.lessonType ===
+                                                    specificLess.lessonType &&
+                                                less.moduleCode ===
+                                                    specificLess.moduleCode
+                                        )
+                                        .map(
+                                            (specificLess) =>
+                                                specificLess.chosen
+                                        )
+                                        .reduce(
+                                            (chosen, specificLess) =>
+                                                chosen && specificLess
+                                        );
+                                return (
+                                    <Activity
+                                        top={
+                                            (100 /
+                                                overlapNActivities.overlaps) *
+                                            (less.order - 1)
+                                        }
+                                        height={
+                                            100 / overlapNActivities.overlaps
+                                        }
+                                        key={`${less.id}_${less.startTime}`}
+                                        code={less.moduleCode}
+                                        color={less.color}
+                                        startTime={less.startTime}
+                                        endTime={less.endTime}
+                                        lessonType={less.lessonType}
+                                        lessonId={less.lessonId}
+                                        venue={less.venue}
+                                        weeks={less.weeks}
+                                        fixed={less.fixed}
+                                        chosen={less.chosen}
+                                        haveOthersChosen={haveOthersChosen}
+                                    />
+                                );
+>>>>>>> Stashed changes
                             })}
                         </div>
                     );

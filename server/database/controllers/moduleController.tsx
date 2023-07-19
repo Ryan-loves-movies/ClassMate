@@ -516,6 +516,7 @@ async function addModule(req: Request, res: Response) {
                     .status(404)
                     .json({ message: 'No lessons for module passed!' });
             }
+            await user?.addModule(modToAdd as Modules);
             await (await user?.getUsers_Modules())
                 ?.find((user_mod) => user_mod.moduleCode === moduleCode)
                 ?.addLessons(lessonsToAdd);
@@ -596,9 +597,7 @@ async function removeModule(req: Request, res: Response) {
     },
     body: {
         username: string,
-        moduleCode: string,
-        lessonId: string (e.g. G03),
-        lessonType: string,
+        lessonIds: string[] (e.g. [1, 2, 3]) - NOTE: This refers to a list of ids, NOT lessonIds,
     }
 }
 Replaces the lesson being taken by the user for particular module in the database and returns the number of values updated
@@ -606,19 +605,12 @@ Replaces the lesson being taken by the user for particular module in the databas
 async function updateLesson(req: Request, res: Response) {
     const {
         username,
-        moduleCode,
-        lessonId,
-        lessonType,
-        ay,
-        semester
+        lessonIds
     }: {
         username: string;
-        moduleCode: string;
-        lessonId: string;
-        lessonType: string;
-        ay: number;
-        semester: number;
+        lessonIds: string[];
     } = req.body;
+    const actLessonIds = lessonIds.map((less) => parseInt(less));
     return await Users.findByPk(username, {
         include: [
             {
@@ -635,37 +627,56 @@ async function updateLesson(req: Request, res: Response) {
         ]
     })
         .then(async (user) => {
-            const user_module = await user
-                ?.getUsers_Modules()
-                .then((user_modules) =>
-                    user_modules.find(
-                        (user_module) => user_module.moduleCode === moduleCode
-                    )
-                );
-
-            // Delete all lessons related to the lesson type and module to be updated
-            const lessons = await user_module?.getLessons();
-            const lessonToRemove = lessons?.find(
-                (lesson) =>
-                    lesson.moduleCode === moduleCode &&
-                    lesson.lessonType === lessonType &&
-                    lesson.ay === ay &&
-                    lesson.sem === semester
+            const user_modules = await user?.getUsers_Modules();
+            const unfilteredLessons = await Promise.all(
+                actLessonIds.map(
+                    async (lessId) => await Lessons.findByPk(lessId)
+                )
             );
-            await user_module?.removeLesson(lessonToRemove);
 
-            // Finally add the lesson passed as param
-            Lessons.findAll({
-                where: {
-                    lessonId: lessonId,
-                    lessonType: lessonType,
-                    moduleCode: moduleCode,
-                    ay: ay,
-                    sem: semester
+            // Remove all related lesson types and module codes
+            const lessonTypes: Lessons[] = [];
+            unfilteredLessons.forEach((less) => {
+                if (
+                    lessonTypes.find(
+                        (lessType) =>
+                            lessType.ay === less?.ay &&
+                            lessType.sem === less.sem &&
+                            lessType.moduleCode === less.moduleCode &&
+                            lessType.lessonType === less.lessonType
+                    ) === undefined
+                ) {
+                    lessonTypes.push(less as Lessons);
                 }
-            }).then((lessonToAdd) => {
-                user_module?.addLessons(lessonToAdd);
             });
+            await Promise.all(
+                lessonTypes.map(async (less) => {
+                    const user_module = user_modules?.find(
+                        (user_mod) => user_mod.moduleCode === less.moduleCode
+                    );
+                    const lessonsToRemove = (
+                        await user_module?.getLessons()
+                    )?.filter(
+                        (toRemove) =>
+                            toRemove.ay === less?.ay &&
+                            toRemove.sem === less.sem &&
+                            toRemove.moduleCode === less.moduleCode &&
+                            toRemove.lessonType === less.lessonType
+                    );
+                    user_module?.removeLessons(lessonsToRemove);
+                })
+            );
+
+            // Add lessons that are found
+            await Promise.all(
+                unfilteredLessons.map(async (less) => {
+                    const user_module = user_modules?.find(
+                        (user_mod) => user_mod.moduleCode === less?.moduleCode
+                    );
+                    await user_module?.addLesson(less as Lessons);
+                })
+            );
+
             return res.status(200).json({ message: 'Lesson updated!' });
         })
         .catch((err) =>

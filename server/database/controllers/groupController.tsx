@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { Request, Response } from 'express';
 import Groups from '@models/Groups';
 import Users from '@models/Users';
@@ -6,43 +5,43 @@ import Users_Groups from '@models/Users_Groups';
 import Modules from '@models/Modules';
 import { Op } from 'sequelize';
 
-/** 
-    req: {
-    headers: {
-        Authorization: ~token~
-    },
-    body: {
-        usernames: string[],
-        groupName: string (new lectureCode)
-    }
-}
-Returns the groupId of the group given the users and group name.
-    NOTE: MAY NOT BE ACCURATE
-**/
-async function getGroupId(req: Request, res: Response) {
-    const { usernames, groupName } = req.body;
-    await Groups.findOne({
-        where: {
-            name: groupName
-        },
-        include: [
-            {
-                model: Users,
-                where: {
-                    username: usernames
-                }
-            }
-        ]
-    })
-        .then((group) => {
-            return res.status(200).json({ groupId: group?.id });
-        })
-        .catch((error: AxiosError) => {
-            return res
-                .status(500)
-                .json({ message: 'Group not found!', error: error });
-        });
-}
+// /**
+//     req: {
+//     headers: {
+//         Authorization: ~token~
+//     },
+//     body: {
+//         usernames: string[],
+//         groupName: string (new lectureCode)
+//     }
+// }
+// Returns the groupId of the group given the users and group name.
+//     NOTE: MAY NOT BE ACCURATE
+// **/
+// async function getGroupId(req: Request, res: Response) {
+//     const { usernames, groupName } = req.body;
+//     await Groups.findOne({
+//         where: {
+//             name: groupName
+//         },
+//         include: [
+//             {
+//                 model: Users,
+//                 where: {
+//                     username: usernames
+//                 }
+//             }
+//         ]
+//     })
+//         .then((group) => {
+//             return res.status(200).json({ groupId: group?.id });
+//         })
+//         .catch((error: AxiosError) => {
+//             return res
+//                 .status(500)
+//                 .json({ message: 'Group not found!', error: error });
+//         });
+// }
 
 /** 
     req: {
@@ -54,10 +53,12 @@ async function getGroupId(req: Request, res: Response) {
         username: string[]
     }
 }
-Create a new group with the list of users, return groupId
-**/
+Create a new group with the list of users, return groupId **/
 async function getGroups(req: Request, res: Response) {
     const username = req.query.username as string;
+    const actAy = parseInt(req.query.ay as string);
+    const actSem = parseInt(req.query.semester as string);
+
     await Users.findByPk(username, {
         include: [
             {
@@ -66,7 +67,9 @@ async function getGroups(req: Request, res: Response) {
         ]
     })
         .then(async (user) => {
-            const groups = await user?.getGroups();
+            const groups = (await user?.getGroups())?.filter(
+                (group) => group.ay === actAy && group.sem === actSem
+            );
             return res.status(200).json({
                 groups: groups?.map((group) => group.toJSON())
             });
@@ -124,7 +127,10 @@ Checks if module code exists and is correct, if not in correct format -> Correct
 Create a new group with the list of users, return groupId
 **/
 async function createGroup(req: Request, res: Response) {
-    const { groupName, moduleCode, color, username } = req.body;
+    const { groupName, moduleCode, color, username, ay, semester } = req.body;
+    const actAy = parseInt(ay);
+    const actSem = parseInt(semester);
+
     await Modules.findOne({
         where: {
             code: {
@@ -137,7 +143,9 @@ async function createGroup(req: Request, res: Response) {
             const group = await Groups.create({
                 name: groupName,
                 moduleCode: moduleCode,
-                color: color
+                color: color,
+                ay: actAy,
+                sem: actSem
             });
             const user = await Users.findByPk(username, {
                 include: [
@@ -271,7 +279,7 @@ async function removeUserFromGroup(req: Request, res: Response) {
 }
 
 export default {
-    getGroupId,
+    // getGroupId,
     getGroups,
     getUsersInGroup,
     createGroup,
