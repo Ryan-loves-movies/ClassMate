@@ -1,35 +1,29 @@
 module.exports = {
     presets: [
-        ["@babel/preset-env", { targets: { node: "current" } }],
-        "@babel/preset-react",
-        "@babel/preset-typescript",
+        [
+            '@babel/preset-env',
+            { targets: { esmodules: false, node: 'current' } }
+        ],
+        '@babel/preset-react',
+        '@babel/preset-typescript'
     ],
     plugins: [
         [
-            "@babel/plugin-transform-runtime",
+            '@babel/plugin-transform-runtime',
             {
-                regenerator: true,
-            },
+                regenerator: true
+            }
         ],
         [
-            "babel-plugin-module-resolver",
+            'babel-plugin-module-resolver',
             {
-                "alias": {
-
-                    "@app/*":
-                        "./src/app"
-                    ,
-                    "@models/*":
-                        "./src/models"
-                    ,
-                    "@components/*":
-                        "./src/components"
-                    ,
-                    "@/*":
-                        "./src"
-
+                alias: {
+                    '@app/*': './src/app',
+                    '@models/*': './src/models',
+                    '@components/*': './src/components',
+                    '@/*': './src'
                 }
             }
         ]
-    ],
+    ]
 };

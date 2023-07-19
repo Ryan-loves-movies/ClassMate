@@ -1,3 +1,4 @@
+import React from 'react';
 import '@app/(login)/globals.css';
 
 export const metadata = {

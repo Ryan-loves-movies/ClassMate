@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import styles from '@components/dashboard/layout/chooseSemester.module.css';
 import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useState } from 'react';
@@ -61,7 +62,7 @@ export default function ChooseSemester() {
             {availableAy[0] === ay && sem === 1 ? (
                 <div className={styles['act-left-arrow']} />
             ) : (
-                <a
+                <button
                     className={styles['act-left-arrow']}
                     onClick={leftArrowHandler}
                 />
@@ -73,7 +74,7 @@ export default function ChooseSemester() {
             {availableAy[availableAy.length - 1] === ay && sem === 2 ? (
                 <div className={styles['act-right-arrow']} />
             ) : (
-                <a
+                <button
                     className={styles['act-right-arrow']}
                     onClick={rightArrowHandler}
                 />

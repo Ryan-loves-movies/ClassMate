@@ -1,3 +1,4 @@
+import React from 'react';
 import module from '@models/module';
 import styles from '@components/dashboard/timetable/searchResults.module.css';
 

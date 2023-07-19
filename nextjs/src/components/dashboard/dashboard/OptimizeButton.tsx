@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from '@components/dashboard/dashboard/optimizeButton.module.css';
 import { userWithoutEmail, userWithoutEmailPhoto } from '@models/user';
 import module, { moduleWithoutName } from '@models/module';

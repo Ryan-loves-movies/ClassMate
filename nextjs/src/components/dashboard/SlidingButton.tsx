@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from '@components/dashboard/slidingButton.module.css';
 
 export default function SlidingButton({

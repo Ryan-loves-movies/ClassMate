@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from '@components/dashboard/timetable/mod.module.css';
 import module, { moduleWithLessonsFixedChosen } from '@models/module';
 import TrashIcon from '../dashboard/TrashIcon';

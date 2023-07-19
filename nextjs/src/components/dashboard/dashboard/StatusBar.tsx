@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import styles from '@components/dashboard/dashboard/statusBar.module.css';
 import { useLayoutEffect, useRef, useState } from 'react';
 

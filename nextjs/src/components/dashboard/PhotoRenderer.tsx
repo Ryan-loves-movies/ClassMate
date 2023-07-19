@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { usePhotoCache } from '@components/dashboard/photoCache';
 import Image from 'next/image';
 
