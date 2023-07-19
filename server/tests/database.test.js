@@ -9,7 +9,6 @@ import authenticateToken from '@server/middleware/auth';
 import validateUser from '@server/utils/validation';
 import { regUsername, regPassword, regEmail } from '@server/utils/validation';
 import { Request, Response } from 'express';
-import { require } from 'yargs';
 
 let hashedPassword = '';
 bcrypt.hash('test123', 10, (err, hashed) => {

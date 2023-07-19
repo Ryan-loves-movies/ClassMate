@@ -3,7 +3,7 @@ const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig.json');
 module.exports = {
     preset: 'ts-jest/presets/js-with-ts-esm',
-    testEnvironment: 'jsdom',
+    testEnvironment: 'node',
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     moduleDirectories: ['node_modules', '<rootDir>'],
@@ -16,8 +16,6 @@ module.exports = {
     modulePathIgnorePatterns: ['<rootDir>/~'],
     // extensionsToTreatAsEsm: ['.ts', '.tsx', '.js', '.jsx'],
     moduleNameMapper: {
-        '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
-        '\\.(gif|ttf|eot|svg)$': '<rootDir>/__mocks__/fileMock.js',
         ...pathsToModuleNameMapper(compilerOptions.paths, {
             prefix: '<rootDir>/'
         })
