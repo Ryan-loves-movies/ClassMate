@@ -26,16 +26,16 @@
         ],
         "paths": {
             "@app/*": [
-                "./src/app/*"
+                "src/app/*"
             ],
             "@models/*": [
-                "./src/models/*"
+                "src/models/*"
             ],
             "@components/*": [
-                "./src/components/*"
+                "src/components/*"
             ],
             "@/*": [
-                "./src/*"
+                "src/*"
             ]
         }
     },
@@ -47,13 +47,5 @@
     ],
     "exclude": [
         "node_modules"
-    ],
-    "jest": {
-        "moduleNameMapper": {
-            "^@app/(.*)$": "<rootDir>/src/app/$1",
-            "^@models/(.*)$": "<rootDir>/src/models/$1",
-            "^@components/(.*)$": "<rootDir>/src/components/",
-            "^@/(.*)$": "<rootDir>/src/$1"
-        }
-    }
+    ]
 }
