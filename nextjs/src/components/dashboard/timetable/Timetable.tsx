@@ -62,8 +62,21 @@ function Timetable({
         semester: number,
         username: string,
         moduleCode: string,
-        lessonType: string
+        lessonType: string,
+        haveOthersChosen: boolean,
+        activities: moduleWithLessonsFixedChosen[],
+        setMods: Dispatch<moduleWithLessonsFixedChosen[]>
     ) => {
+        const activitiesChosen = activities.map((activity) => {
+            return {
+                code: activity.code,
+                name: activity.name,
+                lessons: activity.lessons.filter((less) => less.chosen)
+            };
+        });
+        if (haveOthersChosen) {
+            return setMods(activitiesChosen);
+        }
         const possibleLessons = await axios
             .get(`${expressHost}/authorized/module/lessons`, {
                 headers: {
@@ -86,8 +99,8 @@ function Timetable({
                     } as lessonFixedChosen;
                 });
             });
-        setMods(
-            activities.map((activity) => {
+        return setMods(
+            activitiesChosen.map((activity) => {
                 if (activity.code === moduleCode) {
                     const currLessWithoutLessonType = activity.lessons.filter(
                         (less) => less.lessonType !== lessonType
@@ -244,7 +257,10 @@ function Timetable({
                                         'username'
                                     ) as string,
                                     code,
-                                    lessonType
+                                    lessonType,
+                                    haveOthersChosen,
+                                    activities,
+                                    setMods
                                 )
                                 : actClickHandlerUnchosen(
                                     lessonId,
