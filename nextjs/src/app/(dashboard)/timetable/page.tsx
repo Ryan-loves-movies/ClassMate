@@ -8,11 +8,7 @@ import Timetable from '@components/dashboard/timetable/Timetable';
 import ModSearchBar from '@components/dashboard/timetable/ModSearchBar';
 import colors from '@models/colors';
 
-<<<<<<< Updated upstream
-import module, { moduleWithLessons } from '@models/module';
-=======
 import module, { moduleWithLessonsFixedChosen } from '@models/module';
->>>>>>> Stashed changes
 import SearchResults from '@components/dashboard/timetable/SearchResults';
 import Mod from '@components/dashboard/timetable/Mod';
 

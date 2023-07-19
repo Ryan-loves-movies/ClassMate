@@ -49,8 +49,6 @@ export default function Timetable({
         return (min / (120 * 7)) * 100;
     };
 
-<<<<<<< Updated upstream
-=======
     const actClickHandlerChosen = async (
         ay: number,
         semester: number,
@@ -191,7 +189,6 @@ export default function Timetable({
             });
     };
 
->>>>>>> Stashed changes
     // One Activitiy Tab
     const Activity = ({
         code = 'BT1101',
@@ -201,14 +198,10 @@ export default function Timetable({
         lessonType = 'Tutorial[C1]',
         lessonId = '1',
         venue = 'LOL',
-<<<<<<< Updated upstream
-        weeks = []
-=======
         weeks = [],
         fixed,
         chosen,
         haveOthersChosen
->>>>>>> Stashed changes
     }: {
         code: string;
         startTime: string;
@@ -218,12 +211,9 @@ export default function Timetable({
         lessonId: string;
         venue: string;
         weeks: number[];
-<<<<<<< Updated upstream
-=======
         fixed: boolean;
         chosen: boolean;
         haveOthersChosen: boolean;
->>>>>>> Stashed changes
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
@@ -237,10 +227,6 @@ export default function Timetable({
                     width: `${width}%`
                 }}
             >
-<<<<<<< Updated upstream
-                <div
-                    className={`${color} ${styles['s-act-tab-background']}`}
-=======
                 {fixed ? (
                     <></>
                 ) : (
@@ -278,7 +264,6 @@ export default function Timetable({
                     style={{
                         borderRadius: `${fixed ? 5 : 16}px`
                     }}
->>>>>>> Stashed changes
                 />
                 <div className={styles['s-act-name']}>{code}</div>
                 <div
@@ -304,27 +289,6 @@ export default function Timetable({
             <>
                 {days.map((day) => {
                     return (
-<<<<<<< Updated upstream
-                        <div className={styles['s-act-row']} key={day}>
-                            {activitiesWithColors.map((mod) => {
-                                return mod.lessons
-                                    .filter((less) => less.day === day)
-                                    .map((less) => {
-                                        return (
-                                            <Activity
-                                                key={`${mod.code}_${less.id}_${less.startTime}`}
-                                                code={mod.code}
-                                                color={mod.color}
-                                                startTime={less.startTime}
-                                                endTime={less.endTime}
-                                                lessonType={less.lessonType}
-                                                lessonId={less.lessonId}
-                                                venue={less.venue}
-                                                weeks={less.weeks}
-                                            />
-                                        );
-                                    });
-=======
                         <div
                             className={styles['s-act-row']}
                             style={{
@@ -374,7 +338,6 @@ export default function Timetable({
                                         haveOthersChosen={haveOthersChosen}
                                     />
                                 );
->>>>>>> Stashed changes
                             })}
                         </div>
                     );
