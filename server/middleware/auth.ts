@@ -14,18 +14,14 @@ function authorizeToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization as string;
 
     if (!token || !token.trim()) {
-        return res.status(404).json({ message: "No token provided" });
+        return res.status(404).json({ message: "Token required!" });
     }
 
     try {
         const decoded = jwt.verify(token, config.JWT_SECRET);
-        /* res.status(200).json({
-                    message: 'Token is valid',
-                    decoded: decoded
-                }); */
         return next();
     } catch {
-        return res.status(401).json({ message: "Invalid token" });
+        return res.status(401).json({ message: "Unauthorized!" });
     }
 }
 

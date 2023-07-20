@@ -1,10 +1,10 @@
 // Users for connection with mySQL and { Request, Response } with express api
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '@server/config';
 import Users from '@models/Users';
-import { Op } from 'sequelize';
 
 import { userLogIn } from '@interfaces/user';
 
@@ -25,19 +25,26 @@ const saltRounds = 10;
 const searchUsers = async (req: Request, res: Response) => {
     const query = req.query.query as string;
     const limit = parseInt(req.query.limit as string);
-    let ans;
 
     if (limit === 0) {
-        ans = await Users.findAll({
+        await Users.findAll({
             where: {
                 username: {
                     [Op.like]: `%${query}%`
                 }
             },
             attributes: ['username', 'photo']
-        });
+        })
+            .then((ans) =>
+                res
+                    .status(200)
+                    .json({ users: ans.map((model) => model.toJSON()) })
+            )
+            .catch((err) =>
+                res.status(404).json({ message: 'No users found!', error: err })
+            );
     } else {
-        ans = await Users.findAll({
+        await Users.findAll({
             limit: limit,
             where: {
                 username: {
@@ -45,11 +52,16 @@ const searchUsers = async (req: Request, res: Response) => {
                 }
             },
             attributes: ['username', 'photo']
-        });
+        })
+            .then((ans) =>
+                res
+                    .status(200)
+                    .json({ users: ans.map((model) => model.toJSON()) })
+            )
+            .catch((err) =>
+                res.status(404).json({ message: 'No users found!', error: err })
+            );
     }
-
-    res.status(200).json({ users: ans.map((model) => model.toJSON()) });
-    return ans;
 };
 
 /**
@@ -65,16 +77,27 @@ const searchUsers = async (req: Request, res: Response) => {
 @param res {express.Response}
 @returns void
 **/
-const createUser = (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response) => {
     const { email, username, password, photo } = req.body;
 
-    try {
-        bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-            if (err) {
-                throw err;
-            }
+    if (!username) {
+        return res.status(404).json({ message: 'Username required!' });
+    }
+    if (!email) {
+        return res.status(404).json({ message: 'Email required!' });
+    }
+    if (!password) {
+        return res.status(404).json({ message: 'Password required!' });
+    }
+    if (photo.data.length === 0) {
+        return res.status(404).json({ message: 'Photo required!' });
+    }
+
+    return bcrypt
+        .hash(password, saltRounds)
+        .then(async (hashedPassword) => {
             if (hashedPassword) {
-                return Users.create(
+                await Users.create(
                     {
                         username: username,
                         email: email,
@@ -83,16 +106,16 @@ const createUser = (req: Request, res: Response) => {
                     },
                     { ignoreDuplicates: true }
                 );
+                return res
+                    .status(201)
+                    .json({ message: 'User created successfully!' });
+            } else {
+                throw Error('Could not hash password!');
             }
-        });
-        res.status(201).json({ message: 'Users created successfully!' });
-    } catch (err) {
-        console.log(
-            'Error while making new user in createUser() - userController.tsx, line 65\n',
-            err
+        })
+        .catch((err) =>
+            res.status(500).json({ message: 'Server Error!', error: err })
         );
-        res.status(500).json({ message: 'Server Error' });
-    }
 };
 
 /**
@@ -106,45 +129,37 @@ Verifies password of user, then returns a JSON web token with expiry in 24 hours
     **/
 async function logIn(req: Request, res: Response) {
     const { username, password }: userLogIn = req.body;
-    try {
-        await Users.findByPk(username, {
-            attributes: ['username', 'password']
-        }).then((user) => {
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ message: 'No existing user found' });
-            }
-            bcrypt.compare(
-                password,
-                user.password as string,
-                (err, authenticated) => {
-                    if (err) {
-                        throw err;
-                    }
+    return await Users.findByPk(username, {
+        attributes: ['username', 'password']
+    })
+        .then(async (user) => {
+            return await bcrypt
+                .compare(password, user?.password as string)
+                .then((authenticated) => {
                     if (authenticated) {
-                        const token = jwt.sign(req.body, config.JWT_SECRET, {
-                            expiresIn: '1d'
-                        });
+                        const token = jwt.sign(
+                            req.body as userLogIn,
+                            config.JWT_SECRET,
+                            {
+                                expiresIn: '1d'
+                            }
+                        );
                         return res.status(200).json({
-                            message: 'Users authenticated',
+                            message: 'User authorized!',
                             token: token
                         });
                     } else {
                         return res.status(401).json({
-                            message:
-                                'Wrong password or something wrong with server!'
+                            message: 'Unauthorized!'
                         });
                     }
-                }
-            );
+                });
+        })
+        .catch((err) => {
+            return res
+                .status(404)
+                .json({ message: 'User not found!', error: err });
         });
-    } catch (err) {
-        console.log(
-            'Error while logging in in logIn() function in userController.tsx - line 95\n',
-            err
-        );
-    }
 }
 
 /**
@@ -156,9 +171,9 @@ async function logIn(req: Request, res: Response) {
 Verifies token of user, then return log out successful message. 
     Note: Deletion of JSON web token to be done on client side
 **/
-async function logOut(res: Response) {
+async function logOut(req: Request, res: Response) {
     // Clear JWT token on client-side AND invalidate token on server-side
-    res.status(200).json({ message: 'Logout successful!' });
+    return res.status(200).json({ message: 'Logout successful!' });
 }
 
 /**
@@ -176,31 +191,24 @@ Search for the user profile on the database and returns first matching username.
     Else, only return username and email
 **/
 async function getProfile(req: Request, res: Response) {
-    try {
-        const username = req.query.username as string;
-        if (!username) {
-            res.status(500).json({ message: 'No username passed in params' });
-            return;
-        }
-        /* if (req.query.mods === 'false') { */
-        return await Users.findByPk(username).then((user) => {
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ message: 'No existing user found' });
-            }
-            return res.status(200).json({
-                username: user.get('username'),
-                email: user.get('email'),
-                photo: user.get('photo')
-            });
-        });
-    } catch (err) {
-        console.log(
-            'Error while getting profile details in getProfile() - userController.tsx - line 400?\n',
-            err
-        );
+    const username = req.query.username as string;
+    if (!username) {
+        return res.status(400).json({ message: 'Username required!' });
     }
+
+    return await Users.findByPk(username, {
+        attributes: ['username', 'email', 'photo']
+    })
+        .then((user) => {
+            return res.status(200).json({
+                username: user?.username,
+                email: user?.email,
+                photo: user?.photo
+            });
+        })
+        .catch((err) =>
+            res.status(404).json({ message: 'User not found!', error: err })
+        );
 }
 
 /**
@@ -218,14 +226,14 @@ Updates the values of the user profile in the database and returns the number of
 async function updateProfilePhoto(req: Request, res: Response) {
     const { username, photo } = req.body;
     return await Users.findByPk(username)
-        .then((user) => {
-            user?.update({
+        .then(async (user) => {
+            await user?.update({
                 photo: photo.data
             });
-            res.status(200).json({ message: 'photo updated!' });
+            return res.status(201).json({ message: 'Photo updated!' });
         })
         .catch(() => {
-            res.status(404).json({ message: 'user not found!' });
+            return res.status(404).json({ message: 'User not found!' });
         });
 }
 
@@ -257,7 +265,7 @@ async function resetPassword(req: Request, res: Response) {
                 });
             })
             .catch((error: Error) => {
-                res.status(200).json({
+                res.status(201).json({
                     message: `Error updating row for password: ${error}`
                 });
             });
@@ -294,22 +302,26 @@ async function verifyEmail(req: Request, res: Response) {
 Deletes the user and user profile details from the database
 **/
 async function deleteUser(req: Request, res: Response) {
-    try {
-        return await Users.destroy({
-            where: {
-                username: req.body.username
-            }
-        }).then((rowsDeleted: number) => {
-            console.log(`Deleted ${rowsDeleted} rows.`);
-            return res.status(200).json({ message: 'user deleted!' });
+    const username = req.query.username as string;
+
+    return await Users.destroy({
+        where: {
+            username: username
+        }
+    })
+        .then((rowsDeleted: number) => {
+            // console.log(`Deleted ${rowsDeleted} rows.`);
+            return res.status(204).json({});
+        })
+        .catch((err) => {
+            console.log(
+                'Error when updating profile in deleteUser() - line 501 in userController.tsx\n',
+                err
+            );
+            return res
+                .status(404)
+                .json({ message: 'User could not be found!' });
         });
-    } catch (err) {
-        console.log(
-            'Error when updating profile in deleteUser() - line 501 in userController.tsx\n',
-            err
-        );
-        return res.status(404).json({ message: 'user could not be found!' });
-    }
 }
 
 export default {

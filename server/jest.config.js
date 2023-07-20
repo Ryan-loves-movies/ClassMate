@@ -4,23 +4,20 @@ const { compilerOptions } = require('./tsconfig.json');
 module.exports = {
     preset: 'ts-jest/presets/js-with-ts-esm',
     testEnvironment: 'node',
-    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
+    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(ts?)$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     moduleDirectories: ['node_modules', '<rootDir>'],
     modulePaths: ['<rootDir>'],
     transform: {
-        '^.+\\.(ts|js)x?$': 'babel-jest',
-        '^.+\\.(ts|js)x?$': ['ts-jest', { tsconfig: './tsconfig.json' }]
+        '^.+\\.(ts|js)?$': 'babel-jest',
+        '^.+\\.(ts|js)?$': ['ts-jest', { tsconfig: './tsconfig.json' }]
     },
     transformIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: ['<rootDir>/~'],
-    // extensionsToTreatAsEsm: ['.ts', '.tsx', '.js', '.jsx'],
     moduleNameMapper: {
         ...pathsToModuleNameMapper(compilerOptions.paths, {
             prefix: '<rootDir>/'
         })
-    }
-    // moduleNameMapper: {
-    //     '^@components/(.*)$': '<rootDir>/src/components/$1'
-    // }
+    },
+    globalTeardown: "<rootDir>/tests/teardownJest.ts"
 };

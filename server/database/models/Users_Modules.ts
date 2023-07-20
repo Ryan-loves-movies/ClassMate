@@ -1,3 +1,4 @@
+import sequelize from '@server/database/connection';
 import {
     Association,
     BelongsToGetAssociationMixin,
@@ -16,7 +17,6 @@ import {
     InferCreationAttributes,
     Model
 } from 'sequelize';
-import sequelize from '@server/database/connection';
 import Users from '@models/Users';
 import Lessons from '@models/Lessons';
 import Modules from '@models/Modules';
@@ -61,7 +61,7 @@ Users_Modules.init(
             references: {
                 model: 'Users_Modules_Lessons',
                 key: 'userId'
-            },
+            }
         },
         username: {
             type: DataTypes.STRING(30),

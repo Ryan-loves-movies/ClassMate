@@ -1,47 +1,10 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
+
 import Groups from '@models/Groups';
 import Users from '@models/Users';
 import Users_Groups from '@models/Users_Groups';
 import Modules from '@models/Modules';
-import { Op } from 'sequelize';
-
-// /**
-//     req: {
-//     headers: {
-//         Authorization: ~token~
-//     },
-//     body: {
-//         usernames: string[],
-//         groupName: string (new lectureCode)
-//     }
-// }
-// Returns the groupId of the group given the users and group name.
-//     NOTE: MAY NOT BE ACCURATE
-// **/
-// async function getGroupId(req: Request, res: Response) {
-//     const { usernames, groupName } = req.body;
-//     await Groups.findOne({
-//         where: {
-//             name: groupName
-//         },
-//         include: [
-//             {
-//                 model: Users,
-//                 where: {
-//                     username: usernames
-//                 }
-//             }
-//         ]
-//     })
-//         .then((group) => {
-//             return res.status(200).json({ groupId: group?.id });
-//         })
-//         .catch((error: AxiosError) => {
-//             return res
-//                 .status(500)
-//                 .json({ message: 'Group not found!', error: error });
-//         });
-// }
 
 /** 
     req: {
@@ -105,7 +68,13 @@ async function getUsersInGroup(req: Request, res: Response) {
         .then(async (group) => {
             const users = await group?.getUsers();
             return res.status(200).json({
-                users: users?.map((user) => user.toJSON())
+                users: users?.map((user) => {
+                    return {
+                        username: user.username,
+                        email: user.email,
+                        photo: user.photo
+                    };
+                })
             });
         })
         .catch(() => {
@@ -140,30 +109,34 @@ async function createGroup(req: Request, res: Response) {
     })
         .then(async (module) => {
             const moduleCode = module?.code as string;
-            const group = await Groups.create({
+            await Groups.create({
                 name: groupName,
                 moduleCode: moduleCode,
                 color: color,
                 ay: actAy,
                 sem: actSem
             });
-            const user = await Users.findByPk(username, {
-                include: [
-                    {
-                        model: Groups
-                    }
-                ]
+            const user = await Users.findByPk(username);
+            const group = await Groups.findOne({
+                where: {
+                    name: groupName,
+                    moduleCode: moduleCode,
+                    color: color,
+                    ay: actAy,
+                    sem: actSem
+                }
             });
-            await group.addUser(user as Users);
+            await group?.addUser(user as Users);
 
-            return res.status(200).json({
-                id: group.id,
+            return res.status(201).json({
+                id: group?.id,
                 moduleCode: moduleCode,
                 name: groupName,
                 color: color
             });
         })
-        .catch(() => {
+        .catch((err) => {
+            console.log(err);
             return res.status(404).json({ message: 'Module does not exist!' });
         });
 }
@@ -266,12 +239,12 @@ async function removeUserFromGroup(req: Request, res: Response) {
                         groupId: groupId
                     }
                 });
-                return res.status(200).json({ message: 'Removed User!' });
+                return res.status(200).json({ message: 'Removed user!' });
             }
 
             const user = await Users.findByPk(username);
             await group?.removeUser(user as Users);
-            return res.status(200).json({ message: 'Removed User!' });
+            return res.status(200).json({ message: 'Removed user!' });
         })
         .catch(() => {
             return res.status(404).json({ message: 'Cannot find group!' });
