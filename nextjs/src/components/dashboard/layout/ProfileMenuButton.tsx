@@ -29,9 +29,9 @@ export default function ProfileMenuButton() {
             })
             .catch((err: AxiosError) => {
                 alert(
-                    'Sorry! A problem occured! Your email could not be found.'
+                    'Sorry! A problem occurred! Your email could not be found.'
                 );
-                console.error(err);
+                // console.error(err);
             });
     }, []);
     const [isDropdownActive, setDropdownActive] = useState(false);

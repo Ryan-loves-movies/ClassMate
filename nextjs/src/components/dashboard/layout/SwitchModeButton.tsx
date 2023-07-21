@@ -1,5 +1,5 @@
 'use client';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import styles from '@components/dashboard/layout/switchModeButton.module.css';
 
@@ -21,14 +21,16 @@ export default function SwitchModeButton() {
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
 
+    console.log('isActive:', isActive); //added fr testing
+
     return (
         <button
-            className={`${styles['mode-switch']} ${
-                isActive ? styles['active'] : ''
-            }`}
+            className={`${styles['mode-switch']} ${isActive ? styles['active'] : ''
+                }`}
             onClick={toggleTheme}
             title="Switch Theme"
             type="button"
+            data-testid="switch-mode-button" //added for testing
         >
             <svg
                 className={styles['moon']}

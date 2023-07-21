@@ -1,36 +1,57 @@
-import React from 'react';
-import { render } from '@testing-library/react';
 import ChooseSemester from '@components/dashboard/layout/ChooseSemester';
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+
 import '@testing-library/jest-dom';
 
-// beforeEach(function() {
-//     global.sessionStorage = jest.genMockFunction();
-//     global.sessionStorage.setItem = jest.genMockFunction();
-//     global.sessionStorage.getItem = jest.genMockFunction();
-// }
 
-test('renders status bar with correct descriptor', () => {
-    const color = '#404040';
-    const height = '20px';
-    const descriptor = 'Test Descriptor';
-
-    const { getByText } = render(<ChooseSemester />);
-
-    const descriptorElement = getByText(descriptor);
-    expect(descriptorElement).toBeInTheDocument();
+// Mock sessionStorage.setItem
+const setItemMock = jest.fn();
+const getItemMock = jest.fn();
+jest.mock('next/navigation', () => ({
+    usePathName: () => '/timetable',
+}));
+Object.defineProperty(window, 'sessionStorage', {
+    value: {
+        setItem: setItemMock,
+        getItem: getItemMock,
+    },
+    writable: true,
 });
 
-test('calculates the width correctly based on the descriptor length', () => {
-    const color = '#404040';
-    const height = '20px';
-    const descriptor = 'Test Descriptor sdjknjdnkadnsnkjnasfnn';
 
-    const { container } = render(<ChooseSemester />);
+test('renders semester information correctly', () => {
+    render(<ChooseSemester />);
 
-    const wrapperElement = container.firstChild;
-    const backgroundElement = container.firstChild?.firstChild;
+    const ayText = screen.getByText(/AY 2023\/2024/i);
+    const semText = screen.getByText(/Semester 1/i);
 
-    // Check if the width is dynamically calculated based on the descriptor length
-    expect(wrapperElement).toHaveStyle({ width: '47px' }); // Expected width: (descriptor length + 25)px + 5px for padding
-    expect(backgroundElement).toHaveStyle({ width: '42px' }); // Expected width: descriptor length + 5px for padding
+    expect(ayText).toBeInTheDocument();
+    expect(semText).toBeInTheDocument();
+});
+
+
+// test('clicking left arrow changes semester', () => {
+//     const component = render(<ChooseSemester />);
+
+//     const leftArrowButton = component.getByTestId('left-arrow-button');
+//     fireEvent.click(leftArrowButton);
+
+//     // Check if setAy and setSem are called with the correct arguments
+//     //expect(setItemMock).toHaveBeenCalledTimes(2);
+//     expect(setItemMock).toHaveBeenCalledWith('ay', '2023');
+//     expect(setItemMock).toHaveBeenCalledWith('sem', '2');
+//   });
+
+test('clicking right arrow changes semester', () => {
+    const component = render(<ChooseSemester />);
+
+    const rightArrowButton = component.getByTestId('right-arrow-button');
+    fireEvent.click(rightArrowButton);
+
+    // Check if setAy and setSem are called with the correct arguments
+    //expect(setItemMock).toHaveBeenCalledTimes(2);
+    expect(setItemMock).toHaveBeenCalledWith('ay', '2023');
+    expect(setItemMock).toHaveBeenCalledWith('sem', '2');
 });
