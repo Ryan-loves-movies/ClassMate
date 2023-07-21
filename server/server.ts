@@ -9,6 +9,12 @@ import moduleRouter from '@server/routes/moduleRoutes';
 import freeUserRouter from '@server/routes/freeUserRoutes';
 import authorizeToken from '@server/middleware/auth';
 import sequelize from '@server/database/connection';
+import { sync } from '@models/SyncModels';
+
+const setupDB = async () => {
+    await sync();
+};
+setupDB();
 
 const expressApp = express();
 const port = 8080;

@@ -1,10 +1,10 @@
+import sequelize from '@server/database/connection';
 import {
     DataTypes,
     InferAttributes,
     InferCreationAttributes,
-    Model,
-} from "sequelize";
-import sequelize from "@server/database/connection";
+    Model
+} from 'sequelize';
 
 class Users_Modules_Lessons extends Model<
     InferAttributes<Users_Modules_Lessons>,
@@ -21,24 +21,24 @@ Users_Modules_Lessons.init(
             allowNull: false,
             primaryKey: true,
             references: {
-                model: "Users_Modules",
-                key: "id",
-            },
+                model: 'Users_Modules',
+                key: 'id'
+            }
         },
         lessonId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
             references: {
-                model: "Lessons",
-                key: "id",
-            },
-        },
+                model: 'Lessons',
+                key: 'id'
+            }
+        }
     },
     {
         sequelize,
-        tableName: "Users_Modules_Lessons",
-        timestamps: false,
+        tableName: 'Users_Modules_Lessons',
+        timestamps: false
     }
 );
 

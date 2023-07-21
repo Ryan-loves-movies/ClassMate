@@ -143,6 +143,4 @@ Lessons.init(
     }
 );
 
-Lessons.sync();
-
 export default Lessons;

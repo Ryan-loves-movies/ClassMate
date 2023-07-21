@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { EmptyResultError, Op } from 'sequelize';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import axiosRateLimit from 'axios-rate-limit';
+
 import Users from '@models/Users';
 import Modules from '@models/Modules';
 import Users_Modules from '@models/Users_Modules';
 import Lessons from '@models/Lessons';
-import { EmptyResultError, Op } from 'sequelize';
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import axiosRateLimit from 'axios-rate-limit';
 
 import module from '@interfaces/module';
 import lesson, { lessonChosen, lessonFixedChosen } from '@interfaces/lesson';
@@ -185,13 +186,7 @@ async function hasModule(req: Request, res: Response) {
     const ay = parseInt(req.query.ay as string);
     const semester = parseInt(req.query.semester as string);
 
-    return await Modules.findOne({
-        where: {
-            code: {
-                [Op.iLike]: `%${moduleCode}%`
-            }
-        }
-    })
+    return await Modules.findByPk(moduleCode.toUpperCase())
         .then(async (module) => {
             const lessons = await module
                 ?.getLessons()
@@ -366,7 +361,18 @@ async function getLessons(
                             name: mod.name,
                             lessons: lesses.map((less) => {
                                 return {
-                                    ...less.toJSON(),
+                                    id: less.id,
+                                    ay: less.ay,
+                                    sem: less.sem,
+                                    day: less.day,
+                                    endTime: less.endTime,
+                                    lessonId: less.lessonId,
+                                    lessonType: less.lessonType,
+                                    moduleCode: less.moduleCode,
+                                    size: less.size,
+                                    startTime: less.startTime,
+                                    venue: less.venue,
+                                    weeks: less.weeks,
                                     chosen: true,
                                     fixed:
                                         [
@@ -642,10 +648,8 @@ async function removeModule(req: Request, res: Response) {
             });
             await user_module?.getLessons().then(async (lesses) => {
                 await user_module.removeLessons(
-                    await Promise.all(
-                        lesses.filter(
-                            (less) => less.ay === ay && less.sem === semester
-                        )
+                    lesses.filter(
+                        (less) => less.ay === ay && less.sem === semester
                     )
                 );
             });
@@ -738,7 +742,7 @@ async function updateLesson(req: Request, res: Response) {
                             toRemove.moduleCode === less.moduleCode &&
                             toRemove.lessonType === less.lessonType
                     );
-                    user_module?.removeLessons(lessonsToRemove);
+                    await user_module?.removeLessons(lessonsToRemove);
                 })
             );
 

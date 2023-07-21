@@ -1,14 +1,14 @@
+import sequelize from '@server/database/connection';
 import {
     Association,
     BelongsToManyGetAssociationsMixin,
     DataTypes,
     InferAttributes,
     InferCreationAttributes,
-    Model,
-} from "sequelize";
-import sequelize from "@server/database/connection";
-import Groups from "@models/Groups";
-import Users from "@models/Users";
+    Model
+} from 'sequelize';
+import Groups from '@models/Groups';
+import Users from '@models/Users';
 
 class Users_Groups extends Model<
     InferAttributes<Users_Groups>,
@@ -33,24 +33,24 @@ Users_Groups.init(
             allowNull: false,
             primaryKey: true,
             references: {
-                model: "Users",
-                key: "username",
-            },
+                model: 'Users',
+                key: 'username'
+            }
         },
         groupId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
             references: {
-                model: "Groups",
-                key: "id",
-            },
-        },
+                model: 'Groups',
+                key: 'id'
+            }
+        }
     },
     {
         sequelize,
-        tableName: "Users_Groups",
-        timestamps: false,
+        tableName: 'Users_Groups',
+        timestamps: false
     }
 );
 

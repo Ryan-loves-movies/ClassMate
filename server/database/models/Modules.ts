@@ -66,6 +66,4 @@ Modules.init(
     }
 );
 
-Modules.sync();
-
 export default Modules;

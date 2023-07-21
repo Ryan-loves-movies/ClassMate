@@ -21,6 +21,7 @@ export default function ChooseSemester() {
     };
 
     useLayoutEffect(() => {
+        console.log(sessionStorage.getItem('ay'))
         setAy(parseInt(sessionStorage.getItem('ay') || '2023'));
         setSem(parseInt(sessionStorage.getItem('sem') || '1'));
     });
