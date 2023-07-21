@@ -1,59 +1,59 @@
 {
-    "compilerOptions": {
-        "target": "esnext",
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "esnext"
-        ],
-        "allowJs": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "noEmit": true,
-        "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "node",
-        "outDir": ".next",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "react",
-        "incremental": true,
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
-        "paths": {
-            "@app/*": [
-                "./src/app/*"
-            ],
-            "@models/*": [
-                "./src/models/*"
-            ],
-            "@components/*": [
-                "./src/components/*"
-            ],
-            "@/*": [
-                "./src/*"
-            ]
-        }
-    },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        ".next/types/**/*.ts"
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
-    "exclude": [
-        "node_modules"
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": ".next",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
     ],
-    "jest": {
-        "moduleNameMapper": {
-            "^@app/(.*)$": "<rootDir>/src/app/$1",
-            "^@models/(.*)$": "<rootDir>/src/models/$1",
-            "^@components/(.*)$": "<rootDir>/src/components/",
-            "^@/(.*)$": "<rootDir>/src/$1"
-        }
+    "paths": {
+      "@app/*": [
+        "./src/app/*"
+      ],
+      "@models/*": [
+        "./src/models/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
     }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "jest": {
+    "moduleNameMapper": {
+      "^@app/(.*)$": "<rootDir>/src/app/$1",
+      "^@models/(.*)$": "<rootDir>/src/models/$1",
+      "^@components/(.*)$": "<rootDir>/src/components/",
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
+  }
 }
