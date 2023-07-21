@@ -63,6 +63,7 @@ export default function ChooseSemester() {
                 <div className={styles['act-left-arrow']} />
             ) : (
                 <button
+                    data-testid="left-arrow-button" //added for testing
                     className={styles['act-left-arrow']}
                     onClick={leftArrowHandler}
                 />
@@ -75,6 +76,7 @@ export default function ChooseSemester() {
                 <div className={styles['act-right-arrow']} />
             ) : (
                 <button
+                    data-testid="right-arrow-button" //added for testing
                     className={styles['act-right-arrow']}
                     onClick={rightArrowHandler}
                 />
