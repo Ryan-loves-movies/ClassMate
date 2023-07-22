@@ -51,6 +51,9 @@ export async function sync() {
     Groups.belongsTo(Modules, { foreignKey: 'moduleCode' });
     Modules.hasMany(Groups, { foreignKey: 'moduleCode' });
 
+    await Modules.sync();
+    await Groups.sync();
+    await Lessons.sync();
     await sequelize.sync({ alter: true });
     // await sequelize.sync({ force: true });
 }

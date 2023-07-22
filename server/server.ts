@@ -14,28 +14,29 @@ import { sync } from '@models/SyncModels';
 const setupDB = async () => {
     await sync();
 };
-setupDB();
 
-const expressApp = express();
-const port = 8080;
+const setupServer = async () => {
+    await setupDB();
+    const expressApp = express();
+    const port = 8080;
 
-expressApp.use(express.json({ limit: '10mb' }));
-expressApp.use(cors());
-expressApp.use('/authorized', authorizeToken);
-expressApp.use('/authorized', authorizeUserRouter);
-expressApp.use('/authorized', userRouter);
-expressApp.use('/authorized', groupRouter);
-expressApp.use('/authorized', moduleRouter);
-expressApp.use('/', freeUserRouter);
+    expressApp.use(express.json({ limit: '10mb' }));
+    expressApp.use(cors());
+    expressApp.use('/authorized', authorizeToken);
+    expressApp.use('/authorized', authorizeUserRouter);
+    expressApp.use('/authorized', userRouter);
+    expressApp.use('/authorized', groupRouter);
+    expressApp.use('/authorized', moduleRouter);
+    expressApp.use('/', freeUserRouter);
 
-expressApp.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+    expressApp.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
 
-// Handle on database close
-process.on('SIGINT', () => {
-    sequelize.close();
-    process.exit();
-});
-
-export default expressApp;
+    // Handle on database close
+    process.on('SIGINT', () => {
+        sequelize.close();
+        process.exit();
+    });
+};
+setupServer()
