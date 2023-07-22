@@ -39,7 +39,7 @@ export default function Login() {
                     window['sessionStorage'].setItem('token', res.data.token);
                     window['sessionStorage'].setItem('username', username);
                     window['sessionStorage'].setItem('ay', '2023');
-                    window['sessionStorage'].setItem('ay', '1');
+                    window['sessionStorage'].setItem('sem', '1');
                     router.push('/dashboard');
                     // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {

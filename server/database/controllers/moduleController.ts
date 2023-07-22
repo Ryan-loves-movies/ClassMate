@@ -188,14 +188,12 @@ async function hasModule(req: Request, res: Response) {
 
     return await Modules.findByPk(moduleCode.toUpperCase())
         .then(async (module) => {
-            const lessons = await module
-                ?.getLessons()
-                .then((lesses) =>
-                    lesses.filter(
-                        (less) => less.sem === semester && less.ay === ay
-                    )
-                );
-            if (module && (lessons?.length as number) > 0) {
+            const lessons = (await module?.getLessons())?.filter(
+                (less) => less.sem === semester && less.ay === ay
+            );
+
+            if (module?.code && (lessons?.length as number) > 0) {
+                console.log('ok');
                 return res.status(200).json({ message: 'Module exists!' });
             } else {
                 throw Error;
