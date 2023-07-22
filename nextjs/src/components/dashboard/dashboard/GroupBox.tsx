@@ -61,8 +61,8 @@ export default function GroupBox({
         setUserChosen(undefined);
     };
 
-    const deleteGroupHandler = () => {
-        axios
+    const deleteGroupHandler = async () => {
+        await axios
             .delete(`${expressHost}/authorized/group/user`, {
                 headers: {
                     Authorization: sessionStorage.getItem('token')

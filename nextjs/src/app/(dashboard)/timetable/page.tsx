@@ -78,7 +78,6 @@ export default function TimetableMain() {
                     alert(
                         'Sorry! A problem occured! Your mods could not be found in the database.'
                     );
-                    console.log(err);
                 });
         };
 

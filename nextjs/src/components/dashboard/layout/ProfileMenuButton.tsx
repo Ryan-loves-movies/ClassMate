@@ -1,6 +1,6 @@
 'use client';
 import React, { useLayoutEffect, useState } from 'react';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import styles from '@components/dashboard/layout/profileMenu.module.css';
 import SignOut from '@components/dashboard/layout/SignOut';
 import Link from 'next/link';
@@ -27,7 +27,7 @@ export default function ProfileMenuButton() {
                     setPhotoArrBuffer(res.data.photo.data);
                 }
             })
-            .catch((err: AxiosError) => {
+            .catch(() => {
                 alert(
                     'Sorry! A problem occurred! Your email could not be found.'
                 );

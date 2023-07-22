@@ -80,9 +80,6 @@ export default function overlapCounter(
             }
             maxOverlaps = Math.max(counter, maxOverlaps);
         });
-        if (index === 2) {
-            console.log(day);
-        }
 
         return {
             overlaps: Math.max(maxOverlaps, 1),

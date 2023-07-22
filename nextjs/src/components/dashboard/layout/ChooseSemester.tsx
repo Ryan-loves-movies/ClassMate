@@ -1,8 +1,8 @@
 'use client';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import styles from '@components/dashboard/layout/chooseSemester.module.css';
 import { usePathname } from 'next/navigation';
-import { useLayoutEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function ChooseSemester() {
     const availableAy = [2023];
@@ -11,31 +11,32 @@ export default function ChooseSemester() {
     const [sem, setSemRaw] = useState(1);
 
     const setAy = (newAy: number) => {
-        sessionStorage.setItem('ay', `${newAy}`);
-        setAyRaw(newAy);
+        if (newAy !== ay) {
+            sessionStorage.setItem('ay', `${newAy}`);
+            setAyRaw(newAy);
+        }
     };
 
     const setSem = (newSem: number) => {
-        sessionStorage.setItem('sem', `${newSem}`);
-        setSemRaw(newSem);
+        if (newSem !== sem) {
+            sessionStorage.setItem('sem', `${newSem}`);
+            setSemRaw(newSem);
+        }
     };
 
     useLayoutEffect(() => {
-        console.log(sessionStorage.getItem('ay'))
         setAy(parseInt(sessionStorage.getItem('ay') || '2023'));
         setSem(parseInt(sessionStorage.getItem('sem') || '1'));
-    });
+    }, []);
 
     const pathname = usePathname();
     const refresher = () => {
-        console.log('oskdmk');
         if (
             pathname.includes('/timetable') ||
             pathname.includes('/dashboard')
         ) {
             // Sadly, router.refresh() doesn't work
             window.location.href = pathname;
-            console.log('ok');
         }
     };
 

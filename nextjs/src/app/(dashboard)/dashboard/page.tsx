@@ -33,7 +33,6 @@ const GroupBoxes = ({
     groupsUpdated: boolean;
     setGroupsUpdated: Dispatch<boolean>;
 }) => {
-    console.log('re-rendered groupBoxes');
     return (
         <>
             {groups.map((oneGroup: groupWithUsersNoEmail) => {
@@ -72,7 +71,6 @@ const FoundUsers = ({
     setWaiting: Dispatch<boolean>;
     groupChosen: group | undefined;
 }) => {
-    console.log('re-rendered found users');
     return (
         <>
             {searchRes.map((user) => {
@@ -137,8 +135,8 @@ export default function Dashboard() {
 
     useLayoutEffect(() => {
         // Set all groups
-        const getUsersInGroups = (groups: group[]) => {
-            return Promise.all(
+        const getUsersInGroups = async (groups: group[]) => {
+            return await Promise.all(
                 groups.map(async (group) => {
                     return await axios
                         .get(`${expressHost}/authorized/group`, {
@@ -150,7 +148,6 @@ export default function Dashboard() {
                             }
                         })
                         .then((res: AxiosResponse) => {
-                            console.log('2');
                             return {
                                 id: group.id,
                                 moduleCode: group.moduleCode,
@@ -179,12 +176,10 @@ export default function Dashboard() {
                         semester: sessionStorage.getItem('sem')
                     }
                 })
-                .then((res: AxiosResponse) => {
-                    console.log('3');
+                .then(async (res: AxiosResponse) => {
                     const groups: group[] = res.data.groups;
-                    getUsersInGroups(groups).then((groups) =>
-                        setGroups(groups as groupWithUsersNoEmail[])
-                    );
+                    const groupsWithUsers = await getUsersInGroups(groups);
+                    setGroups(groupsWithUsers as groupWithUsersNoEmail[]);
                 })
                 .catch((err) => {
                     alert(`Error when finding groups associated: ${err}`);
@@ -192,7 +187,6 @@ export default function Dashboard() {
         };
 
         getGroups();
-        console.log('1');
     }, [newGroup, groupsUpdated]);
 
     useEffect(() => {
@@ -227,8 +221,7 @@ export default function Dashboard() {
                     });
             }
         }
-        console.log('4');
-    }, [groups, userChosen, groupChosen]);
+    }, [groups, userChosen?.username, groupChosen?.id]);
 
     // Formatted Date if you ever want it again!
     // <p className={styles['time']}>{formattedDate.toString()}</p>

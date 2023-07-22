@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
@@ -19,19 +19,32 @@ export default function ProfilePhotoButton() {
                     }
                 }
             )
-            .then(() => alert('Photo updated!'))
+            .then((res: AxiosResponse) => {
+                alert('Photo updated!');
+            })
             .catch((err) =>
                 alert(`Error occurred when updating photo! ${err}`)
             );
     };
-    const clickHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const clickHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || new Blob();
 
         const reader = new FileReader();
-        reader.onload = async () => {
-            await updateProfilePhoto(Buffer.from(reader.result as ArrayBuffer));
-        };
+        const readerPromise = new Promise<ArrayBuffer>((resolve, reject) => {
+            reader.onload = () => {
+                if (reader.result instanceof ArrayBuffer) {
+                    resolve(reader.result);
+                } else {
+                    reject(new Error('Failed to read file'));
+                }
+            };
+            reader.onerror = () => {
+                reject(new Error('Error occurred while reading file'));
+            };
+        });
         reader.readAsArrayBuffer(file);
+
+        await updateProfilePhoto(Buffer.from(await readerPromise));
     };
     return (
         <button type="button">

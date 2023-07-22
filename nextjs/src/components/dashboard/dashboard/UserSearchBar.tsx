@@ -86,7 +86,7 @@ export default function UserSearchBar({
                     <defs />
                     <circle cx="11" cy="11" r="8" />
                     <path d="M21 21l-4.35-4.35" />
-                    <title>Search</title>
+                    <title>Search users</title>
                 </svg>
             </div>
         </div>

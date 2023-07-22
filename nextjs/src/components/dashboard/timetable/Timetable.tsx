@@ -227,8 +227,9 @@ function Timetable({
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
         return (
             <div
-                className={`${styles['s-act-tab']} ${haveOthersChosen && chosen ? styles['s-act-tab-chosen'] : ''
-                    }`}
+                className={`${styles['s-act-tab']} ${
+                    haveOthersChosen && chosen ? styles['s-act-tab-chosen'] : ''
+                }`}
                 style={{
                     top: `${top}%`,
                     left: `${start}%`,
@@ -242,33 +243,33 @@ function Timetable({
                 ) : (
                     <button
                         className={styles['act-btn']}
-                        onClick={() =>
+                        onClick={async () =>
                             chosen
-                                ? actClickHandlerChosen(
-                                    parseInt(
-                                        sessionStorage.getItem('ay') as string
-                                    ),
-                                    parseInt(
-                                        sessionStorage.getItem(
-                                            'sem'
-                                        ) as string
-                                    ),
-                                    sessionStorage.getItem(
-                                        'username'
-                                    ) as string,
-                                    code,
-                                    lessonType,
-                                    haveOthersChosen,
-                                    activities,
-                                    setMods
-                                )
-                                : actClickHandlerUnchosen(
-                                    lessonId,
-                                    lessonType,
-                                    code,
-                                    activities,
-                                    setMods
-                                )
+                                ? await actClickHandlerChosen(
+                                      parseInt(
+                                          sessionStorage.getItem('ay') as string
+                                      ),
+                                      parseInt(
+                                          sessionStorage.getItem(
+                                              'sem'
+                                          ) as string
+                                      ),
+                                      sessionStorage.getItem(
+                                          'username'
+                                      ) as string,
+                                      code,
+                                      lessonType,
+                                      haveOthersChosen,
+                                      activities,
+                                      setMods
+                                  )
+                                : await actClickHandlerUnchosen(
+                                      lessonId,
+                                      lessonType,
+                                      code,
+                                      activities,
+                                      setMods
+                                  )
                         }
                     />
                 )}
@@ -324,9 +325,9 @@ function Timetable({
                                         .filter(
                                             (specificLess) =>
                                                 less.lessonType ===
-                                                specificLess.lessonType &&
+                                                    specificLess.lessonType &&
                                                 less.moduleCode ===
-                                                specificLess.moduleCode
+                                                    specificLess.moduleCode
                                         )
                                         .map(
                                             (specificLess) =>
@@ -372,8 +373,9 @@ function Timetable({
     const Col = ({ gray = false }: { gray: boolean }) => {
         return (
             <div
-                className={`${styles['s-hour-row']} ${gray ? styles['gray-col'] : ''
-                    }`}
+                className={`${styles['s-hour-row']} ${
+                    gray ? styles['gray-col'] : ''
+                }`}
             >
                 {orderedActivities.map((overlapNActivities, index: number) => {
                     const height =

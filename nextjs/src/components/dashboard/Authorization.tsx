@@ -20,30 +20,32 @@ export default function AuthorizationComponent({
     // and validate it
     useLayoutEffect(() => {
         const updateAuthorization = async () => {
-            await axios
-                .get(`${config.expressHost}/authorized/user`, {
-                    headers: {
-                        Authorization: window['sessionStorage'].getItem('token')
-                    }
-                })
-                .then((res: AxiosResponse) => {
-                    if (res.status === 200) {
-                        // Render the children components if the user is authenticated
-                        setIsAuthorized(true);
-                        setIsLoading(false);
-                    } else {
+            if (!isAuthorized && isLoading) {
+                await axios
+                    .get(`${config.expressHost}/authorized/user`, {
+                        headers: {
+                            Authorization:
+                                window['sessionStorage'].getItem('token')
+                        }
+                    })
+                    .then((res: AxiosResponse) => {
+                        if (res.status === 200) {
+                            // Render the children components if the user is authenticated
+                            setIsAuthorized(true);
+                            setIsLoading(false);
+                        } else {
+                            router.push('/');
+                        }
+                    })
+                    .catch((err: AxiosError) => {
                         router.push('/');
-                        console.log('Authorization error', res.statusText);
-                    }
-                })
-                .catch((err: AxiosError) => {
-                    router.push('/');
-                    if (err.status === 401) {
-                        alert('Token expired, Please sign back in!');
-                    } else {
-                        alert('Something went wrong! Please sign back in!');
-                    }
-                });
+                        if (err.status === 401) {
+                            alert('Token expired, Please sign back in!');
+                        } else {
+                            alert('Something went wrong! Please sign back in!');
+                        }
+                    });
+            }
         };
         updateAuthorization();
     });

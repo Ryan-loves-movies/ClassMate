@@ -65,12 +65,13 @@ export default function PeopleBar({
                         return [];
                     }
                     return res.data.groups;
-                })
-                .catch(() =>
-                    alert('Problem occurred when retrieving groups of user!')
-                );
+                });
         };
-        getGroups(user.username).then((groups) => setGroups(groups));
+        getGroups(user.username)
+            .then((groups) => setGroups(groups))
+            .catch(() =>
+                alert('Problem occurred when retrieving groups of user!')
+            );
     }, [user.username]);
     return (
         <div className={styles['message-box']}>
@@ -121,7 +122,7 @@ export default function PeopleBar({
                             className="feather feather-plus"
                         >
                             <path d="M12 5v14M5 12h14" />
-                            <title>Add Friend</title>
+                            <title>Add Friend for Group</title>
                         </svg>
                     </button>
                 </div>

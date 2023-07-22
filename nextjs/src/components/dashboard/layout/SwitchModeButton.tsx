@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import styles from '@components/dashboard/layout/switchModeButton.module.css';
 
@@ -20,8 +20,6 @@ export default function SwitchModeButton() {
         setIsActive(!isActive);
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
-
-    console.log('isActive:', isActive); //added fr testing
 
     return (
         <button

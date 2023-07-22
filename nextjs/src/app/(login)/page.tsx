@@ -9,7 +9,7 @@ import LocalError from '@components/login/LocalError';
 import config from '@/config';
 import defaultPhoto from './bbook.json';
 
-export default function Home() {
+export default function Login() {
     const router = useRouter();
     const [bounceDir, setBounceDir] = useState(0);
     const signUpHandler = () => setBounceDir(1);
@@ -38,6 +38,8 @@ export default function Home() {
                 if (res.status === 200) {
                     window['sessionStorage'].setItem('token', res.data.token);
                     window['sessionStorage'].setItem('username', username);
+                    window['sessionStorage'].setItem('ay', '2023');
+                    window['sessionStorage'].setItem('ay', '1');
                     router.push('/dashboard');
                     // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {
@@ -54,7 +56,6 @@ export default function Home() {
                 } else {
                     alert('Wrong username or password!');
                 }
-                console.error(err);
             });
     };
 
@@ -132,20 +133,21 @@ export default function Home() {
                     </div>
 
                     <div
-                        className={`user_options-forms ${
-                            bounceDir ? 'bounceLeft' : 'bounceRight'
-                        }`}
+                        className={`user_options-forms ${bounceDir ? 'bounceLeft' : 'bounceRight'
+                            }`}
                         id="user_options-forms"
                     >
                         <div className="user_forms-login">
                             <h2 className="forms_title">Login</h2>
                             <form
+                                data-testid="login-submit"
                                 className="forms_form"
                                 onSubmit={handleLogInSubmit(handleLogIn)}
                             >
                                 <fieldset className="forms_fieldset">
                                     <div className="forms_field">
                                         <input
+                                            data-testid="login-username"
                                             type="text"
                                             className="forms_field-input"
                                             placeholder="Username"
@@ -174,6 +176,7 @@ export default function Home() {
                                     </div>
                                     <div className="forms_field">
                                         <input
+                                            data-testid="login-password"
                                             type="password"
                                             className="forms_field-input"
                                             placeholder="Password"
@@ -219,6 +222,7 @@ export default function Home() {
                         <div className="user_forms-signup">
                             <h2 className="forms_title">Sign Up</h2>
                             <form
+                                data-testid="register-submit"
                                 className="forms_form"
                                 onSubmit={handleRegistrationSubmit(
                                     handleRegistration
@@ -227,6 +231,7 @@ export default function Home() {
                                 <fieldset className="forms_fieldset">
                                     <div className="forms_field">
                                         <input
+                                            data-testid="register-email"
                                             type="email"
                                             className="forms_field-input"
                                             placeholder="Email"
@@ -259,6 +264,7 @@ export default function Home() {
                                     </div>
                                     <div className="forms_field">
                                         <input
+                                            data-testid="register-username"
                                             type="text"
                                             className="forms_field-input"
                                             placeholder="Username"
@@ -292,6 +298,7 @@ export default function Home() {
                                     </div>
                                     <div className="forms_field">
                                         <input
+                                            data-testid="register-password"
                                             type="password"
                                             className="forms_field-input"
                                             placeholder="Password"
