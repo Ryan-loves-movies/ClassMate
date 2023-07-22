@@ -4,6 +4,15 @@ import DevButtons from '@components/dashboard/settings/DevButtons';
 import ProfilePhotoButton from '@components/dashboard/settings/ProfilePhotoButton';
 
 export default function timetable() {
+    // <div className={styles['settings-box']}>
+    //     <h3 className={styles['settings-header']}>Developer Options</h3>
+    //     <span className={styles['settings-description']}>
+    //         <span>Update modules and lessons in database</span>
+    //         <div className={styles['action']}>
+    //             <DevButtons />
+    //         </div>
+    //     </span>
+    // </div>
     return (
         <div className={styles['projects-section']}>
             <div className={styles['projects-section-header']}>
@@ -27,15 +36,6 @@ export default function timetable() {
                         than 1MB or the dashboard page may lag significantly
                     </span>
                     <ProfilePhotoButton />
-                </span>
-            </div>
-            <div className={styles['settings-box']}>
-                <h3 className={styles['settings-header']}>Developer Options</h3>
-                <span className={styles['settings-description']}>
-                    <span>Update modules and lessons in database</span>
-                    <div className={styles['action']}>
-                        <DevButtons />
-                    </div>
                 </span>
             </div>
         </div>
