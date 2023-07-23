@@ -44,7 +44,7 @@
     margin-right: 10px;
 }
 
-.hover .button-text-from-right {
+.btn:hover .button-text-from-right {
     margin-right: 28px;
     visibility: visible;
     justify-content: right;
@@ -64,7 +64,7 @@
     margin-left: 10px;
 }
 
-.hover .button-text-from-left {
+.btn:hover .button-text-from-left {
     display: flex;
     visibility: visible;
     justify-content: left;

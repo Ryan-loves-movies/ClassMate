@@ -49,7 +49,7 @@ export default function SlidingButton({
                     </div>
                     <div
                         className={styles['button-text-from-left']}
-                        style={{ marginLeft: margin }}
+                        style={{ marginRight: hover ? margin : '10px' }}
                     >
                         {description}
                     </div>
@@ -58,7 +58,7 @@ export default function SlidingButton({
                 <>
                     <div
                         className={styles['button-text-from-right']}
-                        style={{ marginRight: margin }}
+                        style={{ marginRight: hover ? margin : '10px' }}
                     >
                         {description}
                     </div>
@@ -66,7 +66,7 @@ export default function SlidingButton({
                         className={styles['icon']}
                         style={{
                             width: height,
-                            height: height,
+                            height: height
                         }}
                     >
                         {icon()}
