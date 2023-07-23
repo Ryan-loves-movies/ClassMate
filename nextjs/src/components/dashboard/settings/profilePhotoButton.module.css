@@ -1,0 +1,51 @@
+.upload {
+    display: flex;
+    position: relative;
+    width: 150px;
+    height: 50px;
+    border-radius: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: var(--app-container);
+}
+
+.upload .descriptor {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    cursor: pointer;
+}
+
+.descriptor .icon {
+    width: 20%;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+}
+
+.descriptor span {
+    width: 80%;
+    text-align: right;
+    align-items: center;
+    padding-right: 8px;
+}
+
+.btn-input {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    user-select: none;
+}
+.input {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    display: none;
+}

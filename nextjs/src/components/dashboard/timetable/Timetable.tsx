@@ -10,11 +10,6 @@ import config from '@/config';
 import { lessonChosen, lessonFixedChosen } from '@models/lesson';
 const { expressHost } = config;
 
-interface lessonsOrdered extends lessonFixedChosen {
-    color: string;
-    order: number;
-}
-
 const readableWeeks = (weeks: number[]) => {
     const readableStr: string[] = [];
 

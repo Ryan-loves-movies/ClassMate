@@ -45,6 +45,21 @@
     flex-direction: row;
 }
 
+.settings-description-text {
+    display: flex;
+    width: 90%;
+}
+
+.settings-description-text span {
+    display: flex;
+    width: 95%;
+}
+
 .settings-description action {
     align-self: self-end;
+}
+
+.link {
+    display: flex;
+    width: 10%;
 }

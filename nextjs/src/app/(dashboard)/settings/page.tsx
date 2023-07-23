@@ -29,13 +29,17 @@ export default function timetable() {
                     Update Profile Photo
                 </h3>
                 <span className={styles['settings-description']}>
-                    <span>
-                        Update your profile photo!
-                        <br />
-                        Please try NOT to upload jpg or photos that are more
-                        than 1MB or the dashboard page may lag significantly
-                    </span>
-                    <ProfilePhotoButton />
+                    <div className={styles['settings-description-text']}>
+                        <span>
+                            Update your profile photo!
+                            <br />
+                            Please try NOT to upload jpg or photos that are more
+                            than 1MB or the dashboard page may lag significantly
+                        </span>
+                    </div>
+                    <div className={styles['link']}>
+                        <ProfilePhotoButton />
+                    </div>
                 </span>
             </div>
         </div>

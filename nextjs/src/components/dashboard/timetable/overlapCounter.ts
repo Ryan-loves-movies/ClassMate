@@ -65,7 +65,7 @@ export default function overlapCounter(
             })
     );
 
-    return sortedTimesPerDay.map((day, index: number) => {
+    return sortedTimesPerDay.map((day) => {
         let counter = 0;
         let maxOverlaps = 0;
         const lessonsForDay: lessonsOrdered[] = [];
