@@ -200,11 +200,12 @@ export default function Dashboard() {
                     )?.length as number) === 0
             ) {
                 axios
-                    .put(
-                        `${expressHost}/authorized/group/user`,
+                    .post(
+                        `${expressHost}/authorized/notifications`,
                         {
-                            username: userChosen.username,
-                            groupId: groupChosen.id
+                            username: sessionStorage.getItem('username'),
+                            groupId: groupChosen.id,
+                            requestee: userChosen.username
                         },
                         {
                             headers: {
@@ -212,7 +213,10 @@ export default function Dashboard() {
                             }
                         }
                     )
-                    .then(() => setNewGroup(groupChosen))
+                    .then(() => {
+                        setNewGroup(groupChosen);
+                        alert('Request sent!');
+                    })
                     .catch(() =>
                         alert('Error occurred when adding user to group!')
                     )

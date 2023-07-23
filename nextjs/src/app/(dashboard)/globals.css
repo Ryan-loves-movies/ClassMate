@@ -182,12 +182,14 @@ a {
 }
 
 .app-header-right {
+    display: flex;
+    position: relative;
     width: 33.3%;
     justify-content: end;
 }
 
 .app-header-right button {
-    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .app-name {

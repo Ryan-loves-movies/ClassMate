@@ -6,6 +6,7 @@ import Lessons from '@models/Lessons';
 import Users_Groups from '@models/Users_Groups';
 import Users_Modules from '@models/Users_Modules';
 import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
+import GroupRequests from '@models/GroupRequests';
 
 export async function sync() {
     // Users : Modules - M:N
@@ -50,6 +51,10 @@ export async function sync() {
     // Groups : Modules - M:1
     Groups.belongsTo(Modules, { foreignKey: 'moduleCode' });
     Modules.hasMany(Groups, { foreignKey: 'moduleCode' });
+
+    // Users: GroupRequests
+    GroupRequests.belongsTo(Users, { foreignKey: 'requestee' });
+    Users.hasMany(GroupRequests, { foreignKey: 'requestee' });
 
     await Modules.sync();
     await Groups.sync();

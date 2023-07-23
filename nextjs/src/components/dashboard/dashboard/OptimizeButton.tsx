@@ -93,6 +93,9 @@ export default function OptimizeButton({
             fromLeft={false}
             description="Optimise"
             color="#9595fc"
+            width="120px"
+            height="36px"
+            margin="36px"
         />
     );
 }

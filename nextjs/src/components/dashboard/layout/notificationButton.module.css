@@ -1,22 +1,73 @@
-.notification-btn {
-    color: var(--main-color);
-    padding: 0;
-    border: 0;
+.notification {
     background-color: transparent;
-    height: 32px;
+    border: none;
+    padding: 0;
+    color: var(--main-color);
     display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     justify-content: center;
     align-items: center;
 }
 
+.notification:hover {
+    background-color: var(--link-color-hover);
+    color: var(--link-color-active);
+}
+
+.notification.active svg {
+    fill: var(--main-color);
+}
+
 @media screen and (max-width: 720px) {
-    .notification-btn {
+    .mode-switch {
         width: 20px;
         height: 20px;
-        margin-left: 4px;
     }
-    .notification-btn svg {
+    .mode-switch svg {
         width: 16px;
         height: 16px;
     }
+}
+
+.list {
+    border-radius: 16px;
+    width: 50%;
+    margin: 0px;
+    right: calc(25% + 10px + 10px);
+    top: 100%;
+    padding-left: 0px;
+    list-style: none;
+    position: absolute;
+    display: inline-flexbox;
+    overflow-y: scroll;
+    box-shadow: 0 1px 0px 1px rgba(0, 0, 0, 0.15);
+    background: var(--projects-section);
+    z-index: 999;
+}
+
+.list li {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+}
+
+.selected {
+    background-color: var(--app-container);
+}
+
+.message {
+    display: flex;
+    width: 95%;
+    margin-left: 20px;
+}
+
+.actions {
+    height: 50px;
+    width: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: end;
 }
