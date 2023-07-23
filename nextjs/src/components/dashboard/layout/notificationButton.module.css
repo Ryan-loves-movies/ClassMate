@@ -33,7 +33,7 @@
 
 .list {
     border-radius: 16px;
-    width: 50%;
+    width: 70%;
     margin: 0px;
     right: calc(25% + 10px + 10px);
     top: 100%;
@@ -59,13 +59,14 @@
 
 .message {
     display: flex;
-    width: 95%;
+    width: 80%;
     margin-left: 20px;
 }
 
 .actions {
     height: 50px;
-    width: 5%;
+    width: 20%;
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

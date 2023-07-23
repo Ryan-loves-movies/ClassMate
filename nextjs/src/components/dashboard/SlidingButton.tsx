@@ -67,7 +67,6 @@ export default function SlidingButton({
                         style={{
                             width: height,
                             height: height,
-                            right: '10px'
                         }}
                     >
                         {icon()}

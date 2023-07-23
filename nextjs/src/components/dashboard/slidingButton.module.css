@@ -1,10 +1,9 @@
 .btn {
     display: flex;
+    position: relative;
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    width: 36px;
-    height: 36px;
     border: 0px;
     border-radius: 100%;
     /* background: #fff; */
@@ -14,13 +13,12 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: bolder;
     font-size: 1em;
+    padding: 0px;
 }
 
 .btn .icon {
     display: flex;
-    position: absolute;
-    width: 24px;
-    height: 24px;
+    position: relative;
     justify-content: center;
     align-items: center;
 }

@@ -39,7 +39,7 @@
     border-radius: 4px;
     margin-right: 0.5rem;
     padding: 1.5rem;
-    background-color: #fff;
+    background-color: var(--app-container);
     box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08),
         0 2px 4px 0 rgba(50, 50, 93, 0.05),
         0 4px 8px 0 rgba(136, 152, 170, 0.08);
@@ -50,7 +50,7 @@
 }
 
 .dropdown-wrapper.active {
-    top: 90%;
+    top: 100%;
     transform: scale(1);
     opacity: 1;
     visibility: visible;
@@ -64,7 +64,8 @@
 }
 
 .dropdown-profile-details--name {
-    color: #1f1c2e;
+    /* color: #1f1c2e; */
+    color: var(--main-color);
     font-size: 1.05rem;
     margin-bottom: 0;
     font-weight: 700;
@@ -77,7 +78,8 @@
 }
 
 .dropdown-links a {
-    color: #525f7f;
+    /* color: #525f7f; */
+    color: var(--main-color);
     text-decoration: none;
     padding-bottom: 1rem;
     transition: all 0.1s linear;

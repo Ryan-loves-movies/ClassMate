@@ -140,7 +140,8 @@
     order: 4;
     display: flex;
     justify-content: center;
-    height: 30px;
+    position: relative;
+    height: 36px;
 }
 
 /* .project-box-footer:after { */

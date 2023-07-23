@@ -76,14 +76,6 @@ class Users extends Model<
         GroupRequests,
         number
     >;
-    declare removeGroupRequest: HasManyRemoveAssociationMixin<
-        GroupRequests,
-        number
-    >;
-    declare removeGroupRequests: HasManyRemoveAssociationsMixin<
-        GroupRequests,
-        number
-    >;
 
     declare modules?: NonAttribute<Modules[]>;
     declare groups?: NonAttribute<Groups[]>;

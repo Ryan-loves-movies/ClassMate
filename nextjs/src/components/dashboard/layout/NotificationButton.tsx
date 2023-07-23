@@ -42,7 +42,7 @@ export default function NotificationButton() {
 
     const removeNotification = (thisRequest: groupRequest) => {
         setNotificationList(
-            notificationList.filter((notif) => notif === thisRequest)
+            notificationList.filter((notif) => notif !== thisRequest)
         );
     };
 
