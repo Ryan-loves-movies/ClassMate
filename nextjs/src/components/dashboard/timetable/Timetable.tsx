@@ -10,6 +10,11 @@ import config from '@/config';
 import { lessonChosen, lessonFixedChosen } from '@models/lesson';
 const { expressHost } = config;
 
+interface lessonsOrdered extends lessonFixedChosen {
+    color: string;
+    order: number;
+}
+
 const readableWeeks = (weeks: number[]) => {
     const readableStr: string[] = [];
 
@@ -67,6 +72,10 @@ function Timetable({
         activities: moduleWithLessonsFixedChosen[],
         setMods: Dispatch<moduleWithLessonsFixedChosen[]>
     ) => {
+        if (moduleCode === 'MA1521' && lessonType === 'Lecture') {
+            console.log('whyyyyyy');
+            console.log(haveOthersChosen);
+        }
         const activitiesChosen = activities.map((activity) => {
             return {
                 code: activity.code,
@@ -306,6 +315,7 @@ function Timetable({
     );
     // Activities for the whole week
     const Activities = () => {
+        const allLessons = orderedActivities.flatMap((day) => day.lessons);
         return (
             <>
                 {orderedActivities.map((overlapNActivities, index: number) => {
@@ -320,23 +330,19 @@ function Timetable({
                             key={`day-${index}`}
                         >
                             {overlapNActivities.lessons.map((less) => {
-                                const haveOthersChosen =
-                                    !overlapNActivities.lessons
-                                        .filter(
-                                            (specificLess) =>
-                                                less.lessonType ===
-                                                    specificLess.lessonType &&
-                                                less.moduleCode ===
-                                                    specificLess.moduleCode
-                                        )
-                                        .map(
-                                            (specificLess) =>
-                                                specificLess.chosen
-                                        )
-                                        .reduce(
-                                            (chosen, specificLess) =>
-                                                chosen && specificLess
-                                        );
+                                const haveOthersChosen = !allLessons
+                                    .filter(
+                                        (specificLess) =>
+                                            less.lessonType ===
+                                                specificLess.lessonType &&
+                                            less.moduleCode ===
+                                                specificLess.moduleCode
+                                    )
+                                    .map((specificLess) => specificLess.chosen)
+                                    .reduce(
+                                        (chosen, specificLess) =>
+                                            chosen && specificLess
+                                    );
                                 return (
                                     <Activity
                                         top={
