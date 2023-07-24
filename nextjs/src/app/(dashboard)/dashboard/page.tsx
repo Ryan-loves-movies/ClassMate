@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { toast } from 'react-hot-toast';
 import '@app/(dashboard)/globals.css';
 import styles from '@app/(dashboard)/dashboard/dashboard.module.css';
 import GroupBox from '@components/dashboard/dashboard/GroupBox';
@@ -77,7 +78,7 @@ const FoundUsers = ({
                 return (
                     <PeopleBar
                         user={user}
-                        bio="hihi wanna do CS2030 together?"
+                        bio=""
                         setUserChosen={(user: userWithoutEmail) => {
                             setUserChosen(user);
                             if (!groupChosen) {
@@ -156,11 +157,11 @@ export default function Dashboard() {
                                 users: res.data.users as userWithoutEmail[]
                             } as groupWithUsersNoEmail;
                         })
-                        .catch((err) => {
-                            alert(
+                        .catch((err) =>
+                            toast.error(
                                 `Error when fetching users for group: ${err}`
-                            );
-                        });
+                            )
+                        );
                 })
             );
         };
@@ -181,9 +182,9 @@ export default function Dashboard() {
                     const groupsWithUsers = await getUsersInGroups(groups);
                     setGroups(groupsWithUsers as groupWithUsersNoEmail[]);
                 })
-                .catch((err) => {
-                    alert(`Error when finding groups associated: ${err}`);
-                });
+                .catch((err) =>
+                    toast.error(`Error when finding groups associated: ${err}`)
+                );
         };
 
         getGroups();
@@ -199,30 +200,33 @@ export default function Dashboard() {
                         (user) => user.username === userChosen.username
                     )?.length as number) === 0
             ) {
-                axios
-                    .post(
-                        `${expressHost}/authorized/notifications`,
-                        {
-                            username: sessionStorage.getItem('username'),
-                            groupId: groupChosen.id,
-                            requestee: userChosen.username
-                        },
-                        {
-                            headers: {
-                                Authorization: sessionStorage.getItem('token')
+                toast.promise(
+                    axios
+                        .post(
+                            `${expressHost}/authorized/notifications`,
+                            {
+                                username: sessionStorage.getItem('username'),
+                                groupId: groupChosen.id,
+                                requestee: userChosen.username
+                            },
+                            {
+                                headers: {
+                                    Authorization:
+                                        sessionStorage.getItem('token')
+                                }
                             }
-                        }
-                    )
-                    .then(() => {
-                        setNewGroup(groupChosen);
-                        alert('Request sent!');
-                    })
-                    .catch(() =>
-                        alert('Error occurred when adding user to group!')
-                    )
-                    .then(() => {
-                        setUserChosen(undefined);
-                    });
+                        )
+                        .then(() => {
+                            setNewGroup(groupChosen);
+                        })
+                        .catch(() => console.log('Error in sending request!')),
+                    {
+                        loading: 'Sending request...', // Message displayed while the promise is pending
+                        success: () => `Success: Request sent!`, // Message displayed when the promise resolves
+                        error: 'Request was intercepted by the request boogeyman! Please try again!' // Message displayed when the promise rejects
+                    }
+                );
+                setUserChosen(undefined);
             }
         }
     }, [groups, userChosen?.username, groupChosen?.id]);

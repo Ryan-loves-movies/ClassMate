@@ -19,7 +19,18 @@ const auth = jwt.sign(
 
 // Mock the sessionStorage for the tests
 jest.spyOn(window.sessionStorage.__proto__, 'getItem').mockReturnValue(auth);
-jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 
 jest.mock('axios');
 const axios = actAxios as jest.Mocked<typeof actAxios>;
@@ -70,9 +81,6 @@ describe('DevButtons Component', () => {
                 message: 'database updated!'
             });
 
-        // Spy on the global alert function
-        const alertSpy = jest.spyOn(window, 'alert');
-
         // Arrange: Render the component
         const { getByText } = render(<DevButtons />);
 
@@ -83,22 +91,18 @@ describe('DevButtons Component', () => {
         await act(() => Promise.resolve());
 
         // Assert: Check if the alert function is called with the correct message
-        expect(alertSpy).toHaveBeenNthCalledWith(3, 'Modules Updated!');
-        expect(alertSpy).toHaveBeenNthCalledWith(4, 'Lessons Updated!');
+        expect(toastPromise).toHaveBeenCalledTimes(4);
     });
 
     it('should show alert with error message on failed API call', async () => {
         // Mock the failed API call
         axios.post
-            .mockRejectedValueOnce(
-                new Error('Error occurred when updating modules!')
-            )
-            .mockRejectedValueOnce(
-                new Error('Error occurred when updating lessons!')
-            );
-
-        // Spy on the global alert function
-        const alertSpy = jest.spyOn(window, 'alert');
+            .mockRejectedValueOnce({
+                error: new Error('Error occurred when updating modules!')
+            })
+            .mockRejectedValueOnce({
+                error: new Error('Error occurred when updating lessons!')
+            });
 
         // Arrange: Render the component
         const { getByText } = render(<DevButtons />);
@@ -110,13 +114,6 @@ describe('DevButtons Component', () => {
         await act(() => Promise.resolve());
 
         // Assert: Check if the alert function is called with the correct error message
-        expect(alertSpy).toHaveBeenNthCalledWith(
-            5,
-            'Error occurred when updating modules! Error: Error occurred when updating modules!'
-        );
-        expect(alertSpy).toHaveBeenNthCalledWith(
-            6,
-            'Error occurred when updating lessons! Error: Error occurred when updating lessons!'
-        );
+        expect(toastPromise).toHaveBeenCalledTimes(6);
     });
 });

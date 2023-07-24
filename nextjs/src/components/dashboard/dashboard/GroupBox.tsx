@@ -1,4 +1,5 @@
 import React, { Dispatch } from 'react';
+import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
 import axios, { AxiosResponse } from 'axios';
@@ -40,10 +41,9 @@ const optimizeHandler = async (
                 .then((res: AxiosResponse) => res.data as fullUser);
         })
     );
-    console.log(userWithAllLessons);
 
-    axios
-        .put(
+    await toast.promise(
+        axios.put(
             `${expressHost}/authorized/group/optimize`,
             {
                 users: userWithAllLessons,
@@ -54,13 +54,13 @@ const optimizeHandler = async (
                     Authorization: sessionStorage.getItem('token')
                 }
             }
-        )
-        .then(() => {
-            alert('Timetables updated!');
-        })
-        .catch(() => {
-            alert('Failed to find optimal timetable!');
-        });
+        ),
+        {
+            loading: 'Optimising Timetables...', // Message displayed while the promise is pending
+            success: () => 'Timetables updated and optimised!', // Message displayed when the promise resolves
+            error: 'Failed to find optimal timetables!' // Message displayed when the promise rejects
+        }
+    );
     // timetableGenerator(userWithAllLessons, commonModule);
 };
 
@@ -126,7 +126,7 @@ export default function GroupBox({
                     groupId: id
                 }
             })
-            .catch(() => alert('failed to delete group!'));
+            .catch(() => toast.error('Failed to leave group. Please try again!'));
         setGroupsUpdated(true);
     };
 

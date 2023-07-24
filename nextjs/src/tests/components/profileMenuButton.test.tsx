@@ -21,6 +21,17 @@ jest.mock('@components/dashboard/layout/SignOut', () => {
     return () => mockSignOut();
 });
 
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 describe('ProfileMenuButton Component', () => {
     beforeEach(() => {
         // Clear sessionStorage mock before each test
@@ -65,7 +76,6 @@ describe('ProfileMenuButton Component', () => {
         });
     });
 
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
     test('displays an error message when there is an Axios error', async () => {
         // Set sessionStorage mock
         window['sessionStorage'].setItem('username', 'testuser');
@@ -81,8 +91,8 @@ describe('ProfileMenuButton Component', () => {
             const photoRenderer = screen.queryByAltText('Profile');
             expect(photoRenderer).not.toBeInTheDocument();
             // Wait for axios to resolve (or reject in this case)
-            expect(alertSpy).toHaveBeenLastCalledWith(
-                'Sorry! A problem occurred! Your email could not be found.'
+            expect(toastError).toHaveBeenLastCalledWith(
+                'Sorry! A problem occurred! Your photo could not be found!'
             );
         });
     });

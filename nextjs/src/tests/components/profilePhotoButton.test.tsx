@@ -1,6 +1,6 @@
 import React from 'react';
 import ProfilePhotoButton from '@components/dashboard/settings/ProfilePhotoButton';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
 import actAxios from 'axios'; // Import axios directly for mocking
@@ -48,8 +48,17 @@ Object.defineProperty(global, 'FileReader', {
     }))
 });
 
-// Spy on alert status
-const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 
 // Mock the axios.put method
 jest.mock('axios');
@@ -70,47 +79,49 @@ describe('ProfilePhotoButton Component', () => {
         // Arrange: Render the component
         const component = render(<ProfilePhotoButton />);
         // Act: Trigger the file input change event
-        const inputElement = component.container.firstChild?.firstChild as Node;
+        const inputElement = screen.getByTestId('photo-upload');
         fireEvent.change(inputElement, { target: { files: [fakeF] } });
 
         // Wait for the promises to resolve
         await act(() => Promise.resolve());
 
-        // Assert: Check if updateProfilePhoto is called with the correct arguments
-        expect(axios.put).toHaveBeenCalledWith(
-            `${expressHost}/authorized/profile/photo`,
-            {
-                username: 'mockUsername',
-                photo: Buffer.from(new ArrayBuffer(42))
-            },
-            {
-                headers: {
-                    Authorization: auth
+        await waitFor(() => {
+            // Assert: Check if updateProfilePhoto is called with the correct arguments
+            expect(axios.put).toHaveBeenCalledWith(
+                `${expressHost}/authorized/profile/photo`,
+                {
+                    username: 'mockUsername',
+                    photo: Buffer.from(new ArrayBuffer(42))
+                },
+                {
+                    headers: {
+                        Authorization: auth
+                    }
                 }
-            }
-        );
+            );
 
-        // Assert: Check if the alert function is called with the correct message
-        expect(alertSpy).toHaveBeenCalledWith('Photo updated!');
+            // Assert: Check if the alert function is called with the correct message
+            expect(toastPromise).toHaveBeenCalledTimes(1);
+        });
     });
 
     it('should show an error alert when updateProfilePhoto fails', async () => {
         // Implement custom mock for axios.put to simulate a failed request
-        axios.put.mockRejectedValue(new Error('Failed to update photo'));
+        axios.put.mockRejectedValue({
+            error: new Error('Failed to update photo')
+        });
 
         // Arrange: Render the component
-        const component = render(<ProfilePhotoButton />);
+        render(<ProfilePhotoButton />);
 
         // Act: Trigger the file input change event
-        const inputElement = component.container.firstChild?.firstChild as Node;
+        const inputElement = screen.getByTestId('photo-upload');
         fireEvent.change(inputElement, { target: { files: [fakeF] } });
 
         // Wait for the promises to resolve
         await act(() => Promise.resolve());
 
         // Assert: Check if the alert function is called with the correct error message
-        expect(alertSpy).toHaveBeenLastCalledWith(
-            'Error occurred when updating photo! Error: Failed to update photo'
-        );
+        expect(toastPromise).toHaveBeenCalledTimes(2);
     });
 });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/dashboard/groupForm.module.css';
 import { Dispatch, KeyboardEvent, MouseEvent, useEffect, useRef } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
@@ -72,7 +73,9 @@ export default function GroupForm({
                 });
             })
             .catch((err) => {
-                alert(`An error occurred when trying to create group: ${err}`);
+                toast.error(
+                    `An error occurred when trying to create group: ${err}`
+                );
             });
     };
 

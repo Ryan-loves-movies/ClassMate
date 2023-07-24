@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from '@components/dashboard/dashboard/addProjectButton.module.css';
-import SlidingButton from '../SlidingButton';
 
 export default function AddProjectButton({
     clickHandler

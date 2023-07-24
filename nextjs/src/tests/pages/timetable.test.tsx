@@ -62,8 +62,17 @@ Object.defineProperty(window, 'sessionStorage', {
     value: localStorageMock
 });
 
-// Mock alert
-const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 
 describe('TimetableMain component', () => {
     it('can handle adding a module', async () => {
@@ -154,7 +163,7 @@ describe('TimetableMain component', () => {
             );
         });
 
-        expect(alertSpy).toHaveBeenCalledWith(
+        expect(toastError).toHaveBeenCalledWith(
             'Oops! Something went wrong when adding that mod! Error: Oops! Something went wrong!'
         );
     });

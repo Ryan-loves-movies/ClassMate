@@ -9,6 +9,7 @@ import ProfileMenuButton from '@components/dashboard/layout/ProfileMenuButton';
 import Sidebar from '@components/dashboard/layout/Sidebar';
 import '@app/(dashboard)/globals.css';
 import Link from 'next/link';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
     title: 'Next.js',
@@ -54,6 +55,7 @@ export default function RootLayout({
                         </div>
                     </ThemeProviderLocal>
                 </AuthorizationComponent>
+                <Toaster />
             </body>
         </html>
     );

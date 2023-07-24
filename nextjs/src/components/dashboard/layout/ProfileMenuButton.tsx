@@ -1,5 +1,6 @@
 'use client';
 import React, { useLayoutEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import axios, { AxiosResponse } from 'axios';
 import styles from '@components/dashboard/layout/profileMenu.module.css';
 import SignOut from '@components/dashboard/layout/SignOut';
@@ -27,12 +28,11 @@ export default function ProfileMenuButton() {
                     setPhotoArrBuffer(res.data.photo.data);
                 }
             })
-            .catch(() => {
-                alert(
-                    'Sorry! A problem occurred! Your email could not be found.'
-                );
-                // console.error(err);
-            });
+            .catch(() =>
+                toast.error(
+                    'Sorry! A problem occurred! Your photo could not be found!'
+                )
+            );
     }, []);
     const [isDropdownActive, setDropdownActive] = useState(false);
     const toggleDropdown = () => setDropdownActive(!isDropdownActive);

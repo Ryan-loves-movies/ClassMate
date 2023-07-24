@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { FieldValues, useForm } from 'react-hook-form';
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -43,18 +44,18 @@ export default function Login() {
                     router.push('/dashboard');
                     // I BELIEVE THE BELOW ELSE CLAUSE IS NOT REQUIRED - Should not enter that clause based on how the api is currently set up
                 } else {
-                    alert('Invalid username or password');
+                    toast.error('Invalid username or password');
                 }
             })
             .catch((err: AxiosError) => {
                 if (err.response?.status === 404) {
-                    alert(
+                    toast.error(
                         'Username could not be found. Have you signed up yet?'
                     );
                 } else if (err.response?.status === 401) {
-                    alert('Wrong password!');
+                    toast.error('Wrong password!');
                 } else {
-                    alert('Wrong username or password!');
+                    toast.error('Wrong username or password!');
                 }
             });
     };
@@ -65,24 +66,28 @@ export default function Login() {
             usernameRegistration: username,
             passwordRegistration: password
         } = data;
-        return axios
-            .post(`${config.expressHost}/register`, {
-                email: email,
-                username: username,
-                password: password,
-                photo: defaultPhoto
-            })
-            .then((res: AxiosResponse) => {
-                if (res.status === 201) {
-                    // should show pop-up window for a few seconds that redirect to login page
-                    setBounceDir(0);
-                } else {
-                    alert('User already exists!');
-                }
-            })
-            .catch((err: AxiosError) => {
-                console.error(err);
-            });
+        return await toast.promise(
+            axios
+                .post(`${config.expressHost}/register`, {
+                    email: email,
+                    username: username,
+                    password: password,
+                    photo: defaultPhoto
+                })
+                .then((res: AxiosResponse) => {
+                    if (res.status === 201) {
+                        // should show pop-up window for a few seconds then redirect to login page
+                        setBounceDir(0);
+                    } else {
+                        throw new Error()
+                    }
+                }),
+            {
+                loading: 'Signing you up...', // Message displayed while the promise is pending
+                success: () => `Success!`, // Message displayed when the promise resolves
+                error: 'Oops! Something went wrong when signing you up!' // Message displayed when the promise rejects
+            }
+        );
     };
 
     return (

@@ -1,4 +1,5 @@
 import React, { Dispatch, useEffect, useRef } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import styles from '@components/dashboard/dashboard/userSearchBar.module.css';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '@/config';
@@ -42,13 +43,10 @@ export default function UserSearchBar({
                         limit: 0
                     }
                 })
-                .then((res: AxiosResponse) => {
-                    setSearchRes(res.data.users);
-                })
-                .catch((err: AxiosError) => {
-                    console.log('Error:', err);
-                    alert(`Error encountered when finding users: ${err}`);
-                });
+                .then((res: AxiosResponse) => setSearchRes(res.data.users))
+                .catch((err: AxiosError) =>
+                    toast.error(`Error encountered when finding users: ${err}`)
+                );
         }
     };
 

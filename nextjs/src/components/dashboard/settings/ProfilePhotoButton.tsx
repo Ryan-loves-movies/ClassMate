@@ -1,31 +1,34 @@
 'use client';
 import React from 'react';
+import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/settings/profilePhotoButton.module.css';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
 export default function ProfilePhotoButton() {
     const updateProfilePhoto = async (photo: Buffer) => {
-        await axios
-            .put(
-                `${expressHost}/authorized/profile/photo`,
-                {
-                    username: sessionStorage.getItem('username'),
-                    photo: photo
-                },
-                {
-                    headers: {
-                        Authorization: sessionStorage.getItem('token')
+        return await toast.promise(
+            axios
+                .put(
+                    `${expressHost}/authorized/profile/photo`,
+                    {
+                        username: sessionStorage.getItem('username'),
+                        photo: photo
+                    },
+                    {
+                        headers: {
+                            Authorization: sessionStorage.getItem('token')
+                        }
                     }
-                }
-            )
-            .then((res: AxiosResponse) => {
-                alert('Photo updated!');
-            })
-            .catch((err) =>
-                alert(`Error occurred when updating photo! ${err}`)
-            );
+                )
+                .catch(() => console.log('throw')),
+            {
+                loading: 'Updating photo...', // Message displayed while the promise is pending
+                success: () => 'Photo updated!', // Message displayed when the promise resolves
+                error: 'Error occurred when updating photo!' // Message displayed when the promise rejects
+            }
+        );
     };
     const clickHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || new Blob();
@@ -66,6 +69,7 @@ export default function ProfilePhotoButton() {
                 </div>
             </label>
             <input
+                data-testid="photo-upload"
                 className={styles['input']}
                 id="upload-photo"
                 type="file"

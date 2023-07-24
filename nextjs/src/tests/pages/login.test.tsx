@@ -58,8 +58,17 @@ Object.defineProperty(window, 'sessionStorage', {
     writable: true
 });
 
-// Mock alert
-const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 
 describe('Login component', () => {
     it('renders without crashing', () => {
@@ -85,7 +94,7 @@ describe('Login component', () => {
             expect(setItemMock).toHaveBeenCalledWith('token', 'mockedToken');
             expect(setItemMock).toHaveBeenCalledWith('username', 'validUser');
             expect(setItemMock).toHaveBeenCalledWith('ay', '2023');
-            expect(setItemMock).toHaveBeenCalledWith('ay', '1');
+            expect(setItemMock).toHaveBeenCalledWith('sem', '1');
             expect(
                 screen.getAllByText(
                     'One click away from matching modules with your friends!'
@@ -109,7 +118,7 @@ describe('Login component', () => {
         fireEvent.submit(loginButton);
 
         await waitFor(() => {
-            expect(alertSpy).toHaveBeenCalledWith(
+            expect(toastError).toHaveBeenCalledWith(
                 'Username could not be found. Have you signed up yet?'
             );
         });
@@ -129,7 +138,7 @@ describe('Login component', () => {
         fireEvent.submit(loginButton);
 
         await waitFor(() => {
-            expect(alertSpy).toHaveBeenLastCalledWith('Wrong password!');
+            expect(toastError).toHaveBeenLastCalledWith('Wrong password!');
         });
     });
 
@@ -147,7 +156,7 @@ describe('Login component', () => {
         fireEvent.submit(loginButton);
 
         await waitFor(() => {
-            expect(alertSpy).toHaveBeenCalledWith(
+            expect(toastError).toHaveBeenCalledWith(
                 'Wrong username or password!'
             );
         });
@@ -194,7 +203,7 @@ describe('Login component', () => {
 
         await waitFor(() => {
             // To be changed to 'User already exists'
-            expect(alertSpy).toHaveBeenLastCalledWith(
+            expect(toastError).toHaveBeenLastCalledWith(
                 'Wrong username or password!'
             );
         });

@@ -27,7 +27,16 @@ Object.defineProperty(window, 'sessionStorage', {
     },
     writable: true
 });
-const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    promise: (args: any) => toastPromise(args),
+    error: (args: any) => toastError(args),
+    success: (args: any) => toastSuccess(args)
+}));
 
 describe('PeopleBar() component', () => {
     test("displays the user's name and bio", async () => {
@@ -162,8 +171,8 @@ describe('PeopleBar() component', () => {
         );
 
         await waitFor(() => {
-            expect(alertSpy).toHaveBeenCalledTimes(1);
-            expect(alertSpy).toHaveBeenLastCalledWith(
+            expect(toastError).toHaveBeenCalledTimes(1);
+            expect(toastError).toHaveBeenLastCalledWith(
                 'Problem occurred when retrieving groups of user!'
             );
         });
@@ -185,8 +194,8 @@ describe('PeopleBar() component', () => {
         );
 
         await waitFor(() => {
-            expect(alertSpy).toHaveBeenCalledTimes(2);
-            expect(alertSpy).toHaveBeenLastCalledWith(
+            expect(toastError).toHaveBeenCalledTimes(2);
+            expect(toastError).toHaveBeenLastCalledWith(
                 'Problem occurred when retrieving groups of user!'
             );
         });

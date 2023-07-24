@@ -37,7 +37,18 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'sessionStorage', {
     value: localStorageMock
 });
-const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => { });
+
+// Mock toast (alert)
+const toastPromise = jest.fn();
+const toastError = jest.fn();
+const toastSuccess = jest.fn();
+jest.mock('react-hot-toast', () => ({
+    toast: {
+        promise: (args: any) => toastPromise(args),
+        error: (args: any) => toastError(args),
+        success: (args: any) => toastSuccess(args)
+    }
+}));
 
 const groups = [
     { id: 1, name: 'Group 1', moduleCode: 'CS2030', color: 'red' },
@@ -197,7 +208,7 @@ describe('Dashboard page', () => {
 
     it('adds user to a group when userChosen and groupChosen are both defined', async () => {
         // Mock the axios.put call for adding user to group
-        axios.put.mockResolvedValueOnce({
+        axios.post.mockResolvedValue({
             status: 200
         });
 
@@ -304,12 +315,13 @@ describe('Dashboard page', () => {
         });
         // Wait for axios.put to resolve and update state
         await waitFor(() => {
-            expect(axios.put).toHaveBeenCalledTimes(1);
+            expect(axios.post).toHaveBeenCalledTimes(1);
             expect(axios.get).toHaveBeenCalledTimes(23);
-            expect(axios.put).toHaveBeenLastCalledWith(
-                `${config.expressHost}/authorized/group/user`,
+            expect(axios.post).toHaveBeenLastCalledWith(
+                `${config.expressHost}/authorized/notifications`,
                 {
-                    username: 'testuser',
+                    username: 'mockUsername',
+                    requestee: 'testuser',
                     groupId: 1
                 },
                 {
@@ -321,9 +333,9 @@ describe('Dashboard page', () => {
         });
     });
 
-    it('adds user to a group when userChosen and groupChosen are both defined', async () => {
+    it('displays error alert if error occurs when userChosen and groupChosen are both defined', async () => {
         // Mock the axios.put call for adding user to group
-        axios.put.mockRejectedValueOnce({
+        axios.post.mockRejectedValueOnce({
             status: 500
         });
 
@@ -412,12 +424,13 @@ describe('Dashboard page', () => {
         });
         // Wait for axios.put to resolve and update state
         await waitFor(() => {
-            expect(axios.put).toHaveBeenCalledTimes(2);
+            expect(axios.post).toHaveBeenCalledTimes(2);
             expect(axios.get).toHaveBeenCalledTimes(28);
-            expect(axios.put).toHaveBeenLastCalledWith(
-                `${config.expressHost}/authorized/group/user`,
+            expect(axios.post).toHaveBeenLastCalledWith(
+                `${config.expressHost}/authorized/notifications`,
                 {
-                    username: 'testuser',
+                    username: 'mockUsername',
+                    requestee: 'testuser',
                     groupId: 1
                 },
                 {
@@ -426,9 +439,8 @@ describe('Dashboard page', () => {
                     }
                 }
             );
-            expect(alertSpy).toHaveBeenCalledTimes(1)
-            expect(alertSpy).toHaveBeenLastCalledWith('Error occurred when adding user to group!')
-        });
 
+            expect(toastPromise).toHaveBeenCalledTimes(2);
+        });
     });
 });

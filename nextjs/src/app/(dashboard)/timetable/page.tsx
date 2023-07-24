@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
@@ -25,7 +26,7 @@ export default function TimetableMain() {
                 addedMod === undefined ||
                 addedMod === '' ||
                 mods.find((indivMod) => indivMod.code === addedMod) !==
-                undefined
+                    undefined
             ) {
                 return;
             }
@@ -47,7 +48,7 @@ export default function TimetableMain() {
                 )
                 .then(() => console.log('2'))
                 .catch((err) => {
-                    alert(
+                    toast.error(
                         `Oops! Something went wrong when adding that mod! Error: ${err}`
                     );
                 });
@@ -75,7 +76,7 @@ export default function TimetableMain() {
                     }
                 })
                 .catch((err) => {
-                    alert(
+                    toast.error(
                         'Sorry! A problem occured! Your mods could not be found in the database.'
                     );
                 });

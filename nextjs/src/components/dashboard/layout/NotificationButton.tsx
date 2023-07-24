@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/layout/notificationButton.module.css';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
@@ -31,7 +32,7 @@ export default function NotificationButton() {
                     return res.data.requests;
                 })
                 .catch(() =>
-                    alert('Error occurred when retrieving notifications!')
+                    toast.error('Error occurred when retrieving notifications!')
                 )) as groupRequest[];
             setNotificationList(notifications);
         }
@@ -48,8 +49,8 @@ export default function NotificationButton() {
 
     const acceptRequest = async (thisRequest: groupRequest) => {
         removeNotification(thisRequest);
-        await axios
-            .put(
+        await toast.promise(
+            axios.put(
                 `${expressHost}/authorized/notifications`,
                 {
                     ...thisRequest
@@ -59,21 +60,17 @@ export default function NotificationButton() {
                         Authorization: sessionStorage.getItem('token')
                     }
                 }
-            )
-            .then(() =>
-                alert(
-                    'Added! Groups will be updated when you refresh the page!'
-                )
-            )
-            .catch(() =>
-                alert(
-                    'Something went wrong! Please refresh the page and try again!'
-                )
-            );
+            ),
+            {
+                loading: `Notifying ${thisRequest.requestor} of acceptance...`, // Message displayed while the promise is pending
+                success: () =>
+                    'Added! Groups will be updated when you refresh the page!', // Message displayed when the promise resolves
+                error: 'Something went wrong! Please refresh the page and try again!' // Message displayed when the promise rejects
+            }
+        );
     };
 
     const rejectRequest = async (thisRequest: groupRequest) => {
-        removeNotification(thisRequest);
         await axios
             .delete(`${expressHost}/authorized/notifications`, {
                 headers: {
@@ -83,8 +80,9 @@ export default function NotificationButton() {
                     ...thisRequest
                 }
             })
+            .then(() => removeNotification(thisRequest))
             .catch(() =>
-                alert(
+                toast.error(
                     'Something went wrong! Please refresh the page and try again!'
                 )
             );

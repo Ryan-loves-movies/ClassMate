@@ -1,4 +1,5 @@
 import React, { Dispatch, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import styles from '@components/peopleBar.module.css';
 import StatusBar from '@components/dashboard/dashboard/StatusBar';
 import PhotoRenderer from '@components/dashboard/PhotoRenderer';
@@ -59,7 +60,7 @@ export default function PeopleBar({
                 })
                 .then((res: AxiosResponse) => {
                     if (res.status !== 200) {
-                        alert(
+                        toast.error(
                             'Problem occurred when retrieving groups of user!'
                         );
                         return [];
@@ -70,7 +71,7 @@ export default function PeopleBar({
         getGroups(user.username)
             .then((groups) => setGroups(groups))
             .catch(() =>
-                alert('Problem occurred when retrieving groups of user!')
+                toast.error('Problem occurred when retrieving groups of user!')
             );
     }, [user.username]);
     return (
