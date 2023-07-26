@@ -185,7 +185,7 @@ a {
     display: flex;
     position: relative;
     width: 33.3%;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
 .app-header-right button {
@@ -246,8 +246,10 @@ a {
     background: linear-gradient(to right, #7b4022, #d35d2b);
 }
 
-.gray {
-    background: linear-gradient(to right, #9c9c9c, #3d3d3d);
+.gray-fixed {
+    /* background: linear-gradient(to right, #9c9c9c, #3d3d3d); */
+    /* background: #3d3d3d; */
+    background: #595757;
 }
 
 .cyan {

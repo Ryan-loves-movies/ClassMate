@@ -354,6 +354,13 @@ async function getLessons(
                         const possibleLessons = (await mod.getLessons()).filter(
                             (less) => less.ay === ay && less.sem === semester
                         );
+
+                        const fixedLessons = (
+                            await user_module.getFixedLessons()
+                        ).filter(
+                            (less) => less.ay === ay && less.sem === semester
+                        );
+
                         return {
                             code: mod.code,
                             name: mod.name,
@@ -386,7 +393,10 @@ async function getLessons(
                                                             lesson.lessonId
                                                     )
                                             )
-                                        ].length === 1
+                                        ].length === 1,
+                                    constraintFixed: !!fixedLessons.find(
+                                        (fixedLess) => fixedLess.id === less.id
+                                    )
                                 };
                             }) as lessonFixedChosen[]
                         };
@@ -469,7 +479,21 @@ async function getAllPossibleLessons(req: Request, res: Response) {
             }
         ]
     })
-        .then((user) => {
+        .then(async (user) => {
+            // Only get lessons of lesson types that are not part of the fixedLessons array
+            const fixedLessons = (
+                await Promise.all(
+                    (
+                        await user?.getUsers_Modules()
+                    )?.map(async (user_mod) =>
+                        (
+                            await user_mod.getFixedLessons()
+                        ).filter(
+                            (less) => less.sem === semester && less.ay === ay
+                        )
+                    ) || []
+                )
+            ).flat();
             return user?.getModules().then(async (mods) => {
                 const modWithLessons = await Promise.all(
                     mods.map(async (mod) => {
@@ -482,7 +506,14 @@ async function getAllPossibleLessons(req: Request, res: Response) {
                                     lesses.filter(
                                         (less) =>
                                             less.sem === semester &&
-                                            less.ay === ay
+                                            less.ay === ay &&
+                                            !fixedLessons.find(
+                                                (fixedLess) =>
+                                                    fixedLess.moduleCode ===
+                                                        less.moduleCode &&
+                                                    fixedLess.lessonType ===
+                                                        less.lessonType
+                                            )
                                     )
                                 )
                         };
@@ -761,6 +792,52 @@ async function updateLesson(req: Request, res: Response) {
         );
 }
 
+async function addFixedLesson(req: Request, res: Response) {
+    const username = req.body.username as string;
+    const moduleCode = req.body.moduleCode as string;
+    const lessonId = parseInt(req.body.lessonId as string); // This will be the actual id of the lesson, NOT the lessonId attribute
+
+    return await Lessons.findByPk(lessonId)
+        .then(async (lesson) => {
+            const user_mod = await Users_Modules.findOne({
+                where: {
+                    username: username,
+                    moduleCode: moduleCode
+                }
+            });
+            await user_mod?.addFixedLesson(lesson as Lessons);
+            return res.status(201).json({ message: 'Lesson fixed!' });
+        })
+        .catch((err) =>
+            res
+                .status(404)
+                .json({ message: 'Lesson could not be found!', error: err })
+        );
+}
+
+async function removeFixedLesson(req: Request, res: Response) {
+    const username = req.query.username as string;
+    const moduleCode = req.query.moduleCode as string;
+    const lessonId = parseInt(req.query.lessonId as string); // This will be the actual id of the lesson, NOT the lessonId attribute
+
+    return await Lessons.findByPk(lessonId)
+        .then(async (lesson) => {
+            const user_mod = await Users_Modules.findOne({
+                where: {
+                    username: username,
+                    moduleCode: moduleCode
+                }
+            });
+            await user_mod?.removeFixedLesson(lesson as Lessons);
+            return res.status(201).json({ message: 'Lesson unfixed!' });
+        })
+        .catch((err) =>
+            res
+                .status(404)
+                .json({ message: 'Lesson could not be found!', error: err })
+        );
+}
+
 export default {
     populateLessons,
     populateModules,
@@ -771,5 +848,7 @@ export default {
     getAllPossibleLessons,
     addModule,
     removeModule,
-    updateLesson
+    updateLesson,
+    addFixedLesson,
+    removeFixedLesson
 };

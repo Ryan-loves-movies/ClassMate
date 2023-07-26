@@ -29,8 +29,11 @@ class Users_Modules extends Model<
     declare username: string;
     declare moduleCode: string;
 
+    // Get user and module
     declare getUser: BelongsToGetAssociationMixin<Users>;
     declare getModule: BelongsToGetAssociationMixin<Modules>;
+
+    // M:N association with Lessons
     declare getLessons: BelongsToManyGetAssociationsMixin<Lessons>;
     declare addLesson: BelongsToManyAddAssociationMixin<Lessons, number>;
     declare addLessons: BelongsToManyAddAssociationsMixin<Lessons, number>;
@@ -44,6 +47,24 @@ class Users_Modules extends Model<
     declare hasLessons: BelongsToManyHasAssociationsMixin<Lessons, number>;
     declare countLessons: BelongsToManyCountAssociationsMixin;
     declare createLesson: BelongsToManyCreateAssociationMixin<Lessons>;
+
+    // M:N association with Lessons through FixedLessons
+    declare getFixedLessons: BelongsToManyGetAssociationsMixin<Lessons>;
+    declare addFixedLesson: BelongsToManyAddAssociationMixin<Lessons, number>;
+    declare addFixedLessons: BelongsToManyAddAssociationsMixin<Lessons, number>;
+    declare setFixedLessons: BelongsToManySetAssociationsMixin<Lessons, number>;
+    declare removeFixedLesson: BelongsToManyRemoveAssociationMixin<
+        Lessons,
+        number
+    >;
+    declare removeFixedLessons: BelongsToManyRemoveAssociationsMixin<
+        Lessons,
+        number
+    >;
+    declare hasFixedLesson: BelongsToManyHasAssociationMixin<Lessons, number>;
+    declare hasFixedLessons: BelongsToManyHasAssociationsMixin<Lessons, number>;
+    declare countFixedLessons: BelongsToManyCountAssociationsMixin;
+    declare createFixedLesson: BelongsToManyCreateAssociationMixin<Lessons>;
 
     declare static associations: {
         user: Association<Users_Modules, Users>;

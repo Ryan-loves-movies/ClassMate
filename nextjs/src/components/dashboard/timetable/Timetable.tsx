@@ -5,6 +5,7 @@ import colors from '@models/colors';
 
 import { moduleWithLessonsFixedChosen } from '@models/module';
 import overlapCounter from '@components/dashboard/timetable/overlapCounter';
+import TimeSlider from '@components/dashboard/timetable/TimeSlider';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
 import { lessonChosen, lessonFixedChosen } from '@models/lesson';
@@ -31,11 +32,15 @@ const readableWeeks = (weeks: number[]) => {
 function Timetable({
     activities,
     setMods,
-    setOverflowY
+    setOverflowY,
+    selectedLesson,
+    setSelectedLesson
 }: {
     activities: moduleWithLessonsFixedChosen[];
     setMods: Dispatch<moduleWithLessonsFixedChosen[]>;
     setOverflowY: Dispatch<boolean>;
+    selectedLesson: lessonFixedChosen | undefined;
+    setSelectedLesson: Dispatch<lessonFixedChosen | undefined>;
 }) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     // Components for the module tabs
@@ -65,12 +70,10 @@ function Timetable({
         lessonType: string,
         haveOthersChosen: boolean,
         activities: moduleWithLessonsFixedChosen[],
-        setMods: Dispatch<moduleWithLessonsFixedChosen[]>
+        constraintFixed: boolean,
+        setMods: Dispatch<moduleWithLessonsFixedChosen[]>,
+        lesson: lessonFixedChosen
     ) => {
-        if (moduleCode === 'MA1521' && lessonType === 'Lecture') {
-            console.log('whyyyyyy');
-            console.log(haveOthersChosen);
-        }
         const activitiesChosen = activities.map((activity) => {
             return {
                 code: activity.code,
@@ -78,9 +81,18 @@ function Timetable({
                 lessons: activity.lessons.filter((less) => less.chosen)
             };
         });
-        if (haveOthersChosen) {
+        if (haveOthersChosen || constraintFixed) {
+            constraintFixed &&
+            (selectedLesson === undefined || selectedLesson.id !== lesson.id)
+                ? setSelectedLesson(lesson)
+                : setSelectedLesson(undefined);
             return setMods(activitiesChosen);
         }
+        setSelectedLesson(
+            activitiesChosen
+                .find((mod) => mod.code === moduleCode)
+                ?.lessons.find((lesson) => lesson.lessonType === lessonType)
+        );
         const possibleLessons = await axios
             .get(`${expressHost}/authorized/module/lessons`, {
                 headers: {
@@ -130,6 +142,12 @@ function Timetable({
         activities: moduleWithLessonsFixedChosen[],
         setMods: Dispatch<moduleWithLessonsFixedChosen[]>
     ) => {
+        setSelectedLesson(
+            activities
+                .find((mod) => mod.code === moduleCode)
+                ?.lessons.filter((lesson) => lesson.lessonType === lessonType)
+                .find((lesson) => lesson.lessonId === lessonId)
+        );
         const lessonIds = activities.flatMap((mod) =>
             mod.lessons
                 .filter(
@@ -180,7 +198,8 @@ function Timetable({
                                     endTime: less.endTime,
                                     size: less.size,
                                     fixed: less.fixed,
-                                    chosen: true
+                                    chosen: true,
+                                    constraintFixed: false
                                 } as lessonFixedChosen;
                             });
                         const lessonsRemoveLessonType = mod.lessons.filter(
@@ -211,7 +230,9 @@ function Timetable({
         weeks = [],
         fixed,
         chosen,
-        haveOthersChosen
+        constraintFixed,
+        haveOthersChosen,
+        lesson
     }: {
         top: number;
         height: number;
@@ -225,7 +246,9 @@ function Timetable({
         weeks: number[];
         fixed: boolean;
         chosen: boolean;
+        constraintFixed: boolean;
         haveOthersChosen: boolean;
+        lesson: lessonFixedChosen;
     }) => {
         const start = minToPerc(toMin(0, 0, startTime) - toMin(8, 0));
         const width = minToPerc(toMin(0, 0, endTime) - toMin(0, 0, startTime));
@@ -239,7 +262,7 @@ function Timetable({
                     left: `${start}%`,
                     width: `${width}%`,
                     height: `${height}%`,
-                    opacity: `${chosen ? 0.8 : 0.5}`
+                    opacity: `${chosen ? 0.9 : 0.5}`
                 }}
             >
                 {fixed ? (
@@ -265,7 +288,9 @@ function Timetable({
                                       lessonType,
                                       haveOthersChosen,
                                       activities,
-                                      setMods
+                                      constraintFixed,
+                                      setMods,
+                                      lesson
                                   )
                                 : await actClickHandlerUnchosen(
                                       lessonId,
@@ -278,7 +303,9 @@ function Timetable({
                     />
                 )}
                 <div
-                    className={`${color} ${styles['s-act-tab-background']}`}
+                    className={`${constraintFixed ? 'gray-fixed' : color} ${
+                        styles['s-act-tab-background']
+                    }`}
                     style={{
                         borderRadius: `${fixed ? 5 : 16}px`
                     }}
@@ -359,7 +386,9 @@ function Timetable({
                                         weeks={less.weeks}
                                         fixed={less.fixed}
                                         chosen={less.chosen}
+                                        constraintFixed={less.constraintFixed}
                                         haveOthersChosen={haveOthersChosen}
+                                        lesson={less}
                                     />
                                 );
                             })}
@@ -452,6 +481,16 @@ function Timetable({
                         <Col gray={true} />
                     </div>
                 </div>
+            </div>
+            <div className={styles['time-slider']}>
+                <TimeSlider
+                    min={0}
+                    max={840}
+                    onChange={({ min, max }: { min: number; max: number }) =>
+                        console.log(`min = ${min}, max = ${max}`)
+                    }
+                    step={30}
+                />
             </div>
         </div>
     );

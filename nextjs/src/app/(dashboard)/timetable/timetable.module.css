@@ -26,8 +26,23 @@
     color: var(--main-color);
 }
 
+.optimise {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
 .timetable-field {
     margin-left: -30px;
+}
+
+.buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding-top: 10px;
+    padding-right: 80px;
+    justify-content: flex-end;
 }
 
 /* Below css is for below the timetable */

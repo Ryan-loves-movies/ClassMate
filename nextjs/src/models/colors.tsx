@@ -7,7 +7,7 @@ const colors = [
     'cyan',
     'brown',
     'purple',
-    'gray',
+    // 'gray',
     'orange',
     'red',
     'yellow'
