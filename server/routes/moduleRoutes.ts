@@ -12,7 +12,9 @@ const {
     getAllPossibleLessons,
     addModule,
     removeModule,
-    updateLesson
+    updateLesson,
+    addFixedLesson,
+    removeFixedLesson
 } = moduleController;
 
 expressRouter.post('/allModules', populateModules);
@@ -25,5 +27,7 @@ expressRouter.put('/lessons', updateLesson);
 expressRouter.get('/lessons', getLessons);
 expressRouter.get('/module/lessons', getPossibleLessonsForModule);
 expressRouter.get('/all/lessons', getAllPossibleLessons);
+expressRouter.post('/fixed/lesson', addFixedLesson);
+expressRouter.delete('/fixed/lesson', removeFixedLesson);
 
 export default expressRouter;

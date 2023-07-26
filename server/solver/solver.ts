@@ -156,26 +156,14 @@ export default async function timetableGenerator(
                                                     boolVar.eq(0),
                                                     boolVar.eq(1)
                                                 ),
-                                                // If(
-                                                //     boolVar.eq(0),
-                                                //     dayVar.eq(0),
                                                 dayVar.eq(
                                                     convertDayToNumber(less.day)
-                                                    // )
                                                 ),
-                                                // If(
-                                                //     boolVar.eq(0),
-                                                //     startTimeVar.eq(0),
                                                 startTimeVar.eq(
                                                     parseInt(less.startTime)
-                                                    // )
                                                 ),
-                                                // If(
-                                                //     boolVar.eq(0),
-                                                //     endTimeVar.eq(0),
                                                 endTimeVar.eq(
                                                     parseInt(less.endTime)
-                                                    // )
                                                 )
                                             );
                                             return {
@@ -225,18 +213,9 @@ export default async function timetableGenerator(
                             );
                             solver.add(
                                 Or(boolVar.eq(0), boolVar.eq(1)),
-                                // If(
-                                //     boolVar.eq(0),
-                                //     dayVar.eq(0),
                                 dayVar.eq(convertDayToNumber(less.day)),
-                                // If(
-                                //     boolVar.eq(0),
-                                //     startTimeVar.eq(0),
                                 startTimeVar.eq(parseInt(less.startTime)),
-                                // If(
-                                //     boolVar.eq(0),
-                                //     endTimeVar.eq(0),
-                                endTimeVar.eq(parseInt(less.startTime))
+                                endTimeVar.eq(parseInt(less.endTime))
                             );
                             return {
                                 ...less,
@@ -252,30 +231,60 @@ export default async function timetableGenerator(
         } as modiifiedModuleWithoutName
     } as modifiedUsers;
 
+    console.log(
+        modUsers.users[0].modules.map((mod) =>
+            mod.lessons
+                .flat()
+                .flat()
+                .map(
+                    (less) =>
+                        `${less.moduleCode}-${less.lessonType}-${less.lessonId}`
+                )
+        )
+    );
+    console.log(
+        modUsers.commonModule.lessons.map((less) =>
+            less
+                .flat()
+                .flat()
+                .map(
+                    (miniLess) =>
+                        `${miniLess.moduleCode}-${miniLess.lessonType}-${miniLess.lessonId}`
+                )
+        )
+    );
+
     // Constraint 1: Must have only 1 lesson for each lesson type
     modUsers.users.forEach((modUser) => {
         modUser.modules.forEach((specificMod) => {
             specificMod.lessons.forEach((lessType) => {
-                const initial = lessType[0][0].boolVar;
-                const lessTypeSum = lessType
-                    .slice(1)
-                    .reduce(
-                        (firstLess, secLess) =>
-                            firstLess.add(secLess[0].boolVar),
-                        initial
-                    );
-                solver.add(lessTypeSum.eq(1));
+                // lessType.map((less) => {
+                //     const fullSum = less.map(() => 1).reduce((a, b) => a + b);
+                //     const varSum = less
+                //         .map((specificLess) => specificLess.boolVar)
+                //         .reduce((a, b) => a.add(b));
+                //     solver.add(Or(varSum.eq(fullSum), varSum.eq(0)));
+                // });
+                solver.add(
+                    lessType
+                        .map((lessId) => lessId[0].boolVar)
+                        .reduce((a, b) => a.add(b))
+                        .eq(1)
+                );
             });
         });
     });
     modUsers.commonModule.lessons.forEach((lessType) => {
-        const initial = lessType[0][0].boolVar;
+        // lessType.map((less) => {
+        //     const fullSum = less.map(() => 1).reduce((a, b) => a + b);
+        //     const varSum = less
+        //         .map((specificLess) => specificLess.boolVar)
+        //         .reduce((a, b) => a.add(b));
+        //     solver.add(Or(varSum.eq(fullSum), varSum.eq(0)));
+        // });
         const lessTypeSum = lessType
-            .slice(1)
-            .reduce(
-                (firstLess, secLess) => firstLess.add(secLess[0].boolVar),
-                initial
-            );
+            .map((less) => less[0].boolVar)
+            .reduce((firstLess, secLess) => firstLess.add(secLess));
         solver.add(lessTypeSum.eq(1));
     });
 
@@ -297,6 +306,7 @@ export default async function timetableGenerator(
             })
         );
     };
+
     // Constraint 2: No overlap in time slots for the modules not shared by the group
     modUsers.users.forEach((modUser) => {
         for (let modInd = 0; modInd < modUser.modules.length; modInd++) {
@@ -316,60 +326,36 @@ export default async function timetableGenerator(
                         nextSpecificMod.lessons.forEach((nextLessType) => {
                             nextLessType.forEach((nextLess) => {
                                 // Conditions:
-                                //     1. Either one of the lessons are not in play in the first place
+                                //     1. Either one of the lessons are not in play in the first place, pass
                                 //     2. Firstly, if weeks don't interfere at all, pass
                                 //     3. Secondly, if days don't interfere at all, pass
                                 //     4. Lastly, timeslots don't interfere
                                 solver.add(
                                     Or(
-                                        Or(
-                                            less[0].boolVar.eq(0),
-                                            nextLess[0].boolVar.eq(0)
-                                        ),
-                                        Or(
-                                            less
-                                                .reduce(
-                                                    (lessId, nextLessId) =>
-                                                        lessId.or(
+                                        // Or(
+                                        less[0].boolVar.eq(0),
+                                        nextLess[0].boolVar.eq(0),
+                                        reduceInterferenceConstraint(
+                                            (lessId, nextLessId) =>
+                                                Or(
+                                                    lessId.weeksVar
+                                                        .xor(
                                                             nextLessId.weeksVar
-                                                        ),
-                                                    less[0].weeksVar as BitVec
-                                                )
-                                                .xor(
-                                                    nextLess.reduce(
-                                                        (lessId, nextLessId) =>
-                                                            lessId.or(
-                                                                nextLessId.weeksVar
-                                                            ),
-                                                        nextLess[0]
-                                                            .weeksVar as BitVec
+                                                        )
+                                                        .redAnd()
+                                                        .uge(1),
+                                                    lessId.dayVar.neq(
+                                                        nextLessId.dayVar
+                                                    ),
+                                                    lessId.endTimeVar.le(
+                                                        nextLessId.startTimeVar
+                                                    ),
+                                                    lessId.startTimeVar.ge(
+                                                        nextLessId.endTimeVar
                                                     )
-                                                )
-                                                .redAnd()
-                                                .ule(1),
-                                            Or(
-                                                reduceInterferenceConstraint(
-                                                    (lessId, nextLessId) =>
-                                                        lessId.dayVar.neq(
-                                                            nextLessId.dayVar
-                                                        ),
-                                                    less,
-                                                    nextLess
                                                 ),
-                                                reduceInterferenceConstraint(
-                                                    (lessId, nextLessId) =>
-                                                        Or(
-                                                            lessId.endTimeVar.le(
-                                                                nextLessId.startTimeVar
-                                                            ),
-                                                            lessId.startTimeVar.ge(
-                                                                nextLessId.endTimeVar
-                                                            )
-                                                        ),
-                                                    less,
-                                                    nextLess
-                                                )
-                                            )
+                                            less,
+                                            nextLess
                                         )
                                     )
                                 );
@@ -381,54 +367,27 @@ export default async function timetableGenerator(
                         nextLessType.forEach((nextLess) => {
                             solver.add(
                                 Or(
-                                    Or(
-                                        less[0].boolVar.eq(0),
-                                        nextLess[0].boolVar.eq(0)
-                                    ),
-                                    Or(
-                                        less
-                                            .reduce(
-                                                (lessId, nextLessId) =>
-                                                    lessId.or(
-                                                        nextLessId.weeksVar
-                                                    ),
-                                                less[0].weeksVar as BitVec
-                                            )
-                                            .xor(
-                                                nextLess.reduce(
-                                                    (lessId, nextLessId) =>
-                                                        lessId.or(
-                                                            nextLessId.weeksVar
-                                                        ),
-                                                    nextLess[0]
-                                                        .weeksVar as BitVec
+                                    less[0].boolVar.eq(0),
+                                    nextLess[0].boolVar.eq(0),
+                                    reduceInterferenceConstraint(
+                                        (lessId, nextLessId) =>
+                                            Or(
+                                                lessId.weeksVar
+                                                    .xor(nextLessId.weeksVar)
+                                                    .redAnd()
+                                                    .uge(1),
+                                                lessId.dayVar.neq(
+                                                    nextLessId.dayVar
+                                                ),
+                                                lessId.endTimeVar.le(
+                                                    nextLessId.startTimeVar
+                                                ),
+                                                lessId.startTimeVar.ge(
+                                                    nextLessId.endTimeVar
                                                 )
-                                            )
-                                            .redAnd()
-                                            .ule(1),
-                                        Or(
-                                            reduceInterferenceConstraint(
-                                                (lessId, nextLessId) =>
-                                                    lessId.dayVar.neq(
-                                                        nextLessId.dayVar
-                                                    ),
-                                                less,
-                                                nextLess
                                             ),
-                                            reduceInterferenceConstraint(
-                                                (lessId, nextLessId) =>
-                                                    Or(
-                                                        lessId.endTimeVar.le(
-                                                            nextLessId.startTimeVar
-                                                        ),
-                                                        lessId.startTimeVar.ge(
-                                                            nextLessId.endTimeVar
-                                                        )
-                                                    ),
-                                                less,
-                                                nextLess
-                                            )
-                                        )
+                                        less,
+                                        nextLess
                                     )
                                 )
                             );

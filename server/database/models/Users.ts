@@ -15,7 +15,6 @@ import {
     HasManyAddAssociationsMixin,
     HasManyCreateAssociationMixin,
     HasManyGetAssociationsMixin,
-    HasManyRemoveAssociationMixin,
     HasManySetAssociationsMixin,
     InferAttributes,
     InferCreationAttributes,
@@ -27,7 +26,6 @@ import Groups from '@models/Groups';
 import Users_Modules from '@models/Users_Modules';
 import { BelongsToManyRemoveAssociationsMixin } from 'sequelize';
 import GroupRequests from './GroupRequests';
-import { HasManyRemoveAssociationsMixin } from 'sequelize';
 
 class Users extends Model<
     InferAttributes<Users>,

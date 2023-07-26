@@ -51,7 +51,6 @@ describe('AuthorizationComponent', () => {
         await act(() => Promise.resolve());
         // Wait for the authorization logic to complete
         await waitFor(() => {
-            expect(screen.getByText('Authorized content')).toBeInTheDocument();
             // Assert that the authorized content is rendered
             expect(screen.getByText('Authorized content')).toBeInTheDocument();
             expect(axios.get).toHaveBeenCalledTimes(1);

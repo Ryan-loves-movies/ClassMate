@@ -5,6 +5,7 @@ import Groups from '@models/Groups';
 import Users from '@models/Users';
 import Users_Groups from '@models/Users_Groups';
 import Modules from '@models/Modules';
+import GroupRequests from '@models/GroupRequests';
 
 /** 
     req: {
@@ -109,7 +110,7 @@ async function createGroup(req: Request, res: Response) {
     })
         .then(async (module) => {
             const moduleCode = module?.code as string;
-            await Groups.create({
+            const group = await Groups.create({
                 name: groupName,
                 moduleCode: moduleCode,
                 color: color,
@@ -117,15 +118,6 @@ async function createGroup(req: Request, res: Response) {
                 sem: actSem
             });
             const user = await Users.findByPk(username);
-            const group = await Groups.findOne({
-                where: {
-                    name: groupName,
-                    moduleCode: moduleCode,
-                    color: color,
-                    ay: actAy,
-                    sem: actSem
-                }
-            });
             await group?.addUser(user as Users);
 
             return res.status(201).json({
@@ -154,14 +146,14 @@ Create a new group with the list of users, return groupId
 **/
 async function deleteGroup(req: Request, res: Response) {
     const { groupId } = req.body;
-    await Groups.destroy({
-        where: {
-            id: groupId
-        }
-    });
     await Users_Groups.destroy({
         where: {
             groupId: groupId
+        }
+    });
+    await Groups.destroy({
+        where: {
+            id: groupId
         }
     })
         .then(() => {
@@ -218,6 +210,7 @@ Modifies the lessons being taken by the user for particular module in the databa
 async function removeUserFromGroup(req: Request, res: Response) {
     const username = req.query.username as string;
     const groupId = parseInt(req.query.groupId as string);
+
     return await Groups.findByPk(groupId, {
         include: [
             {
@@ -226,12 +219,10 @@ async function removeUserFromGroup(req: Request, res: Response) {
         ]
     })
         .then(async (group) => {
-            if (
-                await group?.countUsers().then((userCount) => userCount === 1)
-            ) {
-                await Groups.destroy({
+            if ((await group?.countUsers()) === 1) {
+                await GroupRequests.destroy({
                     where: {
-                        id: groupId
+                        groupId: groupId
                     }
                 });
                 await Users_Groups.destroy({
@@ -239,7 +230,14 @@ async function removeUserFromGroup(req: Request, res: Response) {
                         groupId: groupId
                     }
                 });
-                return res.status(200).json({ message: 'Removed user!' });
+                await Groups.destroy({
+                    where: {
+                        id: groupId
+                    }
+                });
+                return res
+                    .status(200)
+                    .json({ message: 'Removed user and group deleted!' });
             }
 
             const user = await Users.findByPk(username);

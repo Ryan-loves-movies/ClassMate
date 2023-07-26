@@ -2,14 +2,14 @@ import React, { Dispatch } from 'react';
 import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/dashboard/groupBox.module.css';
 import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '@/config';
 const { expressHost } = config;
 
 import { groupWithUsersNoEmail } from '@models/group';
 import { userWithoutEmail, userWithoutEmailPhoto } from '@models/user';
 import PhotoRenderer from '@components/dashboard/PhotoRenderer';
-import SlidingButton from '../SlidingButton';
+import SlidingButton from '@components/dashboard/SlidingButton';
 import lesson from '@models/lesson';
 import module, { moduleWithoutName } from '@models/module';
 
@@ -116,6 +116,7 @@ export default function GroupBox({
     };
 
     const deleteGroupHandler = async () => {
+        console.log(id);
         await axios
             .delete(`${expressHost}/authorized/group/user`, {
                 headers: {
@@ -126,7 +127,12 @@ export default function GroupBox({
                     groupId: id
                 }
             })
-            .catch(() => toast.error('Failed to leave group. Please try again!'));
+            .catch((err: AxiosError) => {
+                if (err.status === 404) {
+                    toast.error('Group not found!');
+                }
+                toast.error('Failed to leave group. Please try again!');
+            });
         setGroupsUpdated(true);
     };
 

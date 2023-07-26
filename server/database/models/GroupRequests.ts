@@ -23,7 +23,7 @@ GroupRequests.init(
         message: {
             type: DataTypes.STRING(100),
             allowNull: false,
-            primaryKey: true
+            // primaryKey: true
         },
         groupId: {
             type: DataTypes.INTEGER,

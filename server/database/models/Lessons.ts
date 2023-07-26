@@ -35,6 +35,7 @@ class Lessons extends Model<
     declare endTime: string;
     declare size: number;
 
+    // I don't think the below are actually needed BUT ALAS!!
     declare getUsers_Modules: BelongsToManyGetAssociationsMixin<Users_Modules>;
     declare addUser_Module: BelongsToManyAddAssociationMixin<
         Users_Modules,

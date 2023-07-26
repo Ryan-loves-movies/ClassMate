@@ -41,4 +41,5 @@ export interface lessonChosen extends lesson {
 export interface lessonFixedChosen extends lesson {
     fixed: boolean;
     chosen: boolean;
+    constraintFixed: boolean;
 }
