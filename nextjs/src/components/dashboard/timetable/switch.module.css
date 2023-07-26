@@ -1,0 +1,23 @@
+.wrapper {
+    width: 230px;
+    background: none;
+    border: 2px solid;
+    border-radius: 40px;
+    font: inherit;
+    letter-spacing: 0.25em;
+    /* line-height: 1; */
+    /* margin: 0.5em; */
+    padding: 1em 2em;
+    color: #19bc8b;
+    transition: 0.25s;
+    box-shadow: 0.2em 0.2em 0.05em 0.05em #19bc8b, inset 0.3em 0.3em 0 0 #19bc8b;
+}
+
+.on {
+    --fixed: #595757;
+    font-weight: bolder;
+    letter-spacing: 0.25em;
+    border-color: var(--fixed);
+    color: #fff;
+    box-shadow: 0 0 0 0 var(--fixed), inset 6em 3.5em 0 0 var(--fixed);
+}
