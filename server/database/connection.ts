@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize';
 
-// For development
-const sequelize = new Sequelize('ClassMate', 'postgres', 'postgres', {
-    host: 'localhost',
-    port: 5432,
-    dialect: 'postgres',
-    // logging: false
-    // logging: process.env.NODE_ENV === 'production' ? false : console.log,
-});
+// // For development
+// const sequelize = new Sequelize('ClassMate', 'postgres', 'postgres', {
+//     host: 'localhost',
+//     port: 5432,
+//     dialect: 'postgres',
+//     // logging: false
+//     // logging: process.env.NODE_ENV === 'production' ? false : console.log,
+// });
 
 // // For testing
 // const sequelize = new Sequelize('ClassMateTest', 'postgres', 'postgres', {
@@ -18,12 +18,12 @@ const sequelize = new Sequelize('ClassMate', 'postgres', 'postgres', {
 //     // logging: process.env.NODE_ENV === 'production' ? false : console.log,
 // });
 
-// // For Production
-// const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
-//     host: 'db.tubxvcrohjakulghoizg.supabase.co',
-//     port: 6543,
-//     dialect: 'postgres'
-// });
+// For Production
+const sequelize = new Sequelize('postgres', 'postgres', 'ClassMate123!1', {
+    host: 'db.tubxvcrohjakulghoizg.supabase.co',
+    port: 6543,
+    dialect: 'postgres'
+});
 
 
 export async function createSequelizeConnection(instance: Sequelize) {
