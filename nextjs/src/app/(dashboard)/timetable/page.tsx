@@ -54,7 +54,13 @@ const optimizeHandler = async (username: string) => {
         {
             loading: 'Optimising Timetables...', // Message displayed while the promise is pending
             success: () => 'Timetable updated and optimised!', // Message displayed when the promise resolves
-            error: 'Failed to find optimal timetables!' // Message displayed when the promise rejects
+            error: (err) => {
+                if (err.status === 500) {
+                    return err.message;
+                }
+                console.log(err.response.data);
+                return `Failed to find optimal timetables! \n${err.response.data.error}`; // Message displayed when the promise rejects
+            }
         }
     );
 };

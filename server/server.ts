@@ -7,6 +7,7 @@ import userRouter from '@server/routes/userRoutes';
 import groupRouter from '@server/routes/groupRoutes';
 import groupRequestRouter from '@server/routes/groupRequestRoutes';
 import moduleRouter from '@server/routes/moduleRoutes';
+import constraintRouter from '@server/routes/constraintRoute';
 import freeUserRouter from '@server/routes/freeUserRoutes';
 import authorizeToken from '@server/middleware/auth';
 import sequelize from '@server/database/connection';
@@ -29,6 +30,7 @@ const setupServer = async () => {
     expressApp.use('/authorized', groupRouter);
     expressApp.use('/authorized', groupRequestRouter);
     expressApp.use('/authorized', moduleRouter);
+    expressApp.use('/authorized', constraintRouter);
     expressApp.use('/', freeUserRouter);
 
     expressApp.listen(port, () => {

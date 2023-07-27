@@ -56,12 +56,7 @@ interface result {
 }
 
 import { init } from 'z3-solver/build/node';
-import type {
-    Arith,
-    BitVec,
-    BitVecNum,
-    Bool as BoolType
-} from 'z3-solver/build/node';
+import type { Arith, BitVecNum, Bool as BoolType } from 'z3-solver/build/node';
 
 const dayMapper: Map<string, number> = new Map<string, number>();
 dayMapper.set('Monday', 1);

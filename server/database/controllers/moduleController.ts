@@ -355,6 +355,7 @@ async function getLessons(
                             (less) => less.ay === ay && less.sem === semester
                         );
 
+                        // No need for possible lessons for lessons that are fixed
                         const fixedLessons = (
                             await user_module.getFixedLessons()
                         ).filter(

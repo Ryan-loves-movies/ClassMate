@@ -8,16 +8,49 @@ import React, {
     useRef
 } from 'react';
 import styles from '@components/dashboard/timetable/timeSlider.module.css';
+import axios from 'axios';
+import config from '@/config';
+import { toast } from 'react-hot-toast';
+const { expressHost } = config;
 
 interface MultiRangeSliderProps {
     min: number;
     max: number;
+    initMin: number;
+    initMax: number;
     onChange: Function;
     step: number;
 }
 
-const roundToNearest30 = (time: number) => {
-    return Math.round(time / 30) * 30;
+const updateRange = async (
+    token: string,
+    username: string,
+    ay: number,
+    sem: number,
+    min: string,
+    max: string
+) => {
+    return await axios
+        .put(
+            `${expressHost}/authorized/constraints`,
+            {
+                username: username,
+                ay: ay,
+                semester: sem,
+                startTime: min,
+                endTime: max
+            },
+            {
+                headers: {
+                    Authorization: token
+                }
+            }
+        )
+        .catch((err) =>
+            toast.error(
+                `Error occurred when updating time range constraint! ${err}`
+            )
+        );
 };
 
 const formatTimeValue = (time: number) => {
@@ -29,6 +62,8 @@ const formatTimeValue = (time: number) => {
 const TimeSlider: FC<MultiRangeSliderProps> = ({
     min,
     max,
+    initMin,
+    initMax,
     onChange,
     step
 }) => {
@@ -74,6 +109,11 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
         onChange({ min: minVal, max: maxVal });
     }, [minVal, maxVal, onChange]);
 
+    useEffect(() => {
+        setMinVal(initMin);
+        setMaxVal(initMax);
+    }, [initMin, initMax]);
+
     return (
         <div className={styles['container']}>
             <input
@@ -83,8 +123,16 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                 value={minVal}
                 step={step}
                 ref={minValRef}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                onChange={async (event: ChangeEvent<HTMLInputElement>) => {
                     const value = Math.min(+event.target.value, maxVal - 1);
+                    await updateRange(
+                        sessionStorage.getItem('token') as string,
+                        sessionStorage.getItem('username') as string,
+                        parseInt(sessionStorage.getItem('ay') as string),
+                        parseInt(sessionStorage.getItem('sem') as string),
+                        formatTimeValue(value),
+                        formatTimeValue(maxVal)
+                    );
                     setMinVal(value);
                     event.target.value = value.toString();
                 }}
@@ -101,8 +149,16 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                 value={maxVal}
                 step={step}
                 ref={maxValRef}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                onChange={async (event: ChangeEvent<HTMLInputElement>) => {
                     const value = Math.max(+event.target.value, minVal + 1);
+                    await updateRange(
+                        sessionStorage.getItem('token') as string,
+                        sessionStorage.getItem('username') as string,
+                        parseInt(sessionStorage.getItem('ay') as string),
+                        parseInt(sessionStorage.getItem('sem') as string),
+                        formatTimeValue(minVal),
+                        formatTimeValue(value)
+                    );
                     setMaxVal(value);
                     event.target.value = value.toString();
                 }}

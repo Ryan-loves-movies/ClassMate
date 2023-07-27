@@ -15,6 +15,7 @@ import {
     HasManyAddAssociationsMixin,
     HasManyCreateAssociationMixin,
     HasManyGetAssociationsMixin,
+    HasManyRemoveAssociationMixin,
     HasManySetAssociationsMixin,
     InferAttributes,
     InferCreationAttributes,
@@ -25,7 +26,9 @@ import Modules from '@models/Modules';
 import Groups from '@models/Groups';
 import Users_Modules from '@models/Users_Modules';
 import { BelongsToManyRemoveAssociationsMixin } from 'sequelize';
-import GroupRequests from './GroupRequests';
+import GroupRequests from '@models/GroupRequests';
+import Constraints from '@models/Constraints';
+import { HasManyRemoveAssociationsMixin } from 'sequelize';
 
 class Users extends Model<
     InferAttributes<Users>,
@@ -72,6 +75,17 @@ class Users extends Model<
     declare addGroupRequest: HasManyAddAssociationMixin<GroupRequests, number>;
     declare addGroupRequests: HasManyAddAssociationsMixin<
         GroupRequests,
+        number
+    >;
+
+    declare getConstraints: HasManyGetAssociationsMixin<Constraints>;
+    declare addConstraint: HasManyAddAssociationsMixin<Constraints, number>;
+    declare removeConstraint: HasManyRemoveAssociationMixin<
+        Constraints,
+        number
+    >;
+    declare removeConstraints: HasManyRemoveAssociationsMixin<
+        Constraints,
         number
     >;
 

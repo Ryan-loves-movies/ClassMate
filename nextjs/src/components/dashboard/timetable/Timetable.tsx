@@ -1,5 +1,5 @@
 'use client';
-import React, { Dispatch, useEffect } from 'react';
+import React, { Dispatch, useEffect, useState } from 'react';
 import styles from '@components/dashboard/timetable/timetable.module.css';
 import colors from '@models/colors';
 
@@ -428,6 +428,33 @@ function Timetable({
         setOverflowY(totalOverlaps > 6);
     }, [totalOverlaps]);
 
+    const convertTimeToNumber = (time: string) => {
+        const hour = parseInt(time.slice(0, 2));
+        const minute = parseInt(time.slice(2, 4));
+        return (hour - 8) * 60 + minute;
+    };
+    const [initMinVal, setInitMinVal] = useState(0);
+    const [initMaxVal, setInitMaxVal] = useState(840);
+    useEffect(() => {
+        axios
+            .get(`${expressHost}/authorized/constraints`, {
+                headers: {
+                    Authorization: sessionStorage.getItem('token')
+                },
+                params: {
+                    username: sessionStorage.getItem('username'),
+                    ay: sessionStorage.getItem('ay'),
+                    semester: sessionStorage.getItem('sem')
+                }
+            })
+            .then((res: AxiosResponse) => {
+                setInitMinVal(
+                    convertTimeToNumber(res.data.constraint.startTime)
+                );
+                setInitMaxVal(convertTimeToNumber(res.data.constraint.endTime));
+            });
+    });
+
     return (
         <div className={styles['DM_Sans']}>
             <div className={styles['header']}>
@@ -486,6 +513,8 @@ function Timetable({
                 <TimeSlider
                     min={0}
                     max={840}
+                    initMin={initMinVal}
+                    initMax={initMaxVal}
                     onChange={({ min, max }: { min: number; max: number }) =>
                         console.log(`min = ${min}, max = ${max}`)
                     }

@@ -8,6 +8,7 @@ import Users_Modules from '@models/Users_Modules';
 import Users_Modules_Lessons from '@models/Users_Modules_Lessons';
 import GroupRequests from '@models/GroupRequests';
 import Users_Modules_Lessons_Fixed from './Users_Modules_Lessons_Fixed';
+import Constraints from './Constraints';
 
 export async function sync() {
     // Users : Modules - M:N
@@ -50,6 +51,10 @@ export async function sync() {
         foreignKey: 'lessonId',
         as: 'fixedUsers_Modules'
     });
+
+    // Users : Constraints
+    Constraints.belongsTo(Users, { foreignKey: 'username' });
+    Users.hasMany(Constraints, { foreignKey: 'username' });
 
     // Users : Groups - M:N
     Users.belongsToMany(Groups, {
