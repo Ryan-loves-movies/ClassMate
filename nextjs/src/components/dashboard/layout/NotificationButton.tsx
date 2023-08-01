@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import styles from '@components/dashboard/layout/notificationButton.module.css';
 import axios, { AxiosResponse } from 'axios';
 import config from '@/config';
-import SlidingButton from '../SlidingButton';
+import SlidingButton from '@components/dashboard/SlidingButton';
 import groupRequest from '@models/groupRequest';
 const { expressHost } = config;
 

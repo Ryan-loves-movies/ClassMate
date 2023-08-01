@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '@components/dashboard/timetable/mod.module.css';
 import module, { moduleWithLessonsFixedChosen } from '@models/module';
-import TrashIcon from '../dashboard/TrashIcon';
+import TrashIcon from '@components/dashboard/dashboard/TrashIcon';
 import config from '@/config';
 import axios from 'axios';
 import { Dispatch } from 'react';

@@ -125,6 +125,8 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                 ref={minValRef}
                 onChange={async (event: ChangeEvent<HTMLInputElement>) => {
                     const value = Math.min(+event.target.value, maxVal - 1);
+                    setMinVal(value);
+                    event.target.value = value.toString();
                     await updateRange(
                         sessionStorage.getItem('token') as string,
                         sessionStorage.getItem('username') as string,
@@ -133,8 +135,6 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                         formatTimeValue(value),
                         formatTimeValue(maxVal)
                     );
-                    setMinVal(value);
-                    event.target.value = value.toString();
                 }}
                 className={
                     minVal > max - 100
@@ -151,6 +151,8 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                 ref={maxValRef}
                 onChange={async (event: ChangeEvent<HTMLInputElement>) => {
                     const value = Math.max(+event.target.value, minVal + 1);
+                    setMaxVal(value);
+                    event.target.value = value.toString();
                     await updateRange(
                         sessionStorage.getItem('token') as string,
                         sessionStorage.getItem('username') as string,
@@ -159,8 +161,6 @@ const TimeSlider: FC<MultiRangeSliderProps> = ({
                         formatTimeValue(minVal),
                         formatTimeValue(value)
                     );
-                    setMaxVal(value);
-                    event.target.value = value.toString();
                 }}
                 className={`${styles['thumb']} ${styles['thumb--zindex-4']}`}
             />

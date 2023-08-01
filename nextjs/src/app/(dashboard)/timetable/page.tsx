@@ -69,7 +69,7 @@ export default function TimetableMain() {
     const [mods, setMods] = useState<moduleWithLessonsFixedChosen[]>([]);
     const [addedMod, setAddedMod] = useState<string>();
     const [searchRes, setSearchRes] = useState<module[]>([]);
-    const [overflowY, setOverflowY] = useState<boolean>(false);
+    const [overflowY, setOverflowY] = useState<boolean>(true);
     const [selectedLesson, setSelectedLesson] = useState<
         lessonFixedChosen | undefined
     >();
@@ -245,7 +245,7 @@ export default function TimetableMain() {
             className={styles['projects-section']}
             onKeyDown={handleKeyDown}
             style={{
-                overflowY: `${overflowY ? 'scroll' : 'hidden'}`
+                overflowY: `${true ? 'scroll' : 'hidden'}`
             }}
         >
             <div className={styles['optimise']}>
